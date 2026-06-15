@@ -115,6 +115,7 @@ class SnakeGame {
   private autoRotateLastTime: number = 0
   private autoRotateSpeed: number = 0.15 // radians per second
   private autoRotatePausedUntil: number = 0 // timestamp when manual override expires
+  private autoRotatePaused: boolean = false // user-toggled pause (T key)
 
   // Menu demo (small rotating snake on the start screen)
   private menuDemo: MenuDemo | null = null
@@ -402,10 +403,15 @@ class SnakeGame {
     }
   }
 
+  private toggleAutoRotatePause() {
+    if (!this.autoRotating) return
+    this.autoRotatePaused = !this.autoRotatePaused
+  }
+
   private autoRotateStep(timestamp: number) {
     if (!this.autoRotating) return
 
-    if (this.autoRotateLastTime > 0 && timestamp > this.autoRotatePausedUntil) {
+    if (!this.autoRotatePaused && this.autoRotateLastTime > 0 && timestamp > this.autoRotatePausedUntil) {
       const dt = (timestamp - this.autoRotateLastTime) / 1000
       this.isoAngle += this.autoRotateSpeed * dt
       this.updateCanvasSize()
@@ -660,6 +666,11 @@ class SnakeGame {
       this.autoRotatePausedUntil = performance.now() + 3000
       this.updateCanvasSize()
       this.draw()
+      return
+    }
+
+    if (e.key === 't' || e.key === 'T') {
+      this.toggleAutoRotatePause()
       return
     }
 
@@ -1328,9 +1339,9 @@ class SnakeGame {
     toggleBot.classList.toggle('hidden', isTwoPlayer)
 
     if (this.gameMode === 'pvp') {
-      controlsText.textContent = 'P1: WASD | P2: Arrow Keys | P to Pause | R to Reset | Q/E to rotate'
+      controlsText.textContent = 'P1: WASD | P2: Arrow Keys | P to Pause | R to Reset | Q/E to rotate | T to pause rotation'
     } else if (this.gameMode === 'bvb') {
-      controlsText.textContent = `${this.activeBot.name} vs ${this.activeBot2.name} | P to Pause | R to Reset | Q/E to rotate`
+      controlsText.textContent = `${this.activeBot.name} vs ${this.activeBot2.name} | P to Pause | R to Reset | Q/E to rotate | T to pause rotation`
     } else {
       controlsText.textContent = 'Use Arrow Keys or WASD to move | Press P to Pause | Press R to Reset | +/- to change grid size | Press B to toggle bot | Press any direction to start'
     }
