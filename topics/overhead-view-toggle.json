@@ -1,0 +1,18 @@
+{
+	"schemaVersion": 1,
+	"stableSlug": "overhead-view-toggle",
+	"title": "Overhead (Top-Down) View Toggle",
+	"content": "## Overview\n\nThe snake game board supports an overhead (top-down) view mode, toggled by pressing `O`. When active, the isometric 3D perspective is fully flattened into a simple axis-aligned top-down layout. Pressing `O` again restores the previous view exactly.\n\n## Implementation\n\nAll logic lives in `src/main.ts`.\n\n### `toggleOverheadView()`\n\nThe toggle function is bound to the `O` key. On activation it:\n\n1. Saves the current isometric angle, perspective ratio, and perspective strength to private fields.\n2. Zeroes all three values, collapsing the camera to a flat overhead position.\n\nOn deactivation it restores the saved values exactly, so any customisation the user made before entering overhead view is preserved.\n\n### Flat Block Rendering\n\nZeroing the camera angles alone was not sufficient — snake segments and food blocks still rendered as extruded cubes viewed straight-on. The fix makes `baseBlockHeight` conditional on the overhead flag: when overhead view is active, block height is set to zero, causing all blocks to render as flat squares. This is a single-expression change contained entirely within the existing block rendering path, with no separate rendering branch.\n\n### Input Lockout\n\nWhile overhead view is active:\n\n- Rotation keys (`Q`/`E`) return early and have no effect.\n- Perspective keys (`[`/`]`) return early and have no effect.\n- The auto-rotate loop skips its angle update.\n\nThis keeps the overhead view stable and predictable. The alternative — allowing those keys to work and immediately re-flattening — was rejected as confusing.\n\n### Controls Text\n\nControls text in all three game modes (single-player, PvP, BvB) was updated to document the `O` key.\n\n## Behavior Summary\n\n| State | Camera angles | Perspective | Block height | Rotation/perspective keys |\n|---|---|---|---|---|\n| Normal | User values | User values | Normal | Active |\n| Overhead | 0 | 0 | 0 | Locked out |",
+	"relatedBranches": [
+		"feature/overhead-view-toggle"
+	],
+	"sourceRefs": [
+		{
+			"type": "summary",
+			"id": "937bb4b31e84f937429a362141d8da1d95f581ee",
+			"timestamp": "2026-06-23T18:20:11.000Z",
+			"branch": "feature/overhead-view-toggle"
+		}
+	],
+	"lastUpdatedAt": "2026-06-23T18:20:32.078Z"
+}
