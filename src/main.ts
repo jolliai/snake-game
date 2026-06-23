@@ -100,6 +100,13 @@ class SnakeGame {
   private isoOriginY: number = 0
   private isoCache: { x: number; y: number }[][] = []
 
+  // Overhead (top-down) view toggle. When active, the board is rendered flat
+  // and axis-aligned; the prior isometric settings are saved for restoration.
+  private overheadView: boolean = false
+  private savedIsoAngle: number = 0
+  private savedPerspectiveRatio: number = 0
+  private savedPerspectiveStrength: number = 0
+
   // Stats tracking (for leaderboards)
   private gameStartTime: number = 0
   private maxLength1: number = 1
@@ -177,8 +184,9 @@ class SnakeGame {
     this.basisYy = cosA * scale * pr
 
     // Rotation-invariant block height: use fixed scale * pr * sqrt(2) instead of
-    // angle-dependent (basisXy + basisYy) so blocks stay the same height at all angles
-    this.baseBlockHeight = scale * pr * Math.SQRT2 * 0.6
+    // angle-dependent (basisXy + basisYy) so blocks stay the same height at all angles.
+    // In overhead view blocks are flattened to squares (no extruded height).
+    this.baseBlockHeight = this.overheadView ? 0 : scale * pr * Math.SQRT2 * 0.6
 
     // Compute raw iso corner positions (before perspective and origin offset)
     const N = this.gridSize
@@ -408,10 +416,32 @@ class SnakeGame {
     this.autoRotatePaused = !this.autoRotatePaused
   }
 
+  // === Overhead view ===
+
+  private toggleOverheadView() {
+    this.overheadView = !this.overheadView
+    if (this.overheadView) {
+      // Save the current isometric settings, then switch to a flat top-down view.
+      this.savedIsoAngle = this.isoAngle
+      this.savedPerspectiveRatio = this.perspectiveRatio
+      this.savedPerspectiveStrength = this.perspectiveStrength
+      this.isoAngle = 0
+      this.perspectiveRatio = 1
+      this.perspectiveStrength = 0
+    } else {
+      // Restore the previously saved isometric settings.
+      this.isoAngle = this.savedIsoAngle
+      this.perspectiveRatio = this.savedPerspectiveRatio
+      this.perspectiveStrength = this.savedPerspectiveStrength
+    }
+    this.updateCanvasSize()
+    this.draw()
+  }
+
   private autoRotateStep(timestamp: number) {
     if (!this.autoRotating) return
 
-    if (!this.autoRotatePaused && this.autoRotateLastTime > 0 && timestamp > this.autoRotatePausedUntil) {
+    if (!this.autoRotatePaused && !this.overheadView && this.autoRotateLastTime > 0 && timestamp > this.autoRotatePausedUntil) {
       const dt = (timestamp - this.autoRotateLastTime) / 1000
       this.isoAngle += this.autoRotateSpeed * dt
       this.updateCanvasSize()
@@ -653,7 +683,13 @@ class SnakeGame {
       return
     }
 
+    if (e.key === 'o' || e.key === 'O') {
+      this.toggleOverheadView()
+      return
+    }
+
     if (e.key === 'q' || e.key === 'Q') {
+      if (this.overheadView) return  // perspective is fixed in overhead view
       this.isoAngle -= Math.PI / 36  // rotate clockwise by 5°
       this.autoRotatePausedUntil = performance.now() + 3000
       this.updateCanvasSize()
@@ -662,6 +698,7 @@ class SnakeGame {
     }
 
     if (e.key === 'e' || e.key === 'E') {
+      if (this.overheadView) return  // perspective is fixed in overhead view
       this.isoAngle += Math.PI / 36  // rotate counter-clockwise by 5°
       this.autoRotatePausedUntil = performance.now() + 3000
       this.updateCanvasSize()
@@ -675,6 +712,7 @@ class SnakeGame {
     }
 
     if (e.key === '[') {
+      if (this.overheadView) return  // perspective is fixed in overhead view
       this.perspectiveStrength = Math.max(this.perspectiveStrength - 0.05, 0)
       this.updateCanvasSize()
       this.draw()
@@ -682,6 +720,7 @@ class SnakeGame {
     }
 
     if (e.key === ']') {
+      if (this.overheadView) return  // perspective is fixed in overhead view
       this.perspectiveStrength = Math.min(this.perspectiveStrength + 0.05, 0.8)
       this.updateCanvasSize()
       this.draw()
@@ -1339,11 +1378,11 @@ class SnakeGame {
     toggleBot.classList.toggle('hidden', isTwoPlayer)
 
     if (this.gameMode === 'pvp') {
-      controlsText.textContent = 'P1: WASD | P2: Arrow Keys | P to Pause | R to Reset | Q/E to rotate | T to pause rotation'
+      controlsText.textContent = 'P1: WASD | P2: Arrow Keys | P to Pause | R to Reset | Q/E to rotate | T to pause rotation | O for overhead view'
     } else if (this.gameMode === 'bvb') {
-      controlsText.textContent = `${this.activeBot.name} vs ${this.activeBot2.name} | P to Pause | R to Reset | Q/E to rotate | T to pause rotation`
+      controlsText.textContent = `${this.activeBot.name} vs ${this.activeBot2.name} | P to Pause | R to Reset | Q/E to rotate | T to pause rotation | O for overhead view`
     } else {
-      controlsText.textContent = 'Use Arrow Keys or WASD to move | Press P to Pause | Press R to Reset | +/- to change grid size | Press B to toggle bot | Press any direction to start'
+      controlsText.textContent = 'Use Arrow Keys or WASD to move | Press P to Pause | Press R to Reset | +/- to change grid size | Press B to toggle bot | Press O for overhead view | Press any direction to start'
     }
   }
 
