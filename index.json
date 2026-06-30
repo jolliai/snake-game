@@ -17,5 +17,8 @@
 				"deletions": 6
 			}
 		}
-	]
+	],
+	"commitAliases": {
+		"93f7100fada709ef217b01dc4c2bc3a83516509b": "937bb4b31e84f937429a362141d8da1d95f581ee"
+	}
 }
