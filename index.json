@@ -32,6 +32,22 @@
 				"insertions": 3,
 				"deletions": 0
 			}
+		},
+		{
+			"commitHash": "4b0f9fd779a7e8cbdc3dd702d41ad4f55eb2836a",
+			"parentCommitHash": null,
+			"treeHash": "c770e86b4a8e98058020ab7ec601894944f9f95e",
+			"commitType": "commit",
+			"commitMessage": "docs: consolidate READMEs and update feature list",
+			"commitDate": "2026-07-01T18:53:35.000Z",
+			"branch": "docs/cleanup",
+			"generatedAt": "2026-07-01T18:53:55.376Z",
+			"topicCount": 2,
+			"diffStats": {
+				"filesChanged": 3,
+				"insertions": 47,
+				"deletions": 19
+			}
 		}
 	],
 	"commitAliases": {

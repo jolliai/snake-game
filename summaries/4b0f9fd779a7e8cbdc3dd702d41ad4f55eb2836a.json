@@ -1,0 +1,60 @@
+{
+	"version": 5,
+	"commitHash": "4b0f9fd779a7e8cbdc3dd702d41ad4f55eb2836a",
+	"commitMessage": "docs: consolidate READMEs and update feature list",
+	"commitAuthor": "Joe Hart",
+	"commitDate": "2026-07-01T18:53:35.000Z",
+	"branch": "docs/cleanup",
+	"generatedAt": "2026-07-01T18:53:55.376Z",
+	"commitType": "commit",
+	"commitSource": "cli",
+	"transcriptEntries": 9,
+	"conversationTurns": 5,
+	"llm": {
+		"model": "claude-sonnet-4-6",
+		"inputTokens": 11968,
+		"outputTokens": 791,
+		"apiLatencyMs": 19217,
+		"stopReason": null,
+		"source": "jolli-proxy"
+	},
+	"stats": {
+		"filesChanged": 3,
+		"insertions": 47,
+		"deletions": 19
+	},
+	"topics": [
+		{
+			"title": "README rewritten to reflect all shipped features accurately",
+			"trigger": "The main README was significantly out of date — features like the isometric 3D board, two-player mode, and most bots were either missing or still listed as \"coming soon\" despite being fully implemented.",
+			"response": "- `README.md` was rewritten top to bottom. The headline description was updated to lead with the isometric 3D board. A new \"Game modes\" section documents all four entry points (single player, two-player PvP, solo bot, bot-vs-bot). A bot strategy table was added covering all 11 bots. The controls table was expanded with rotation, perspective, overhead view, Enter, and Esc keys. The \"Coming soon\" section was trimmed to only genuinely unshipped items.\n- An AI agent was dispatched to inventory the full codebase before any edits were made, cataloguing keyboard bindings, game modes, bot profiles, rendering features, leaderboard mechanics, and UI elements from the source files directly. The README rewrite was based on that inventory rather than on assumptions.",
+			"decisions": "- **Codebase exploration before writing**: Rather than editing the README from memory or from the existing text, a subagent was used to read the actual source files first. This avoided the risk of documenting features inaccurately or missing newly added ones, at the cost of a longer round-trip before any edits appeared.\n- **\"Coming soon\" items pruned to only unshipped work**: Isometric 3D and two-player mode were removed from the roadmap and moved into the main feature list, since both are fully implemented. Color blind mode, first-person view, and the \"snek\" rename were kept as they remain unimplemented. This keeps the roadmap honest and avoids misleading users about what the product currently does.\n- **Global leaderboards re-added to roadmap as a distinct item**: The user confirmed that \"view other players' high scores\" from the deleted README3 should remain in the roadmap, framed as a global/online leaderboard to distinguish it from the local per-mode leaderboards that already exist. Dropping it entirely would have lost a genuine user request captured in the old feedback file.",
+			"filesAffected": [
+				"README.md"
+			],
+			"category": "docs",
+			"importance": "minor"
+		},
+		{
+			"title": "Extra README files removed and content consolidated into one",
+			"trigger": "The project had three separate README files, with the two extras containing forward-looking ideas and user feedback that had no permanent home.",
+			"response": "`README2.md` and `README3.md` were deleted. Their relevant content (color blind mode, possible rename to \"snek\", first-person view, and viewing other players' high scores) was merged into the \"Coming soon\" section of the main `README.md`. The overlapping \"color blind mode\" request that appeared in both files was deduplicated to a single entry.",
+			"decisions": "Redundant framing from the extra files (separate \"future plans\" and \"user feedback\" headers) was dropped rather than preserved as subsections. Folding everything into the existing roadmap keeps the README as a single source of truth and avoids readers needing to check multiple files for the full picture.",
+			"filesAffected": [
+				"README.md",
+				"README2.md",
+				"README3.md"
+			],
+			"category": "docs",
+			"importance": "minor"
+		}
+	],
+	"diffStats": {
+		"filesChanged": 3,
+		"insertions": 47,
+		"deletions": 19
+	},
+	"transcripts": [
+		"57949d6e-5eab-462f-bd30-d75ecb62a8b4"
+	]
+}
