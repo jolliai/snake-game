@@ -34,6 +34,23 @@
 				}
 			],
 			"lastUpdatedAt": "2026-07-01T18:45:05.942Z"
+		},
+		{
+			"stableSlug": "readme-and-feature-docs",
+			"title": "README Consolidation and Feature Documentation",
+			"summary": "Main README rewritten from codebase inventory; extra README files deleted; all shipped features documented accurately.",
+			"relatedBranches": [
+				"docs/cleanup"
+			],
+			"sourceRefs": [
+				{
+					"type": "summary",
+					"id": "4b0f9fd779a7e8cbdc3dd702d41ad4f55eb2836a",
+					"timestamp": "2026-07-01T18:53:35.000Z",
+					"branch": "docs/cleanup"
+				}
+			],
+			"lastUpdatedAt": "2026-07-01T18:53:55.562Z"
 		}
 	]
 }
