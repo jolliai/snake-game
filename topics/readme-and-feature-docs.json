@@ -1,0 +1,18 @@
+{
+	"schemaVersion": 1,
+	"stableSlug": "readme-and-feature-docs",
+	"title": "README Consolidation and Feature Documentation",
+	"content": "## Overview\n\nIn commit `4b0f9fd7`, the project's README was rewritten top to bottom based on a direct inventory of the source files, and two supplementary README files were deleted. The goal was to make `README.md` the single source of truth, accurately reflecting what is actually shipped.\n\n## What Changed\n\n### README.md — Full Rewrite\n\nRather than editing from memory or from the existing stale text, a subagent first read the actual source files to catalogue all shipped functionality before any edits were made. The inventory covered:\n\n- Keyboard bindings\n- Game modes and entry points\n- Bot profiles and strategies\n- Rendering features (including isometric 3D)\n- Leaderboard mechanics\n- UI elements\n\nThe rewrite then proceeded from that inventory. Key structural additions:\n\n- **Headline description** updated to lead with the isometric 3D board (previously unmentioned or buried).\n- **\"Game modes\" section** added, documenting all four entry points: single player, two-player PvP, solo bot, and bot-vs-bot.\n- **Bot strategy table** added, covering all 11 bots.\n- **Controls table** expanded to include rotation, perspective toggle, overhead view, Enter, and Esc keys.\n- **\"Coming soon\" section** trimmed to only genuinely unshipped items (see below).\n\n### README2.md and README3.md — Deleted\n\nThe project previously had three README files. `README2.md` contained forward-looking ideas; `README3.md` contained user feedback. Both were deleted. Their relevant content was merged into the \"Coming soon\" section of `README.md`. Redundant framing (separate \"future plans\" and \"user feedback\" headers) was dropped rather than preserved as subsections.\n\n## Roadmap / Coming Soon (Current State)\n\nItems retained in the \"Coming soon\" section are **genuinely unshipped**:\n\n| Item | Notes |\n|---|---|\n| Color blind mode | Requested in both deleted files; deduplicated to one entry |\n| First-person view | Unimplemented |\n| Rename to \"snek\" | Unimplemented |\n| Global/online leaderboard | Distinct from local per-mode leaderboards that already exist; preserved from README3 user feedback |\n\nItems **removed from the roadmap** because they are fully implemented:\n\n- Isometric 3D board → moved to main feature list\n- Two-player mode → moved to main feature list",
+	"relatedBranches": [
+		"docs/cleanup"
+	],
+	"sourceRefs": [
+		{
+			"type": "summary",
+			"id": "4b0f9fd779a7e8cbdc3dd702d41ad4f55eb2836a",
+			"timestamp": "2026-07-01T18:53:35.000Z",
+			"branch": "docs/cleanup"
+		}
+	],
+	"lastUpdatedAt": "2026-07-01T18:53:55.562Z"
+}
