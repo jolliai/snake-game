@@ -4,7 +4,7 @@
 		{
 			"stableSlug": "overhead-view-toggle",
 			"title": "Overhead (Top-Down) View Toggle",
-			"summary": "Press `O` to toggle a flat top-down view of the snake game board, zeroing camera angles and block height; restores prior settings on exit.",
+			"summary": "Press `O` to toggle a flat top-down view of the snake game board, zeroing camera angles and block height; original settings are restored on exit.",
 			"relatedBranches": [
 				"feature/overhead-view-toggle"
 			],
@@ -16,7 +16,7 @@
 					"branch": "feature/overhead-view-toggle"
 				}
 			],
-			"lastUpdatedAt": "2026-06-23T18:20:32.078Z"
+			"lastUpdatedAt": "2026-07-01T18:45:05.942Z"
 		}
 	]
 }
