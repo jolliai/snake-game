@@ -1,0 +1,35 @@
+{
+	"version": 5,
+	"commitHash": "31d93c3f670b49f2eb5583d128ce61bdc2a98299",
+	"commitMessage": "chore: ignore .jolli directory",
+	"commitAuthor": "Joe Hart",
+	"commitDate": "2026-07-01T18:45:04.000Z",
+	"branch": "chore/gitignore-jolli",
+	"generatedAt": "2026-07-01T18:45:05.796Z",
+	"commitType": "commit",
+	"commitSource": "cli",
+	"transcriptEntries": 2,
+	"conversationTurns": 1,
+	"llm": {
+		"model": "claude-sonnet-4-6",
+		"inputTokens": 5208,
+		"outputTokens": 8,
+		"apiLatencyMs": 1341,
+		"stopReason": null,
+		"source": "jolli-proxy"
+	},
+	"stats": {
+		"filesChanged": 1,
+		"insertions": 3,
+		"deletions": 0
+	},
+	"topics": [],
+	"diffStats": {
+		"filesChanged": 1,
+		"insertions": 3,
+		"deletions": 0
+	},
+	"transcripts": [
+		"3a8f29d8-b80c-43aa-ae28-ca2cc94b0256"
+	]
+}

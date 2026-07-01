@@ -1,0 +1,21 @@
+{
+	"sessions": [
+		{
+			"sessionId": "019f14b3-5d3e-76a0-bd58-f99c32107507",
+			"source": "codex",
+			"transcriptPath": "/Users/jeverest/.codex/sessions/2026/06/29/rollout-2026-06-29T11-45-27-019f14b3-5d3e-76a0-bd58-f99c32107507.jsonl",
+			"entries": [
+				{
+					"role": "human",
+					"content": "do you have a resume conversation command?",
+					"timestamp": "2026-06-29T18:45:41.530Z"
+				},
+				{
+					"role": "assistant",
+					"content": "I’ll check the Codex/OpenAI docs guidance for the precise terminology before answering, since “resume” behavior depends on the surface you’re using.\n\nThe current Codex manual fetched successfully. I’m checking the command/reference sections now for the exact resume terminology.\n\nYes. In Codex CLI you have both:\n\n- `codex resume` from the shell: opens a picker of saved sessions.\n- `/resume` inside the Codex TUI: resumes a saved conversation from the session list.\n\nUseful variants:\n\n```bash\ncodex resume --last\ncodex resume --all\ncodex resume <SESSION_ID>\n```\n\nFor non-interactive runs:\n\n```bash\ncodex exec resume --last \"Continue the task\"\ncodex exec resume <SESSION_ID> \"Continue the task\"\n```\n\nDocs source: [Codex CLI reference](https://developers.openai.com/codex/cli/reference) and [Codex CLI slash commands](https://developers.openai.com/codex/cli/slash-commands).",
+					"timestamp": "2026-06-29T18:45:45.545Z"
+				}
+			]
+		}
+	]
+}

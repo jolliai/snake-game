@@ -16,6 +16,22 @@
 				"insertions": 45,
 				"deletions": 6
 			}
+		},
+		{
+			"commitHash": "31d93c3f670b49f2eb5583d128ce61bdc2a98299",
+			"parentCommitHash": null,
+			"treeHash": "e99b01cc5e77fe52437a18dbd7f0bde704facf72",
+			"commitType": "commit",
+			"commitMessage": "chore: ignore .jolli directory",
+			"commitDate": "2026-07-01T18:45:04.000Z",
+			"branch": "chore/gitignore-jolli",
+			"generatedAt": "2026-07-01T18:45:05.796Z",
+			"topicCount": 0,
+			"diffStats": {
+				"filesChanged": 1,
+				"insertions": 3,
+				"deletions": 0
+			}
 		}
 	],
 	"commitAliases": {
