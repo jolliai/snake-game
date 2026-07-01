@@ -1,0 +1,18 @@
+{
+	"schemaVersion": 1,
+	"stableSlug": "gitignore-configuration",
+	"title": "Gitignore Configuration",
+	"content": "## Overview\n\nThe project maintains a `.gitignore` file to exclude files and directories that should not be tracked in version control.\n\n## Ignored Paths\n\n### `.jolli/`\n\nThe `.jolli` directory is explicitly ignored. This was added to prevent any files generated or managed by the `.jolli` tooling from being committed to the repository.",
+	"relatedBranches": [
+		"chore/gitignore-jolli"
+	],
+	"sourceRefs": [
+		{
+			"type": "summary",
+			"id": "31d93c3f670b49f2eb5583d128ce61bdc2a98299",
+			"timestamp": "2026-07-01T18:45:04.000Z",
+			"branch": "chore/gitignore-jolli"
+		}
+	],
+	"lastUpdatedAt": "2026-07-01T18:45:05.942Z"
+}
