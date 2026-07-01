@@ -1,32 +1,67 @@
 # Snake Game
 
-A classic snake game built with TypeScript and HTML5 Canvas, bundled with Vite.
+A classic snake game reimagined with an isometric, rotating 3D board — built with TypeScript and HTML5 Canvas, bundled with Vite.
 
 ## Features
 
+- **Isometric 3D board** - the grid renders as a rotating isometric scene with shaded blocks, depth ordering, and adjustable perspective (no WebGL — just canvas 2D)
+- **Overhead view** - toggle to a flat, top-down grid at any time with `O`
+- **Board rotation** - spin the board manually with `Q`/`E`, tweak perspective with `[`/`]`, or let it auto-rotate during bot playback
 - **Expanding grid** - the grid doubles in size when the snake fills 25% of the board, advancing the level and increasing speed
 - **Adjustable starting grid** - use `+`/`-` keys to change grid resolution (5x5 to 50x50) before the game starts
-- **High score** - persisted in localStorage across sessions
-- **Pause/resume** - press `P` at any time during gameplay
-- **Multiple autoplay bots** - pick a bot profile (Survival, Hunter, Explorer) and switch any time
+- **Three game modes** - single player, two-player (PvP), and bot-vs-bot
+- **11 autoplay bots** - each with a distinct strategy; pick one for solo bot demos or pit two against each other
+- **Per-mode leaderboards** - separate top-10 boards for Single Player, Two Player, and Bot vs Bot, with score/length/survival-time stats, persisted in localStorage
+- **High score** - persisted in localStorage across sessions (single player)
+- **Redesigned start menu** - hero screen with a live rotating demo snake and expandable mode panels
 - **Dark theme** with a green/red color scheme
 
-## Coming soon
-- 2.5 D mode with isometric view and 3D snake rendering
-- 2 snakes at once
+## Game modes
+
+- **New Game (single player)** - control one snake; toggle bot AI on/off mid-game with `B`
+- **Two Player (PvP)** - Player 1 (green, WASD) vs Player 2 (blue, arrow keys); last snake alive wins
+- **Solo Bot** - watch a single bot of your choice play
+- **Bot vs Bot** - pick two bots and watch them compete
+
+## Bots
+
+| Bot | Strategy |
+|---|---|
+| Survival | Maximizes open space and avoids dead ends before chasing food |
+| Hunter | Pushes hard toward food while rejecting immediately fatal moves |
+| Explorer | Roams open lanes and keeps distance from walls for a calmer style |
+| Coiler | Hugs its own body to stay compact and methodical |
+| Edge Runner | Patrols the perimeter, sweeping inward only to grab food |
+| Ambusher | Lurks near the center and strikes when food spawns nearby |
+| Chaser | Follows the shortest path to food, falling back to tail-chasing when unsafe |
+| Nomad | Avoids its own trail to explore fresh territory |
+| Spiral | Moves in clockwise spirals, turning inward at walls |
+| Zigzag | Weaves in a sawtooth pattern while advancing toward food |
+| Sweeper | Covers the grid in a back-and-forth lawnmower pattern |
 
 ## Controls
 
 | Key | Action |
 |---|---|
-| Arrow keys / WASD | Move the snake |
+| Arrow keys / WASD | Move the snake (P1: WASD, P2: arrow keys in two-player) |
 | P | Pause / Resume |
-| Bot Profile dropdown | Switch active bot behavior |
-| B | Toggle bot autoplay |
 | R | Reset current run |
-| +/- | Adjust grid size (before game starts) |
+| Enter | Start a new game (menu / game over) |
+| Esc | Return to the main menu |
+| B | Toggle bot autoplay (single player) |
+| O | Toggle overhead (top-down) view |
+| Q / E | Rotate the board clockwise / counter-clockwise |
+| T | Pause / resume auto-rotation (during bot playback) |
+| [ / ] | Decrease / increase perspective strength |
+| +/- | Adjust grid size (before game starts, single player) |
 
-The game begins when you press a direction key after starting a new game.
+In single player, the game begins when you press a direction key after starting a new game.
+
+## Coming soon
+- Color blind mode
+- Global/online leaderboards to view other players' high scores
+- First-person view from the snake
+- Possible rename to "snek"
 
 ## Getting Started
 
