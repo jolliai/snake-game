@@ -114,9 +114,10 @@
 		{
 			"stableSlug": "freeze-on-death-loss-reason",
 			"title": "Freeze on Death with Loss Reason Display",
-			"summary": "When a snake dies, the board freezes, the fatal cell is highlighted, a banner names the cause, and any key advances to Game Over.",
+			"summary": "On any snake death the board freezes, highlights the fatal cell at correct scene depth, shows a pulsing loss-reason banner, and waits for a key press before advancing to Game Over.",
 			"relatedBranches": [
-				"feature/lossreason"
+				"feature/lossreason",
+				"feature/progression"
 			],
 			"sourceRefs": [
 				{
@@ -130,9 +131,15 @@
 					"id": "prancy-nibbling-phoenix-b0cf9765",
 					"timestamp": "2026-07-02T03:20:37.332Z",
 					"branch": "feature/lossreason"
+				},
+				{
+					"type": "summary",
+					"id": "5247d42bbd4122ab09cb0eea51a8573c84a7f626",
+					"timestamp": "2026-07-02T04:55:03.000Z",
+					"branch": "feature/progression"
 				}
 			],
-			"lastUpdatedAt": "2026-07-02T03:21:07.651Z"
+			"lastUpdatedAt": "2026-07-02T04:56:23.854Z"
 		},
 		{
 			"stableSlug": "claude-md-jolli-memory",
