@@ -2,49 +2,6 @@
 	"version": 1,
 	"entries": [
 		{
-			"commitHash": "5247d42bbd4122ab09cb0eea51a8573c84a7f626",
-			"recap": "Iron Snake mode now carries the snake's full accumulated length across level advances. When a level goal is reached, the board grows to a size proportional to how long the snake will be by the next goal, and the snake reappears in the same shape it had at the end of the previous level — translated to a new position on the new board, or rotated if the exact placement won't fit. A Warnsdorff-guided layout handles the rare cases where even a rotated fit is impossible, preserving length even when the exact shape cannot be honored. The net effect is that progression feels continuous: the snake the player has grown over several levels carries forward, and the expanding board keeps later levels challenging without becoming impossible.\n\nThe snake's head and tail received distinct visual treatments in the same session. The head now rises noticeably above the body segments and displays eyes on the face pointing in the direction of travel, making it immediately clear which end is the front and where the snake is headed. The tail tapers to a narrow point rather than ending in a full-sized cube, giving the snake a clear visual start and finish. Both effects use the same underlying shading logic as the body, so they blend naturally into the isometric scene.",
-			"topics": [
-				{
-					"title": "Iron Snake levels now preserve snake length and grow the board",
-					"decisions": "- **Shape preservation over simple length preservation**: Carrying the snake's exact geometry (not just its length) across a level advance makes the transition feel continuous rather than like a fresh start. Rigid placement tries the identity orientation first so the snake appears in the same shape it was in; rotations are a fallback that still preserve the visual form. A pure length-preserving re-layout was kept as a deeper fallback for cases where the exact shape genuinely cannot fit.\n- **40% fill target at goal, not at level start**: Sizing the board so the snake fills 40% of playable cells at the moment the goal is reached means the board feels roomy at the start of each level and tightens naturally as the snake grows toward the goal. A tighter target would make early play cramped; a looser one would make late levels too easy. The floor at the user's chosen grid size ensures level 1 is byte-identical to the old behavior.\n- **Warnsdorff heuristic for the layout fallback**: A greedy straight-first walk painted itself into corners on irregular boards with long snakes, causing the fallback to fail and ultimately reset the snake to length 1. Warnsdorff's rule (extend toward the most-constrained neighbor first, break ties by continuing straight) reliably seats long snakes on irregular boards without expensive backtracking, keeping the fallback chain robust at high levels.",
-					"category": "feature",
-					"importance": "major",
-					"filesAffected": [
-						"src/main.ts",
-						"src/iron-snake.ts"
-					]
-				},
-				{
-					"title": "Snake head now stands taller with direction-facing eyes",
-					"decisions": "- **Eyes on the leading face only, no fallback**: An earlier version placed eyes on the top face when the leading face was hidden, but this looked unnatural (a snake staring at the sky). The user confirmed it was acceptable to show no eyes when the snake faces away from the camera, keeping the rendering clean and the code simpler.",
-					"category": "ux",
-					"importance": "major",
-					"filesAffected": [
-						"src/main.ts"
-					]
-				},
-				{
-					"title": "Snake tail now tapers to a point instead of ending in a flat stub",
-					"decisions": "Extracting `drawPrism` as a shared primitive was chosen over duplicating the face-visibility and shading logic inside `drawSnakeTail`. The isometric shading (which faces are front vs. back, how they are colored) is non-trivial, and duplicating it would have made the two renderers diverge visually over time. Sharing the primitive guarantees the tail shades identically to the body regardless of orientation.",
-					"category": "ux",
-					"importance": "major",
-					"filesAffected": [
-						"src/main.ts"
-					]
-				},
-				{
-					"title": "Death marker now respects scene depth instead of floating on top",
-					"decisions": "Using the existing stable painter's sort rather than a separate depth-test pass kept the fix minimal and consistent with how every other object in the scene is ordered. The only exception retained is the off-grid wall-death sliver, which is genuinely outside the board's coordinate space and has no meaningful depth position to sort into.",
-					"category": "bugfix",
-					"importance": "minor",
-					"filesAffected": [
-						"src/main.ts"
-					]
-				}
-			]
-		},
-		{
 			"commitHash": "b7b116ef0101ee1b0420443bb2f1e79d57d50415",
 			"recap": "The landing page preview was substantially upgraded to match the real game's visual quality. The snake now renders with a taller head block featuring eyes that face the direction of travel, and a tapered tail that narrows to a point. Each page load randomly commits to either an Iron Snake carved board or a classic rectangle, with a fresh shape generated on every life. A small overlay in the corner of the preview names the bot currently playing, and the bot changes on every reset — so the preview now showcases the variety of strategies available in the full game.\n\nA long-standing bug in the bot movement system was also fixed. When a bot detected it was stuck in a loop, it would switch to an escape strategy and never return to its own algorithm. The escape phase now runs for a fixed window of time, after which the bot resumes its normal decision-making with a clean slate. Bots will still break out of loops when needed, but they no longer get permanently locked into the escape behavior.",
 			"topics": [
@@ -324,6 +281,49 @@
 					"importance": "minor",
 					"filesAffected": [
 						"CLAUDE.md"
+					]
+				}
+			]
+		},
+		{
+			"commitHash": "5247d42bbd4122ab09cb0eea51a8573c84a7f626",
+			"recap": "Iron Snake mode now carries the snake's full accumulated length across level advances. When a level goal is reached, the board grows to a size proportional to how long the snake will be by the next goal, and the snake reappears in the same shape it had at the end of the previous level — translated to a new position on the new board, or rotated if the exact placement won't fit. A Warnsdorff-guided layout handles the rare cases where even a rotated fit is impossible, preserving length even when the exact shape cannot be honored. The net effect is that progression feels continuous: the snake the player has grown over several levels carries forward, and the expanding board keeps later levels challenging without becoming impossible.\n\nThe snake's head and tail received distinct visual treatments in the same session. The head now rises noticeably above the body segments and displays eyes on the face pointing in the direction of travel, making it immediately clear which end is the front and where the snake is headed. The tail tapers to a narrow point rather than ending in a full-sized cube, giving the snake a clear visual start and finish. Both effects use the same underlying shading logic as the body, so they blend naturally into the isometric scene.",
+			"topics": [
+				{
+					"title": "Iron Snake levels now preserve snake length and grow the board",
+					"decisions": "- **Shape preservation over simple length preservation**: Carrying the snake's exact geometry (not just its length) across a level advance makes the transition feel continuous rather than like a fresh start. Rigid placement tries the identity orientation first so the snake appears in the same shape it was in; rotations are a fallback that still preserve the visual form. A pure length-preserving re-layout was kept as a deeper fallback for cases where the exact shape genuinely cannot fit.\n- **40% fill target at goal, not at level start**: Sizing the board so the snake fills 40% of playable cells at the moment the goal is reached means the board feels roomy at the start of each level and tightens naturally as the snake grows toward the goal. A tighter target would make early play cramped; a looser one would make late levels too easy. The floor at the user's chosen grid size ensures level 1 is byte-identical to the old behavior.\n- **Warnsdorff heuristic for the layout fallback**: A greedy straight-first walk painted itself into corners on irregular boards with long snakes, causing the fallback to fail and ultimately reset the snake to length 1. Warnsdorff's rule (extend toward the most-constrained neighbor first, break ties by continuing straight) reliably seats long snakes on irregular boards without expensive backtracking, keeping the fallback chain robust at high levels.",
+					"category": "feature",
+					"importance": "major",
+					"filesAffected": [
+						"src/main.ts",
+						"src/iron-snake.ts"
+					]
+				},
+				{
+					"title": "Snake head now stands taller with direction-facing eyes",
+					"decisions": "- **Eyes on the leading face only, no fallback**: An earlier version placed eyes on the top face when the leading face was hidden, but this looked unnatural (a snake staring at the sky). The user confirmed it was acceptable to show no eyes when the snake faces away from the camera, keeping the rendering clean and the code simpler.",
+					"category": "ux",
+					"importance": "major",
+					"filesAffected": [
+						"src/main.ts"
+					]
+				},
+				{
+					"title": "Snake tail now tapers to a point instead of ending in a flat stub",
+					"decisions": "Extracting `drawPrism` as a shared primitive was chosen over duplicating the face-visibility and shading logic inside `drawSnakeTail`. The isometric shading (which faces are front vs. back, how they are colored) is non-trivial, and duplicating it would have made the two renderers diverge visually over time. Sharing the primitive guarantees the tail shades identically to the body regardless of orientation.",
+					"category": "ux",
+					"importance": "major",
+					"filesAffected": [
+						"src/main.ts"
+					]
+				},
+				{
+					"title": "Death marker now respects scene depth instead of floating on top",
+					"decisions": "Using the existing stable painter's sort rather than a separate depth-test pass kept the fix minimal and consistent with how every other object in the scene is ordered. The only exception retained is the off-grid wall-death sliver, which is genuinely outside the board's coordinate space and has no meaningful depth position to sort into.",
+					"category": "bugfix",
+					"importance": "minor",
+					"filesAffected": [
+						"src/main.ts"
 					]
 				}
 			]
