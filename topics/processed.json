@@ -7,18 +7,31 @@
 			"4b0f9fd779a7e8cbdc3dd702d41ad4f55eb2836a",
 			"a00b5c620c8105d59d06c34e2567a3b78fbcd1ac",
 			"4e91f64cb71e1e858e3b492d8900d863fe447675",
-			"b0cf976572670c1490b0c2fd604942e8b7243105",
 			"6aeabc387455a2e195e08ecce50f26d3eea1c19c",
-			"fb4d625d116e8463141265efc147fc41cbf7a8e6",
-			"7fdbb7aefeb1311c20012868220c2b11de0597fd"
+			"7fdbb7aefeb1311c20012868220c2b11de0597fd",
+			"5247d42bbd4122ab09cb0eea51a8573c84a7f626",
+			"b7b116ef0101ee1b0420443bb2f1e79d57d50415",
+			"ee8ce65e95eb466316f41f0f744879957887d040"
 		],
 		"plan": [
 			"i-want-to-add-deep-eich-a00b5c62",
 			"i-noticed-that-there-fluttering-frog-4e91f64c",
-			"prancy-nibbling-phoenix-b0cf9765",
-			"also-use-jolli-memory-snazzy-kahan-132523e0"
+			"also-use-jolli-memory-snazzy-kahan-132523e0",
+			"i-want-to-smooth-purrfect-pretzel-5247d42b",
+			"i-have-some-cleanup-fancy-yeti-b7b116ef",
+			"i-have-a-linear-eager-biscuit-ee8ce65e"
 		],
 		"note": [],
-		"userfile": []
+		"userfile": [
+			"daily-git-summary-2026-06-18.md@e9dbed6b79adbeec87cf48d534f2133eb053094b41500d8a4160e7ed899720ed",
+			"daily-git-summary.md@ab883949963205673ec0d98b6fd34eeabe7105e49e895aa1c735c9a0b6d2c41f",
+			"daily-standup-2026-07-16.md@ab0019a899e343a1caafd3075221b19e6f3eaca04c753533a88c78751f79bffa",
+			"git-activity-summary-2026-06-16.md@5fe73d0dff1c6102673da731d7d452f33e5cf68b0199f4da1a64b30104379ec2",
+			"git-daily-summary.md@2f0601084090d59cd75c81afb346c424b1912f987ff296a1f86cacc2546ca53b",
+			"management-summary-2026-06-15.md@b73e9ea60c6d3d0a07dc09837f8d378e0e7586bb4f13d11c91b5416f10e5e069",
+			"management-summary-2026-06-16.md@e4ef26961d008be8852e3757114b3cdaf4c6956332954de3a3db5985ec63180d",
+			"standup-summary-2026-06-29.md@1542ac31cfb5796a2e3467e7e094c9f556343fe5a6ff8ac31dd4f3277ab7a2b2",
+			"untitled.md@971547dcca9cbe685971d3fc8737b8f4ed7cf34b64cad38b3c6c7a57191f6ee3"
+		]
 	}
 }
