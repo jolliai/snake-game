@@ -58,6 +58,29 @@
 				}
 			],
 			"lastUpdatedAt": "2026-07-02T21:12:13.686Z"
+		},
+		{
+			"stableSlug": "iron-snake-mode-board-shapes",
+			"title": "Iron Snake Mode: Random Board Shapes with Level Goals",
+			"summary": "Optional mode replacing the square grid with irregular random board shapes and a cumulative score-based level progression system.",
+			"relatedBranches": [
+				"feature/boardshape"
+			],
+			"sourceRefs": [
+				{
+					"type": "summary",
+					"id": "a00b5c620c8105d59d06c34e2567a3b78fbcd1ac",
+					"timestamp": "2026-07-02T01:07:24.000Z",
+					"branch": "feature/boardshape"
+				},
+				{
+					"type": "plan",
+					"id": "i-want-to-add-deep-eich-a00b5c62",
+					"timestamp": "2026-07-02T01:08:10.250Z",
+					"branch": "feature/boardshape"
+				}
+			],
+			"lastUpdatedAt": "2026-07-02T21:12:13.686Z"
 		}
 	]
 }
