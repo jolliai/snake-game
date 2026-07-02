@@ -16,14 +16,15 @@
 					"branch": "feature/overhead-view-toggle"
 				}
 			],
-			"lastUpdatedAt": "2026-06-23T18:20:32.078Z"
+			"lastUpdatedAt": "2026-07-02T21:59:40.201Z"
 		},
 		{
-			"stableSlug": "gitignore-jolli",
-			"title": "Chore: Ignore .jolli Directory",
-			"summary": "The .jolli directory is excluded from version control via a project-level ignore rule added in commit 31d93c3f.",
+			"stableSlug": "project-tooling-config",
+			"title": "Project Tooling & Configuration",
+			"summary": "Repo-level tooling config: .gitignore ignores .jolli/, and CLAUDE.md instructs Claude to use Jolli Memory each session.",
 			"relatedBranches": [
-				"chore/gitignore-jolli"
+				"chore/gitignore-jolli",
+				"docs/claude-md-jolli-memory"
 			],
 			"sourceRefs": [
 				{
@@ -31,24 +32,6 @@
 					"id": "31d93c3f670b49f2eb5583d128ce61bdc2a98299",
 					"timestamp": "2026-07-01T18:45:04.000Z",
 					"branch": "chore/gitignore-jolli"
-				}
-			],
-			"lastUpdatedAt": "2026-07-02T21:12:13.686Z"
-		},
-		{
-			"stableSlug": "docs-readme-consolidation",
-			"title": "Documentation: Consolidate READMEs and Update Feature List",
-			"summary": "README rewritten from source inventory; README2/3 deleted; CLAUDE.md added with Jolli Memory guidance.",
-			"relatedBranches": [
-				"docs/cleanup",
-				"docs/claude-md-jolli-memory"
-			],
-			"sourceRefs": [
-				{
-					"type": "summary",
-					"id": "4b0f9fd779a7e8cbdc3dd702d41ad4f55eb2836a",
-					"timestamp": "2026-07-01T18:53:35.000Z",
-					"branch": "docs/cleanup"
 				},
 				{
 					"type": "summary",
@@ -57,42 +40,29 @@
 					"branch": "docs/claude-md-jolli-memory"
 				}
 			],
-			"lastUpdatedAt": "2026-07-02T21:12:13.686Z"
+			"lastUpdatedAt": "2026-07-02T21:59:40.201Z"
 		},
 		{
-			"stableSlug": "iron-snake-mode-board-shapes",
-			"title": "Iron Snake Mode: Random Board Shapes with Level Goals",
-			"summary": "Optional mode replacing the square grid with random irregular shapes, interior holes, and a triangular score-goal level progression system.",
+			"stableSlug": "documentation",
+			"title": "Documentation & README",
+			"summary": "README.md is the single source of truth, rewritten from codebase inventory; README2.md and README3.md deleted and content merged in.",
 			"relatedBranches": [
-				"feature/boardshape",
-				"josephhart/joe-6-iron-snake-boards-with-holes-in-the-middle"
+				"docs/cleanup"
 			],
 			"sourceRefs": [
 				{
 					"type": "summary",
-					"id": "a00b5c620c8105d59d06c34e2567a3b78fbcd1ac",
-					"timestamp": "2026-07-02T01:07:24.000Z",
-					"branch": "feature/boardshape"
-				},
-				{
-					"type": "plan",
-					"id": "i-want-to-add-deep-eich-a00b5c62",
-					"timestamp": "2026-07-02T01:08:10.250Z",
-					"branch": "feature/boardshape"
-				},
-				{
-					"type": "summary",
-					"id": "87ca35264f76ea255a9635c68249f566612b1c19",
-					"timestamp": "2026-07-02T21:51:22.000Z",
-					"branch": "josephhart/joe-6-iron-snake-boards-with-holes-in-the-middle"
+					"id": "4b0f9fd779a7e8cbdc3dd702d41ad4f55eb2836a",
+					"timestamp": "2026-07-01T18:53:35.000Z",
+					"branch": "docs/cleanup"
 				}
 			],
-			"lastUpdatedAt": "2026-07-02T21:51:48.651Z"
+			"lastUpdatedAt": "2026-07-02T21:59:40.201Z"
 		},
 		{
-			"stableSlug": "bot-loop-fix-starvation-timer",
-			"title": "Bot Fix: Infinite Loop / Oscillation and Starvation Timer",
-			"summary": "Loop guard breaks bot oscillation cycles via revisit + confinement detection; starvation timer ends games when bots wander indefinitely without eating.",
+			"stableSlug": "bot-ai-fixes",
+			"title": "Bot AI Fixes: Infinite Loops & Starvation Timer",
+			"summary": "Loop guard breaks bot oscillation cycles; starvation timer ends games when bots wander indefinitely without eating.",
 			"relatedBranches": [
 				"bug/botupdate"
 			],
@@ -106,43 +76,27 @@
 				{
 					"type": "plan",
 					"id": "i-noticed-that-there-fluttering-frog-4e91f64c",
-					"timestamp": "2026-07-02T02:04:16.898Z",
+					"timestamp": "2026-07-02T21:59:30.155Z",
 					"branch": "bug/botupdate"
 				}
 			],
-			"lastUpdatedAt": "2026-07-02T21:12:13.686Z"
+			"lastUpdatedAt": "2026-07-02T21:59:40.201Z"
 		},
 		{
-			"stableSlug": "iron-snake-fruit-color",
-			"title": "Iron Snake Mode: Final-Stretch Fruit Recoloring",
-			"summary": "In Iron Snake Mode, the fruit recolors for the last 3 fruits of each level: violet (3 left), magenta (2), white (1).",
+			"stableSlug": "death-overlay-loss-reason",
+			"title": "Freeze-on-Death with Loss Reason Display",
+			"summary": "On death the board freezes with an amber highlight, pulsing banner naming the loss reason, and waits for any key before advancing to Game Over.",
 			"relatedBranches": [
-				"feature/fruitcolor"
-			],
-			"sourceRefs": [
-				{
-					"type": "plan",
-					"id": "also-use-jolli-memory-snazzy-kahan-132523e0",
-					"timestamp": "2026-07-02T03:37:22.753Z",
-					"branch": "feature/fruitcolor"
-				},
-				{
-					"type": "summary",
-					"id": "6aeabc387455a2e195e08ecce50f26d3eea1c19c",
-					"timestamp": "2026-07-01T20:40:06-07:00",
-					"branch": "feature/fruitcolor"
-				}
-			],
-			"lastUpdatedAt": "2026-07-02T21:12:13.686Z"
-		},
-		{
-			"stableSlug": "iron-snake-progression",
-			"title": "Iron Snake Mode: Smooth Progression, Head/Tail Graphics, and Death Overlay",
-			"summary": "Iron Snake levels preserve snake shape/length, grow the board to 40% fill at goal, render distinct head/tail graphics, and depth-sort the death marker.",
-			"relatedBranches": [
+				"feature/lossreason",
 				"feature/progression"
 			],
 			"sourceRefs": [
+				{
+					"type": "summary",
+					"id": "b0cf976572670c1490b0c2fd604942e8b7243105",
+					"timestamp": "2026-07-02T03:20:13.000Z",
+					"branch": "feature/lossreason"
+				},
 				{
 					"type": "summary",
 					"id": "5247d42bbd4122ab09cb0eea51a8573c84a7f626",
@@ -151,17 +105,17 @@
 				},
 				{
 					"type": "plan",
-					"id": "i-want-to-smooth-purrfect-pretzel-5247d42b",
-					"timestamp": "2026-07-02T04:55:55.506Z",
-					"branch": "feature/progression"
+					"id": "prancy-nibbling-phoenix-b0cf9765",
+					"timestamp": "2026-07-02T21:59:30.178Z",
+					"branch": "feature/lossreason"
 				}
 			],
-			"lastUpdatedAt": "2026-07-02T21:12:13.686Z"
+			"lastUpdatedAt": "2026-07-02T22:19:53.166Z"
 		},
 		{
-			"stableSlug": "menu-bot-arrow-cleanup",
-			"title": "Cleanup: Menu Preview Polish, Bot Control Removal, Arrow-Key Scroll Fix",
-			"summary": "Polished landing-page demo with real snake graphics/Iron boards/random bots; removed vestigial bot controls; fixed arrow-key page scroll.",
+			"stableSlug": "menu-polish-cleanup",
+			"title": "Menu Preview Polish & Miscellaneous Bug Fixes",
+			"summary": "Upgraded landing-page snake demo with real head/tail graphics, random bots, Iron Snake boards; removed vestigial bot controls; fixed loop-guard and arrow-key scroll.",
 			"relatedBranches": [
 				"chores/cleanup-bugs"
 			],
@@ -175,111 +129,11 @@
 				{
 					"type": "plan",
 					"id": "i-have-some-cleanup-fancy-yeti-b7b116ef",
-					"timestamp": "2026-07-02T05:49:10.249Z",
+					"timestamp": "2026-07-02T21:59:30.148Z",
 					"branch": "chores/cleanup-bugs"
 				}
 			],
-			"lastUpdatedAt": "2026-07-02T21:12:13.686Z"
-		},
-		{
-			"stableSlug": "daily-git-summaries",
-			"title": "Daily Git and Management Summary Reports",
-			"summary": "Format, content, and recurring patterns for daily git activity and management summary reports on jolliai/jolli and jolliai/jolliai.",
-			"relatedBranches": [],
-			"sourceRefs": [
-				{
-					"type": "userfile",
-					"id": "daily-git-summary-2026-06-18.md@e9dbed6b79adbeec87cf48d534f2133eb053094b41500d8a4160e7ed899720ed",
-					"timestamp": "2026-07-02T15:51:48.150Z"
-				},
-				{
-					"type": "userfile",
-					"id": "daily-git-summary.md@ab883949963205673ec0d98b6fd34eeabe7105e49e895aa1c735c9a0b6d2c41f",
-					"timestamp": "2026-07-02T15:51:48.150Z"
-				},
-				{
-					"type": "userfile",
-					"id": "daily-standup-2026-07-16.md@ab0019a899e343a1caafd3075221b19e6f3eaca04c753533a88c78751f79bffa",
-					"timestamp": "2026-07-02T15:51:48.150Z"
-				},
-				{
-					"type": "userfile",
-					"id": "git-activity-summary-2026-06-16.md@5fe73d0dff1c6102673da731d7d452f33e5cf68b0199f4da1a64b30104379ec2",
-					"timestamp": "2026-07-02T15:51:48.150Z"
-				},
-				{
-					"type": "userfile",
-					"id": "git-daily-summary.md@2f0601084090d59cd75c81afb346c424b1912f987ff296a1f86cacc2546ca53b",
-					"timestamp": "2026-07-02T15:51:48.152Z"
-				},
-				{
-					"type": "userfile",
-					"id": "management-summary-2026-06-15.md@b73e9ea60c6d3d0a07dc09837f8d378e0e7586bb4f13d11c91b5416f10e5e069",
-					"timestamp": "2026-07-02T15:51:48.152Z"
-				},
-				{
-					"type": "userfile",
-					"id": "management-summary-2026-06-16.md@e4ef26961d008be8852e3757114b3cdaf4c6956332954de3a3db5985ec63180d",
-					"timestamp": "2026-07-02T15:51:48.152Z"
-				},
-				{
-					"type": "userfile",
-					"id": "standup-summary-2026-06-29.md@1542ac31cfb5796a2e3467e7e094c9f556343fe5a6ff8ac31dd4f3277ab7a2b2",
-					"timestamp": "2026-07-02T15:51:48.154Z"
-				},
-				{
-					"type": "userfile",
-					"id": "untitled.md@971547dcca9cbe685971d3fc8737b8f4ed7cf34b64cad38b3c6c7a57191f6ee3",
-					"timestamp": "2026-07-02T15:51:48.154Z"
-				}
-			],
-			"lastUpdatedAt": "2026-07-02T21:12:13.686Z"
-		},
-		{
-			"stableSlug": "iron-snake-level-transition-animation",
-			"title": "Iron Snake Mode: Animated Level-to-Level Board Morph Transition (JOE-5)",
-			"summary": "Iron Snake level transitions animate the board mask cell-by-cell at snake-move pace; the snake stays stationary while the arena reshapes around it.",
-			"relatedBranches": [
-				"josephhart/joe-5-create-smooth-transition-from-level-to-level-in-iron-snake"
-			],
-			"sourceRefs": [
-				{
-					"type": "summary",
-					"id": "ee8ce65e95eb466316f41f0f744879957887d040",
-					"timestamp": "2026-07-02T21:10:51.000Z",
-					"branch": "josephhart/joe-5-create-smooth-transition-from-level-to-level-in-iron-snake"
-				},
-				{
-					"type": "plan",
-					"id": "i-have-a-linear-eager-biscuit-ee8ce65e",
-					"timestamp": "2026-07-02T21:11:41.231Z",
-					"branch": "josephhart/joe-5-create-smooth-transition-from-level-to-level-in-iron-snake"
-				}
-			],
-			"lastUpdatedAt": "2026-07-02T21:12:13.686Z"
-		},
-		{
-			"stableSlug": "death-freeze-loss-reason",
-			"title": "Death Freeze: Show Loss Reason Until Key Press",
-			"summary": "Freezes the board on death, highlights the fatal cell, shows a loss-reason banner, and waits for any key before advancing to Game Over.",
-			"relatedBranches": [
-				"feature/lossreason"
-			],
-			"sourceRefs": [
-				{
-					"type": "summary",
-					"id": "b0cf976572670c1490b0c2fd604942e8b7243105",
-					"timestamp": "2026-07-02T03:20:13.000Z",
-					"branch": "feature/lossreason"
-				},
-				{
-					"type": "plan",
-					"id": "prancy-nibbling-phoenix-b0cf9765",
-					"timestamp": "2026-07-02T03:20:37.332Z",
-					"branch": "feature/lossreason"
-				}
-			],
-			"lastUpdatedAt": "2026-07-02T21:19:04.338Z"
+			"lastUpdatedAt": "2026-07-02T21:59:40.201Z"
 		}
 	]
 }
