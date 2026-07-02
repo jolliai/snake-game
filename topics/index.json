@@ -243,6 +243,23 @@
 				}
 			],
 			"lastUpdatedAt": "2026-07-02T22:19:53.166Z"
+		},
+		{
+			"stableSlug": "e2e-test-harness",
+			"title": "Playwright End-to-End Test Harness",
+			"summary": "Playwright E2E harness for the snake game: Chromium-only, keyboard+DOM testing strategy, four spec files, and a GitHub Actions CI workflow.",
+			"relatedBranches": [
+				"test/playwright-harness"
+			],
+			"sourceRefs": [
+				{
+					"type": "summary",
+					"id": "4721040fdaf5d2c67c4b594f2354d3c9e0d8efde",
+					"timestamp": "2026-07-02T22:19:30.000Z",
+					"branch": "test/playwright-harness"
+				}
+			],
+			"lastUpdatedAt": "2026-07-02T22:19:53.166Z"
 		}
 	]
 }
