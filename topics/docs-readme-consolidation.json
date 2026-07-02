@@ -1,0 +1,25 @@
+{
+	"schemaVersion": 1,
+	"stableSlug": "docs-readme-consolidation",
+	"title": "Documentation: Consolidate READMEs and Update Feature List",
+	"content": "## Overview\n\nThe project's documentation was overhauled in two commits: the main `README.md` was rewritten from a live codebase inventory, extra README files were deleted and their content merged in, and a `CLAUDE.md` project guidance file was added.\n\n---\n\n## README Consolidation\n\n### Problem\nThe project had three README files (`README.md`, `README2.md`, `README3.md`). The main README was significantly out of date — features like the isometric 3D board, two-player mode, and most bots were either missing or still listed as \"coming soon\" despite being fully implemented. The extra files contained forward-looking ideas and user feedback with no permanent home.\n\n### What Changed\n\n**`README.md`** was rewritten top to bottom based on a full codebase inventory (keyboard bindings, game modes, bot profiles, rendering features, leaderboard mechanics, and UI elements were read directly from source files before any edits were made):\n- Headline description updated to lead with the isometric 3D board.\n- New **\"Game modes\"** section documents all four entry points: single player, two-player PvP, solo bot, and bot-vs-bot.\n- **Bot strategy table** added covering all 11 bots.\n- **Controls table** expanded with rotation, perspective toggle, overhead view, Enter, and Esc keys.\n- **\"Coming soon\"** section trimmed to only genuinely unshipped items: color blind mode, first-person view, \"snek\" rename, and global/online leaderboards.\n\n**`README2.md` and `README3.md`** were deleted. Their relevant content was merged into the \"Coming soon\" section of `README.md`:\n- Color blind mode (appeared in both files — deduplicated to one entry).\n- Possible rename to \"snek\".\n- First-person view.\n- Viewing other players' high scores (reframed as **global/online leaderboards** to distinguish from the local per-mode leaderboards that already exist).\n\nRedundant section headers from the extra files (\"future plans\", \"user feedback\") were dropped rather than preserved as subsections, keeping `README.md` as a single source of truth.\n\n---\n\n## Roadmap Decisions\n\n| Item | Status | Rationale |\n|---|---|---|\n| Isometric 3D board | ✅ Shipped — moved to feature list | Was listed as \"coming soon\"; fully implemented |\n| Two-player mode | ✅ Shipped — moved to feature list | Was listed as \"coming soon\"; fully implemented |\n| Color blind mode | 🔜 Roadmap | Unimplemented; retained from README2/3 |\n| First-person view | 🔜 Roadmap | Unimplemented; retained from README2/3 |\n| \"Snek\" rename | 🔜 Roadmap | Unimplemented; retained from README2/3 |\n| Global leaderboards | 🔜 Roadmap | Re-added from deleted README3; distinct from existing local leaderboards |\n\n---\n\n## CLAUDE.md\n\n`CLAUDE.md` was created at the repo root with a **\"Use Jolli Memory\"** section. It instructs Claude to:\n- Recall prior branch context before planning or coding.\n- Search across branches when design questions arise.\n- Use the Jolli PR skill when opening pull requests.\n\nThis file was added on a separate branch (not bundled with any active feature branch) to keep the diff minimal and allow it to land independently. A project-level guidance file was chosen over a memory entry or hook because it is loaded into context every session and applies to all contributors — a hook would be too rigid for a \"when relevant\" guideline.\n\n---\n\n## Files Affected\n\n| File | Action |\n|---|---|\n| `README.md` | Rewritten |\n| `README2.md` | Deleted |\n| `README3.md` | Deleted |\n| `CLAUDE.md` | Created |",
+	"relatedBranches": [
+		"docs/cleanup",
+		"docs/claude-md-jolli-memory"
+	],
+	"sourceRefs": [
+		{
+			"type": "summary",
+			"id": "4b0f9fd779a7e8cbdc3dd702d41ad4f55eb2836a",
+			"timestamp": "2026-07-01T18:53:35.000Z",
+			"branch": "docs/cleanup"
+		},
+		{
+			"type": "summary",
+			"id": "7fdbb7aefeb1311c20012868220c2b11de0597fd",
+			"timestamp": "2026-07-01T20:46:17-07:00",
+			"branch": "docs/claude-md-jolli-memory"
+		}
+	],
+	"lastUpdatedAt": "2026-07-02T21:12:13.686Z"
+}
