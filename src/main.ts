@@ -153,6 +153,18 @@ class SnakeGame {
   private movesSinceFood2: number = 0
   private deathCause: 'collision' | 'starved' = 'collision'
 
+  // Death freeze: on any loss the board stays visible and frozen, the fatal
+  // collision is highlighted, and a banner names the reason until any key is
+  // pressed — then the deferred game-over finalize runs. deathMessage is the
+  // banner text (composed at the death site, which has full per-snake context);
+  // deathCells are the fatal head cell(s) to highlight (empty for starvation,
+  // where the head is already part of the snake); awaitingDeathAck gates the
+  // freeze; pendingFinalize is the deferred endGame/endGameTwoPlayer call.
+  private deathMessage: string = ''
+  private deathCells: Array<{ x: number; y: number; who: 1 | 2 }> = []
+  private awaitingDeathAck: boolean = false
+  private pendingFinalize: (() => void) | null = null
+
   // Leaderboard UI
   private leaderboardActiveMode: LeaderboardMode = 'single'
   private pendingEntry: { mode: LeaderboardMode; entry: LeaderboardEntry } | null = null
@@ -626,6 +638,30 @@ class SnakeGame {
           break
       }
     }
+
+    // Death freeze: highlight the fatal cell(s) on top of everything else, in an
+    // amber "impact" palette distinct from the green/blue snakes and red food, so
+    // the player sees exactly how they lost. Starvation has no fatal cell.
+    if (this.awaitingDeathAck) {
+      for (const dc of this.deathCells) {
+        const offGrid = dc.x < 0 || dc.x >= this.gridSize || dc.y < 0 || dc.y >= this.gridSize
+        if (offGrid) {
+          // Classic wall death: the true cell projects mostly off-canvas and
+          // clips, so anchor a visible marker on this snake's last valid cell
+          // (still snake[0] — the fatal head was never unshifted), and also draw
+          // at the true out-of-bounds coord so a sliver pokes past the border.
+          const head = dc.who === 1 ? this.snake[0] : this.snake2[0]
+          this.drawBlockShadow(head.x, head.y)
+          this.drawBlock(head.x, head.y, '#facc15', '#eab308', '#a16207')
+          this.drawBlock(dc.x, dc.y, '#facc15', '#eab308', '#a16207')
+        } else {
+          // Self / opponent / head-to-head, or an Iron Snake masked-void cell:
+          // projects on-canvas, drawn on top of the collided segment.
+          this.drawBlockShadow(dc.x, dc.y)
+          this.drawBlock(dc.x, dc.y, '#facc15', '#eab308', '#a16207')
+        }
+      }
+    }
   }
 
   // === Event handling ===
@@ -749,6 +785,28 @@ class SnakeGame {
     const target = e.target as HTMLElement | null
     if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT')) {
       return
+    }
+
+    // Death freeze: any key dismisses the frozen board and runs the deferred
+    // game-over finalize. Must sit above the Enter/r/Escape branches so the first
+    // post-death key acknowledges the freeze rather than restarting/exiting.
+    // Exception: the camera controls (rotate q/e, auto-rotate toggle t, overhead
+    // o, perspective [ ]) fall through to their normal handlers so the player can
+    // inspect the collision from any angle without ending the freeze. Ignore
+    // auto-repeat and bare modifiers so a held/stray key doesn't skip it.
+    if (this.awaitingDeathAck) {
+      if (e.repeat || e.key === 'Shift' || e.key === 'Control' || e.key === 'Alt' || e.key === 'Meta') return
+      const cameraKeys = ['q', 'Q', 'e', 'E', 't', 'T', 'o', 'O', '[', ']']
+      if (!cameraKeys.includes(e.key)) {
+        e.preventDefault()
+        this.awaitingDeathAck = false
+        this.hideDeathBanner()
+        const finalize = this.pendingFinalize
+        this.pendingFinalize = null
+        finalize?.()
+        return
+      }
+      // Camera key: fall through to the view handlers below; freeze stays active.
     }
 
     if (e.key === 'Enter') {
@@ -1102,12 +1160,17 @@ class SnakeGame {
     this.movesSinceFood1 = 0
     this.movesSinceFood2 = 0
     this.deathCause = 'collision'
+    this.deathMessage = ''
+    this.deathCells = []
+    this.awaitingDeathAck = false
+    this.pendingFinalize = null
     resetLoopMemory(this.botLoopMemory)
     resetLoopMemory(this.botLoopMemory2)
     this.spawnFood()
     this.updateUI()
     this.showScreen('game')
     document.getElementById('pause')!.classList.add('hidden')
+    this.hideDeathBanner()
 
     if (this.gameLoop) clearInterval(this.gameLoop)
     this.gameLoop = null
@@ -1159,7 +1222,10 @@ class SnakeGame {
     }
 
     if (this.checkCollision(head)) {
-      this.endGame()
+      const hitWall = !this.inBounds(head)
+      this.deathMessage = hitWall ? 'Hit the wall!' : 'Ran into itself!'
+      this.deathCells = [{ x: head.x, y: head.y, who: 1 }]
+      this.beginDeathFreeze(() => this.endGame())
       return
     }
 
@@ -1182,7 +1248,9 @@ class SnakeGame {
 
     if (this.movesSinceFood1 >= this.starvationLimit()) {
       this.deathCause = 'starved'
-      this.endGame()
+      this.deathMessage = 'Starved!'
+      this.deathCells = []
+      this.beginDeathFreeze(() => this.endGame())
       return
     }
 
@@ -1229,7 +1297,25 @@ class SnakeGame {
     const p2Dead = p2HitsWall || p2HitsSelf || p2HitsP1 || headToHead
 
     if (p1Dead || p2Dead) {
-      this.endGameTwoPlayer(p1Dead, p2Dead)
+      this.deathCells = []
+      if (p1Dead) this.deathCells.push({ x: head1.x, y: head1.y, who: 1 })
+      if (p2Dead) this.deathCells.push({ x: head2.x, y: head2.y, who: 2 })
+      // Compose a per-snake reason so the banner reads sensibly however each
+      // snake died. Head-on is a single shared cause; otherwise describe each
+      // dead snake (wall > self > opponent, matching the p*Dead precedence).
+      const describe = (who: 1 | 2, hitsWall: boolean, hitsSelf: boolean): string =>
+        hitsWall ? `P${who} hit the wall`
+          : hitsSelf ? `P${who} ran into itself`
+          : `P${who} crashed into P${who === 1 ? 2 : 1}`
+      if (headToHead) {
+        this.deathMessage = 'Head-on collision!'
+      } else {
+        const parts: string[] = []
+        if (p1Dead) parts.push(describe(1, p1HitsWall, p1HitsSelf))
+        if (p2Dead) parts.push(describe(2, p2HitsWall, p2HitsSelf))
+        this.deathMessage = parts.join(' · ')
+      }
+      this.beginDeathFreeze(() => this.endGameTwoPlayer(p1Dead, p2Dead))
       return
     }
 
@@ -1274,7 +1360,11 @@ class SnakeGame {
     const p2Starved = this.movesSinceFood2 >= limit
     if (p1Starved || p2Starved) {
       this.deathCause = 'starved'
-      this.endGameTwoPlayer(p1Starved, p2Starved)
+      this.deathMessage = p1Starved && p2Starved
+        ? 'Both snakes starved!'
+        : `P${p1Starved ? 1 : 2} starved!`
+      this.deathCells = []
+      this.beginDeathFreeze(() => this.endGameTwoPlayer(p1Starved, p2Starved))
       return
     }
 
@@ -1769,6 +1859,19 @@ class SnakeGame {
     warningEl.classList.remove('hidden')
   }
 
+  // Show the frozen-death banner over the still-visible board, naming how the
+  // snake lost. deathMessage is set at the death site; " — Press any key" is the
+  // universal dismissal hint. Mirrors the starvation-warning overlay pattern.
+  private showDeathBanner() {
+    const bannerEl = document.getElementById('death-banner')!
+    bannerEl.textContent = `${this.deathMessage} — Press any key`
+    bannerEl.classList.remove('hidden')
+  }
+
+  private hideDeathBanner() {
+    document.getElementById('death-banner')!.classList.add('hidden')
+  }
+
   private updateModeUI() {
     const isTwoPlayer = this.isTwoSnakeMode()
 
@@ -1797,6 +1900,29 @@ class SnakeGame {
   }
 
   // === Game over ===
+
+  // Enter the death-freeze phase instead of jumping straight to the game-over
+  // screen: stop the loop, keep the board on screen, render the frozen frame
+  // (including any highlighted fatal cell), and show the loss-reason banner. The
+  // deferred `finalize` (endGame / endGameTwoPlayer) runs when the player presses
+  // any key — see the awaitingDeathAck branch in handleKeyPress. Steps mirror the
+  // interval-stop that endGame runs at finalize time, so re-running them is safe.
+  private beginDeathFreeze(finalize: () => void) {
+    this.isGameOver = true
+    this.awaitingDeathAck = true
+    this.pendingFinalize = finalize
+    // Leave auto-rotate running (it spins the frozen board into a death cam in
+    // bot/bvb modes); the camera keys stay live too — see handleKeyPress. The
+    // deferred endGame/endGameTwoPlayer stops auto-rotate when the freeze ends.
+    if (this.gameLoop) {
+      clearInterval(this.gameLoop)
+      this.gameLoop = null
+    }
+    // Hide the starvation alert so it doesn't overlap the death banner.
+    document.getElementById('starvation-warning')!.classList.add('hidden')
+    this.draw()
+    this.showDeathBanner()
+  }
 
   private endGame() {
     this.isGameOver = true
