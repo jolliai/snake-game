@@ -186,6 +186,29 @@
 				}
 			],
 			"lastUpdatedAt": "2026-07-02T04:56:23.854Z"
+		},
+		{
+			"stableSlug": "menu-preview-arrow-scroll-polish",
+			"title": "Menu Preview Polish and Arrow-Key Scroll Fix",
+			"summary": "Commit b7b116ef: upgraded landing-page snake preview with real graphics/bots/boards, removed vestigial bot controls, fixed arrow-key scroll and loop-guard.",
+			"relatedBranches": [
+				"chores/cleanup-bugs"
+			],
+			"sourceRefs": [
+				{
+					"type": "summary",
+					"id": "b7b116ef0101ee1b0420443bb2f1e79d57d50415",
+					"timestamp": "2026-07-02T05:48:21.000Z",
+					"branch": "chores/cleanup-bugs"
+				},
+				{
+					"type": "plan",
+					"id": "i-have-some-cleanup-fancy-yeti-b7b116ef",
+					"timestamp": "2026-07-02T05:49:10.249Z",
+					"branch": "chores/cleanup-bugs"
+				}
+			],
+			"lastUpdatedAt": "2026-07-02T13:49:05.294Z"
 		}
 	]
 }

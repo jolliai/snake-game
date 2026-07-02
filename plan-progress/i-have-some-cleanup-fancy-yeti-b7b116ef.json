@@ -1,0 +1,43 @@
+{
+	"version": 1,
+	"commitHash": "b7b116ef0101ee1b0420443bb2f1e79d57d50415",
+	"commitMessage": "Polish menu preview, remove stale bot controls, fix loop-guard & arrow scroll",
+	"commitDate": "2026-07-02T05:48:21.000Z",
+	"planSlug": "i-have-some-cleanup-fancy-yeti-b7b116ef",
+	"originalSlug": "i-have-some-cleanup-fancy-yeti",
+	"summary": "The developer completed all four cleanup tasks: upgrading the landing-page preview demo with real snake graphics, random bots, and Iron Snake boards; removing the vestigial 'Disable Bot' button and mid-game bot switcher; fixing arrow-key page scrolling; and additionally fixing a bug where the bot loop-guard escape mode never timed out and returned control to the bot's own algorithm.",
+	"steps": [
+		{
+			"id": "1",
+			"description": "Preview demo parity — head/tail graphics, Iron/classic board, random bot + corner label (src/menu-demo.ts, index.html, src/style.css)",
+			"status": "completed",
+			"note": "All sub-tasks implemented: drawPrism/drawSnakeHead/drawSnakeTail ported, DEMO_HEAD_HEIGHT_SCALE=1.6 and DEMO_TAIL_HEIGHT_SCALE=0.7 added, draw() extended with 'tail' type, Iron Snake board generation wired with onBoard/inBounds delegation, bot label DOM element added and styled. A key trade-off discovered during browser verification: per-life board randomization caused classic boards to dominate screenshots (snake survives longer on rectangles), so the decision was changed to lock Iron vs. classic once per page load (useIron field) while still regenerating a fresh shape each life — this ensures a given visit consistently showcases one style."
+		},
+		{
+			"id": "2",
+			"description": "Remove the 'Disable Bot' button — index.html button + controls text, main.ts click listener + B-key branch + toggleBot() method + updateBotUI guard + updateModeUI references",
+			"status": "completed",
+			"note": "Button, B-key branch, toggleBot() method, and all UI references removed. The critical guard fix in updateBotUI was handled correctly: the null-guard was changed from requiring status+toggle+demoButton to requiring only status, preventing the function from bailing out and stopping bot-status updates. botEnabled/botEverActive flags and their downstream uses (Solo Bot launch, leaderboard disqualification) were deliberately preserved."
+		},
+		{
+			"id": "3",
+			"description": "Remove mid-game bot switching — index.html #game-bot-selection block, main.ts setupBotSelectors/updateBotDescriptions/updateModeUI, src/style.css .bot-selection rules",
+			"status": "completed",
+			"note": "The #game-bot-selection block removed from HTML, gameSelect dropped from botSelectors array, 'game-bot-description' removed from updateBotDescriptions, gameBotSelection/.toggleBot lookups removed from updateModeUI, and .bot-selection CSS rules (including responsive rule at line 624) deleted. Noted in conversation that this is a UX/consistency cleanup rather than a leaderboard-corruption fix, since botEverActive already disqualifies bot-assisted runs."
+		},
+		{
+			"id": "4",
+			"description": "Arrow keys scroll the page — add preventDefault() for arrow keys in handleKeyPress after the INPUT/TEXTAREA/SELECT guard",
+			"status": "completed",
+			"note": "preventDefault() added for all four arrow keys immediately after the text-field early-return guard, applied unconditionally across all game states rather than only when a game is active — a deliberate choice to prevent any simultaneous scroll+movement scenario. The developer noted this was verified structurally but could not script a live key-press+scroll check without a browser driver."
+		}
+	],
+	"llm": {
+		"model": "claude-haiku-4-5-20251001",
+		"inputTokens": 21810,
+		"outputTokens": 842,
+		"apiLatencyMs": 21316,
+		"stopReason": null,
+		"source": "jolli-proxy"
+	}
+}
