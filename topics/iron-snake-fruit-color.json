@@ -1,0 +1,24 @@
+{
+	"schemaVersion": 1,
+	"stableSlug": "iron-snake-fruit-color",
+	"title": "Iron Snake Mode: Final-Stretch Fruit Recoloring",
+	"content": "## Overview\n\nIn **Iron Snake Mode**, the fruit changes color for each of the last three fruits remaining in a level, giving players an unambiguous per-fruit countdown before the level completes. Outside Iron Snake Mode (classic), the fruit remains red — no behavior change.\n\n## Color Scheme — \"Flash to White\"\n\n| Fruits remaining | Color   | Top face  | Right face | Left face |\n|------------------|---------|-----------|------------|-----------|\n| 3                | Violet  | `#8b5cf6` | `#7c3aed`  | `#6d28d9` |\n| 2                | Magenta | `#ec4899` | `#db2777`  | `#be185d` |\n| 1 (final fruit)  | White   | `#f8fafc` | `#e2e8f0`  | `#cbd5e1` |\n| all others       | Red (default) | `#ef4444` | `#dc2626` | `#b91c1c` |\n\nThe progression toward near-white on the final fruit is intentionally climactic and unmistakable against the dark isometric board.\n\n## Implementation — `src/main.ts`\n\nAll changes are confined to `src/main.ts`.\n\n### Color lookup table (near `main.ts:37–39`)\n\nA module-level constant maps fruits-remaining values to isometric face-color triads, matching the existing `[string, string, string]` convention used elsewhere in the file:\n\n```ts\nconst IRON_SNAKE_FINAL_FRUIT_COLORS: Record<number, [string, string, string]> = {\n  3: ['#8b5cf6', '#7c3aed', '#6d28d9'], // violet\n  2: ['#ec4899', '#db2777', '#be185d'], // magenta\n  1: ['#f8fafc', '#e2e8f0', '#cbd5e1'], // white flash (final fruit)\n}\n```\n\n### `ironSnakeRemaining()` helper\n\nA private method computes how many fruits (== points, since each fruit is worth 1 point) remain in the current level:\n\n```ts\nprivate ironSnakeRemaining(): number {\n  if (!this.ironSnakeMode) return 0\n  const combined = this.score + (this.isTwoSnakeMode() ? this.score2 : 0)\n  return Math.max(0, this.levelGoal - combined)\n}\n```\n\nReturns `0` outside Iron Snake Mode. Both `draw()` and `updateScore()` call this helper — the previously duplicated inline arithmetic in `updateScore()` (`main.ts:1827–1828`) was removed.\n\n### Fruit rendering in `draw()` (near `main.ts:609–619` and `636–638`)\n\nAlongside the existing hunger-tint computation, the fruit color triad is resolved before the render switch:\n\n```ts\nconst remainingFruit = this.ironSnakeRemaining()\nconst foodColors: [string, string, string] =\n  IRON_SNAKE_FINAL_FRUIT_COLORS[remainingFruit] ?? ['#ef4444', '#dc2626', '#b91c1c']\n```\n\nThen in the `case 'food':` branch:\n\n```ts\ncase 'food':\n  this.drawBlock(obj.x, obj.y, foodColors[0], foodColors[1], foodColors[2])\n  break\n```\n\nThe `?? red` fallback covers classic mode (helper returns `0`) and all early-level states where remaining > 3. This single insertion point covers both the isometric and overhead views, which share the same `case 'food':` path.\n\n## Edge Cases\n\n- **No \"remaining 0\" fruit on screen.** When the goal fruit is eaten, `checkLevelAdvance()` → `advanceLevel()` runs synchronously before the next `draw()`, raising `levelGoal` and re-spawning fruit. The lookup's `{1,2,3}`-only keys guard this anyway.\n- **Two-player mode.** `ironSnakeRemaining()` uses the combined `score + score2`, consistent with the existing HUD countdown, so the last 3 fruits of the *shared* goal are recolored.\n- **Menu demo screen (`src/menu-demo.ts`) is untouched.** Its decorative fruit has no connection to level state; introducing a dependency there would be incorrect.",
+	"relatedBranches": [
+		"feature/fruitcolor"
+	],
+	"sourceRefs": [
+		{
+			"type": "plan",
+			"id": "also-use-jolli-memory-snazzy-kahan-132523e0",
+			"timestamp": "2026-07-02T03:37:22.753Z",
+			"branch": "feature/fruitcolor"
+		},
+		{
+			"type": "summary",
+			"id": "6aeabc387455a2e195e08ecce50f26d3eea1c19c",
+			"timestamp": "2026-07-01T20:40:06-07:00",
+			"branch": "feature/fruitcolor"
+		}
+	],
+	"lastUpdatedAt": "2026-07-02T21:12:13.686Z"
+}
