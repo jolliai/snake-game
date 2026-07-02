@@ -68,5 +68,23 @@
 	],
 	"transcripts": [
 		"6b4885a9-2173-4b49-8fb2-af3da14e4841"
+	],
+	"e2eTestGuide": [
+		{
+			"title": "Playwright test suite runs and passes",
+			"preconditions": "Node 18 or later installed; dependencies installed by running \"npm ci\" in the project folder; Playwright browsers installed by running \"npx playwright install chromium\".",
+			"steps": [
+				"Open a terminal in the project folder.",
+				"Type \"npm test\" and press Enter.",
+				"Wait for the suite to finish (it may take up to a minute on first run while the dev server starts).",
+				"Check the terminal output when the run completes.",
+				"Optionally type \"npm run test:report\" and press Enter to open the HTML report in your browser."
+			],
+			"expectedResults": [
+				"The terminal should show all tests passing with no failures (look for a green summary line such as \"28 passed\").",
+				"The HTML report should open and list every test as passed, with no red entries.",
+				"No browser window should remain open after the run finishes."
+			]
+		}
 	]
 }
