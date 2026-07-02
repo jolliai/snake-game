@@ -72,7 +72,9 @@
 			"slug": "i-have-a-linear-eager-biscuit-ee8ce65e",
 			"title": "JOE-5 — Smooth level-to-level transition in Iron Snake mode",
 			"addedAt": "2026-07-02T18:01:34.103Z",
-			"updatedAt": "2026-07-02T21:11:41.185Z"
+			"updatedAt": "2026-07-02T21:11:41.185Z",
+			"jolliPlanDocUrl": "https://jolli.ai/brckbmk4/articles?doc=2176",
+			"jolliPlanDocId": 2176
 		}
 	],
 	"references": [
@@ -102,5 +104,7 @@
 	],
 	"transcripts": [
 		"7f63fd80-741e-4150-b8e4-7006e1ffefb9"
-	]
+	],
+	"jolliDocUrl": "https://jolli.ai/brckbmk4/articles?doc=2177",
+	"jolliDocId": 2177
 }
