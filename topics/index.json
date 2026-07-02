@@ -226,6 +226,23 @@
 				}
 			],
 			"lastUpdatedAt": "2026-07-02T22:19:53.166Z"
+		},
+		{
+			"stableSlug": "iron-snake-interior-holes",
+			"title": "Iron Snake Boards with Interior Holes",
+			"summary": "Iron Snake boards support interior obstacle holes the snake must navigate around; holes scale in count and size with level difficulty.",
+			"relatedBranches": [
+				"josephhart/joe-6-iron-snake-boards-with-holes-in-the-middle"
+			],
+			"sourceRefs": [
+				{
+					"type": "summary",
+					"id": "87ca35264f76ea255a9635c68249f566612b1c19",
+					"timestamp": "2026-07-02T21:51:22.000Z",
+					"branch": "josephhart/joe-6-iron-snake-boards-with-holes-in-the-middle"
+				}
+			],
+			"lastUpdatedAt": "2026-07-02T22:19:53.166Z"
 		}
 	]
 }
