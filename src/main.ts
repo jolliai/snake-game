@@ -40,6 +40,14 @@ const HUNGER_BODY_COLORS: [string, string, string] = ['#ef4444', '#dc2626', '#b9
 // Cumulative point goal to clear a level: 5, 15, 30, 50, 75, ... Each level
 // requires more points than the last (deltas 5, 10, 15, 20, ...).
 const ironSnakeGoalForLevel = (level: number): number => (5 * level * (level + 1)) / 2
+// Iron Snake "final stretch" fruit colours. The fruit is recoloured for the
+// last three fruits of a level (remaining 3 -> 2 -> 1), flashing near-white on
+// the final fruit so the level ending is unmistakable.
+const IRON_SNAKE_FINAL_FRUIT_COLORS: Record<number, [string, string, string]> = {
+  3: ['#8b5cf6', '#7c3aed', '#6d28d9'], // violet
+  2: ['#ec4899', '#db2777', '#be185d'], // magenta
+  1: ['#f8fafc', '#e2e8f0', '#cbd5e1'], // white flash (final fruit)
+}
 
 function formatDuration(seconds: number): string {
   const total = Math.max(0, Math.floor(seconds))
@@ -618,6 +626,11 @@ class SnakeGame {
     const head2 = tint(['#60a5fa', '#3b82f6', '#2563eb'], HUNGER_HEAD_COLORS, f2)
     const body2 = tint(['#3b82f6', '#2563eb', '#1d4ed8'], HUNGER_BODY_COLORS, f2)
 
+    // Iron Snake final-stretch cue: recolour the fruit for the last three fruits.
+    const remainingFruit = this.ironSnakeRemaining()
+    const foodColors: [string, string, string] =
+      IRON_SNAKE_FINAL_FRUIT_COLORS[remainingFruit] ?? ['#ef4444', '#dc2626', '#b91c1c']
+
     // Draw blocks
     for (const obj of objects) {
       switch (obj.type) {
@@ -634,7 +647,7 @@ class SnakeGame {
           this.drawBlock(obj.x, obj.y, body2[0], body2[1], body2[2])
           break
         case 'food':
-          this.drawBlock(obj.x, obj.y, '#ef4444', '#dc2626', '#b91c1c')
+          this.drawBlock(obj.x, obj.y, foodColors[0], foodColors[1], foodColors[2])
           break
       }
     }
@@ -1629,6 +1642,14 @@ class SnakeGame {
     return Math.min(1, (movesSinceFood - warnStart) / (limit - warnStart))
   }
 
+  // Points (== fruits, since 1 fruit = 1 pt) still needed to clear the current
+  // Iron Snake level. 0 outside Iron Snake Mode or once the goal is reached.
+  private ironSnakeRemaining(): number {
+    if (!this.ironSnakeMode) return 0
+    const combined = this.score + (this.isTwoSnakeMode() ? this.score2 : 0)
+    return Math.max(0, this.levelGoal - combined)
+  }
+
   // Linear interpolate between two "#rrggbb" colours (t in [0,1]).
   private lerpHex(from: string, to: string, t: number): string {
     const parse = (hex: string) => [
@@ -1824,8 +1845,7 @@ class SnakeGame {
     gridDisplay.classList.toggle('hidden', this.ironSnakeMode)
     goalDisplay.classList.toggle('hidden', !this.ironSnakeMode)
     if (this.ironSnakeMode) {
-      const combined = this.score + (this.isTwoSnakeMode() ? this.score2 : 0)
-      const remaining = Math.max(0, this.levelGoal - combined)
+      const remaining = this.ironSnakeRemaining()
       const suffix = remaining === 1 ? 'pt' : 'pts'
       document.getElementById('iron-snake-goal')!.textContent = `${remaining} ${suffix}`
     }
