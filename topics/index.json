@@ -250,6 +250,29 @@
 				}
 			],
 			"lastUpdatedAt": "2026-07-02T21:12:13.686Z"
+		},
+		{
+			"stableSlug": "death-freeze-loss-reason",
+			"title": "Death Freeze: Show Loss Reason Until Key Press",
+			"summary": "Freezes the board on death, highlights the fatal cell, shows a loss-reason banner, and waits for any key before advancing to Game Over.",
+			"relatedBranches": [
+				"feature/lossreason"
+			],
+			"sourceRefs": [
+				{
+					"type": "summary",
+					"id": "b0cf976572670c1490b0c2fd604942e8b7243105",
+					"timestamp": "2026-07-02T03:20:13.000Z",
+					"branch": "feature/lossreason"
+				},
+				{
+					"type": "plan",
+					"id": "prancy-nibbling-phoenix-b0cf9765",
+					"timestamp": "2026-07-02T03:20:37.332Z",
+					"branch": "feature/lossreason"
+				}
+			],
+			"lastUpdatedAt": "2026-07-02T21:19:04.338Z"
 		}
 	]
 }
