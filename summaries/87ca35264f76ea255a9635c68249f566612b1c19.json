@@ -1,0 +1,93 @@
+{
+	"version": 5,
+	"commitHash": "87ca35264f76ea255a9635c68249f566612b1c19",
+	"commitMessage": "Add interior holes to Iron Snake boards (JOE-6)",
+	"commitAuthor": "Joe Hart",
+	"commitDate": "2026-07-02T21:51:22.000Z",
+	"branch": "josephhart/joe-6-iron-snake-boards-with-holes-in-the-middle",
+	"generatedAt": "2026-07-02T21:51:48.545Z",
+	"commitType": "commit",
+	"commitSource": "cli",
+	"transcriptEntries": 7,
+	"conversationTurns": 4,
+	"llm": {
+		"model": "claude-sonnet-4-6",
+		"inputTokens": 16319,
+		"outputTokens": 916,
+		"apiLatencyMs": 25432,
+		"stopReason": null,
+		"source": "jolli-proxy"
+	},
+	"stats": {
+		"filesChanged": 2,
+		"insertions": 202,
+		"deletions": 15
+	},
+	"topics": [
+		{
+			"title": "Add interior obstacle holes to Iron Snake boards",
+			"trigger": "A customer requested that Iron Snake boards have holes in the middle — interior gaps the snake must navigate around, where colliding with one is fatal, just like hitting the outer wall.",
+			"response": "- Added a `carveHoles()` function in `src/iron-snake.ts` that punches small interior voids into an already-valid solid board shape. Holes are validated before being committed: each candidate is rejected if it breaks single-component connectivity (which would make some food unreachable) or creates a corridor narrower than the existing minimum-width threshold. Both validators were reused verbatim from the base shape generator rather than written fresh.\n- Wired hole carving into both board generators: `generateIronSnakeBoard` (level 1) carves after the solid shape passes validation; `growIronSnakeBoard` (level transitions) builds a protected-cell set covering every snake cell plus its orthogonal neighbors before carving, so a hole can never open under a snake or immediately in front of a head when play resumes.\n- Hole count and maximum footprint size scale with the Iron Snake level: early boards get one or two small single-cell gaps; later boards get several larger cavities (up to roughly 4×4 cells by level 8–10), providing a natural difficulty ramp without any separate tuning pass.",
+			"decisions": "- **Reusing existing invariant checkers as hole validators**: Rather than writing new safety logic, the hole-carving pass reuses the same connectivity check and minimum-width morphological open that already guard the base shape. This means any hole that survives is automatically guaranteed to be a genuine interior gap with adequate clearance — the minimum-width check rejects holes placed within one cell of another wall, so thin corridors and edge bites are impossible without any extra code.\n- **Anchoring placement attempts on known playable cells**: Random placement across the full bounding grid wastes most of the attempt budget on off-board positions, since the playable blob covers only about 57% of the grid. Anchoring each attempt on an actual on-board cell and requiring the entire footprint to be surrounded by playable neighbors (the \"interior only\" constraint) was the change that made hole placement reliable on small early boards, where deep-interior positions are a minority.\n- **Level-scaled count and size rather than fixed tuning constants**: Tying hole count and maximum footprint to the current level means the difficulty increase is automatic as the arena grows across levels, and no separate difficulty curve needs to be maintained. The play-test feedback during the session (holes should be randomly larger and more numerous at later levels) was the direct prompt for this approach over the original area-only scaling.",
+			"todo": "The \"Fell into a hole!\" death message was not visually confirmed firing during automated verification — bots avoid holes, so the message could not be triggered in the headless run. A quick manual play-through to confirm the message appears on a hole collision is still outstanding.",
+			"filesAffected": [
+				"src/iron-snake.ts",
+				"src/main.ts"
+			],
+			"category": "feature",
+			"importance": "major"
+		}
+	],
+	"ticketId": "JOE-6",
+	"recap": "Iron Snake boards now contain interior holes — dark voids surrounded by the playable surface that the snake must navigate around. Colliding with a hole is immediately fatal, food never spawns inside one, and the bot correctly routes around them. The holes grow in number and size as the player advances through levels: early boards have one or two small single-cell gaps, while later boards host several larger cavities, giving the mode a natural difficulty ramp without any manual tuning.\n\nOn level transitions, holes are carved after the new board shape is finalized, and the area immediately around the snake is always protected, so a hole can never appear under the snake or directly in its path the moment play resumes. The death screen now distinguishes between hitting the outer wall and falling into an interior hole, in both single-player and two-player modes.",
+	"diffStats": {
+		"filesChanged": 2,
+		"insertions": 202,
+		"deletions": 15
+	},
+	"references": [
+		{
+			"archivedKey": "notion:3914fc101d348090a433da4566d0144e-87ca3526",
+			"source": "notion",
+			"nativeId": "3914fc101d348090a433da4566d0144e",
+			"title": "Snake Game Customer Requests",
+			"url": "https://app.notion.com/p/3914fc101d348090a433da4566d0144e",
+			"fields": [
+				{
+					"key": "entity-type",
+					"label": "Type",
+					"value": "page",
+					"icon": "symbol-class"
+				}
+			],
+			"referencedAt": "2026-07-02T21:20:24.755Z",
+			"sourceToolName": "mcp__claude_ai_Notion__notion-fetch"
+		},
+		{
+			"archivedKey": "linear:JOE-6-87ca3526",
+			"source": "linear",
+			"nativeId": "JOE-6",
+			"title": "Iron Snake: boards with holes in the middle",
+			"url": "https://linear.app/joesthewizardworkspace/issue/JOE-6/iron-snake-boards-with-holes-in-the-middle",
+			"fields": [
+				{
+					"key": "status",
+					"label": "Status",
+					"value": "Backlog",
+					"icon": "circle-large-filled"
+				},
+				{
+					"key": "priority",
+					"label": "Priority",
+					"value": "Medium",
+					"icon": "flame"
+				}
+			],
+			"referencedAt": "2026-07-02T21:22:10.701Z",
+			"sourceToolName": "mcp__claude_ai_Linear__save_issue"
+		}
+	],
+	"transcripts": [
+		"ecb5afda-1c96-4f3a-ac5b-0aceef721625"
+	]
+}
