@@ -2,62 +2,6 @@
 	"version": 1,
 	"entries": [
 		{
-			"commitHash": "b7b116ef0101ee1b0420443bb2f1e79d57d50415",
-			"recap": "The landing page preview was substantially upgraded to match the real game's visual quality. The snake now renders with a taller head block featuring eyes that face the direction of travel, and a tapered tail that narrows to a point. Each page load randomly commits to either an Iron Snake carved board or a classic rectangle, with a fresh shape generated on every life. A small overlay in the corner of the preview names the bot currently playing, and the bot changes on every reset — so the preview now showcases the variety of strategies available in the full game.\n\nA long-standing bug in the bot movement system was also fixed. When a bot detected it was stuck in a loop, it would switch to an escape strategy and never return to its own algorithm. The escape phase now runs for a fixed window of time, after which the bot resumes its normal decision-making with a clean slate. Bots will still break out of loops when needed, but they no longer get permanently locked into the escape behavior.",
-			"topics": [
-				{
-					"title": "Landing page preview upgraded with real snake graphics, random bots, and Iron Snake boards",
-					"decisions": "- **Per-page-load vs. per-life board type**: Iron vs. classic is decided once when the page loads rather than re-randomized on every death. During verification, screenshots taken at random moments almost always landed on the classic board at a 50/50 per-life split, because the snake survives much longer on the roomy rectangle. Locking the style per visit means a given page load consistently showcases one style across all lives, and visitors who reload will see the other style.\n- **Bot label placement and style**: The overlay is positioned absolutely inside the hero container rather than rendered onto the canvas itself. This keeps text rendering in the DOM where it is crisp at all resolutions and accessible, and avoids adding a text-drawing pass to the animation loop.",
-					"category": "feature",
-					"importance": "major",
-					"filesAffected": [
-						"src/menu-demo.ts",
-						"index.html",
-						"src/style.css"
-					]
-				},
-				{
-					"title": "Bot loop-guard escape now times out and returns control to the bot's own algorithm",
-					"decisions": "- **Clear visit history on escape exit**: when the escape window closes, the record of recently visited positions is wiped. Without this, the bot would immediately re-detect the same stale loop on the very next tick and start another escape, effectively staying in escape mode indefinitely through a different path. Clearing the history gives the bot a clean slate to resume its own strategy.\n- **Trigger only on fresh detection**: the guard now checks whether an escape is already running before starting a new one. The previous code reset the timer unconditionally whenever a loop was detected, which is what caused the timer to hover at one tick below its maximum and never expire. Separating \"start an escape\" from \"continue an escape\" makes the two phases independent and the duration predictable.",
-					"category": "bugfix",
-					"importance": "major",
-					"filesAffected": [
-						"src/bots/loop-guard.ts"
-					]
-				},
-				{
-					"title": "Removed the \"Disable Bot\" button and its keyboard shortcut from the game screen",
-					"decisions": "The `botEnabled` flag and the `botEverActive` leaderboard-disqualification flag were deliberately kept intact. The Solo Bot launch path still sets the bot active, human-input suppression still reads the flag, and the leaderboard check still uses it — only the mid-session toggle surface was removed.",
-					"category": "ux",
-					"importance": "minor",
-					"filesAffected": [
-						"src/main.ts",
-						"index.html"
-					]
-				},
-				{
-					"title": "Removed the ability to switch bots after a game has started",
-					"decisions": "Bot selection is now exclusively a pre-game action available through the Solo Bot and Bot vs. Bot menu panels. The existing bot status display on the game screen still shows the active bot's name for Solo Bot runs, so players retain visibility without the ability to change mid-game.",
-					"category": "ux",
-					"importance": "minor",
-					"filesAffected": [
-						"src/main.ts",
-						"index.html",
-						"src/style.css"
-					]
-				},
-				{
-					"title": "Arrow keys no longer scroll the page while playing",
-					"decisions": "The prevention is applied unconditionally in all game states rather than only when a game is active. This avoids the snake moving and the page scrolling simultaneously in any screen, and the placement after the text-field guard ensures the fix never interferes with typing.",
-					"category": "bugfix",
-					"importance": "minor",
-					"filesAffected": [
-						"src/main.ts"
-					]
-				}
-			]
-		},
-		{
 			"commitHash": "ee8ce65e95eb466316f41f0f744879957887d040",
 			"recap": "Iron Snake mode now animates the board transition between levels: the playable region reshapes cell-by-cell from the completed level's outline into the next level's shape, with each beat of the reshape held for roughly the same duration as one snake move. The arena grows outward from the center in a wave, and old-only cells peel away as the new boundary fills in. The snake and food remain visible and grounded throughout, and normal play resumes automatically once the reshape completes.\n\nTwo bugs discovered during testing were also fixed. The snake was teleporting to the center of the new board on every level advance — the new approach generates the board around the snake's current position rather than relocating the snake onto a freshly generated board, so the snake never moves. A separate issue caused some level transitions to show no shape change at all: the board generation was seeding from the previous board's shape, which was already at target fill when the grid size stayed the same. Seeding from the snake's bounding box instead ensures a genuinely different shape is generated every level regardless of whether the grid grows.",
 			"ticketId": "JOE-5",
@@ -320,6 +264,62 @@
 				{
 					"title": "Death marker now respects scene depth instead of floating on top",
 					"decisions": "Using the existing stable painter's sort rather than a separate depth-test pass kept the fix minimal and consistent with how every other object in the scene is ordered. The only exception retained is the off-grid wall-death sliver, which is genuinely outside the board's coordinate space and has no meaningful depth position to sort into.",
+					"category": "bugfix",
+					"importance": "minor",
+					"filesAffected": [
+						"src/main.ts"
+					]
+				}
+			]
+		},
+		{
+			"commitHash": "b7b116ef0101ee1b0420443bb2f1e79d57d50415",
+			"recap": "The landing page preview was substantially upgraded to match the real game's visual quality. The snake now renders with a taller head block featuring eyes that face the direction of travel, and a tapered tail that narrows to a point. Each page load randomly commits to either an Iron Snake carved board or a classic rectangle, with a fresh shape generated on every life. A small overlay in the corner of the preview names the bot currently playing, and the bot changes on every reset — so the preview now showcases the variety of strategies available in the full game.\n\nA long-standing bug in the bot movement system was also fixed. When a bot detected it was stuck in a loop, it would switch to an escape strategy and never return to its own algorithm. The escape phase now runs for a fixed window of time, after which the bot resumes its normal decision-making with a clean slate. Bots will still break out of loops when needed, but they no longer get permanently locked into the escape behavior.",
+			"topics": [
+				{
+					"title": "Landing page preview upgraded with real snake graphics, random bots, and Iron Snake boards",
+					"decisions": "- **Per-page-load vs. per-life board type**: Iron vs. classic is decided once when the page loads rather than re-randomized on every death. During verification, screenshots taken at random moments almost always landed on the classic board at a 50/50 per-life split, because the snake survives much longer on the roomy rectangle. Locking the style per visit means a given page load consistently showcases one style across all lives, and visitors who reload will see the other style.\n- **Bot label placement and style**: The overlay is positioned absolutely inside the hero container rather than rendered onto the canvas itself. This keeps text rendering in the DOM where it is crisp at all resolutions and accessible, and avoids adding a text-drawing pass to the animation loop.",
+					"category": "feature",
+					"importance": "major",
+					"filesAffected": [
+						"src/menu-demo.ts",
+						"index.html",
+						"src/style.css"
+					]
+				},
+				{
+					"title": "Bot loop-guard escape now times out and returns control to the bot's own algorithm",
+					"decisions": "- **Clear visit history on escape exit**: when the escape window closes, the record of recently visited positions is wiped. Without this, the bot would immediately re-detect the same stale loop on the very next tick and start another escape, effectively staying in escape mode indefinitely through a different path. Clearing the history gives the bot a clean slate to resume its own strategy.\n- **Trigger only on fresh detection**: the guard now checks whether an escape is already running before starting a new one. The previous code reset the timer unconditionally whenever a loop was detected, which is what caused the timer to hover at one tick below its maximum and never expire. Separating \"start an escape\" from \"continue an escape\" makes the two phases independent and the duration predictable.",
+					"category": "bugfix",
+					"importance": "major",
+					"filesAffected": [
+						"src/bots/loop-guard.ts"
+					]
+				},
+				{
+					"title": "Removed the \"Disable Bot\" button and its keyboard shortcut from the game screen",
+					"decisions": "The `botEnabled` flag and the `botEverActive` leaderboard-disqualification flag were deliberately kept intact. The Solo Bot launch path still sets the bot active, human-input suppression still reads the flag, and the leaderboard check still uses it — only the mid-session toggle surface was removed.",
+					"category": "ux",
+					"importance": "minor",
+					"filesAffected": [
+						"src/main.ts",
+						"index.html"
+					]
+				},
+				{
+					"title": "Removed the ability to switch bots after a game has started",
+					"decisions": "Bot selection is now exclusively a pre-game action available through the Solo Bot and Bot vs. Bot menu panels. The existing bot status display on the game screen still shows the active bot's name for Solo Bot runs, so players retain visibility without the ability to change mid-game.",
+					"category": "ux",
+					"importance": "minor",
+					"filesAffected": [
+						"src/main.ts",
+						"index.html",
+						"src/style.css"
+					]
+				},
+				{
+					"title": "Arrow keys no longer scroll the page while playing",
+					"decisions": "The prevention is applied unconditionally in all game states rather than only when a game is active. This avoids the snake moving and the page scrolling simultaneously in any screen, and the placement after the text-field guard ensures the fix never interferes with typing.",
 					"category": "bugfix",
 					"importance": "minor",
 					"filesAffected": [
