@@ -4,7 +4,7 @@
 		{
 			"stableSlug": "overhead-view-toggle",
 			"title": "Overhead (Top-Down) View Toggle",
-			"summary": "Press `O` to toggle a flat top-down view of the snake game board, zeroing camera angles and block height; original settings are restored on exit.",
+			"summary": "Press `O` to toggle a flat top-down view of the snake game board, zeroing camera angles and block height; restores prior settings on exit.",
 			"relatedBranches": [
 				"feature/overhead-view-toggle"
 			],
@@ -16,12 +16,12 @@
 					"branch": "feature/overhead-view-toggle"
 				}
 			],
-			"lastUpdatedAt": "2026-07-01T18:45:05.942Z"
+			"lastUpdatedAt": "2026-06-23T18:20:32.078Z"
 		},
 		{
-			"stableSlug": "gitignore-configuration",
-			"title": "Gitignore Configuration",
-			"summary": "Project .gitignore configuration, including ignored directories such as .jolli.",
+			"stableSlug": "gitignore-jolli",
+			"title": "Chore: Ignore .jolli Directory",
+			"summary": "The .jolli directory is excluded from version control via a project-level ignore rule added in commit 31d93c3f.",
 			"relatedBranches": [
 				"chore/gitignore-jolli"
 			],
@@ -33,182 +33,7 @@
 					"branch": "chore/gitignore-jolli"
 				}
 			],
-			"lastUpdatedAt": "2026-07-01T18:45:05.942Z"
-		},
-		{
-			"stableSlug": "readme-and-feature-docs",
-			"title": "README Consolidation and Feature Documentation",
-			"summary": "Main README rewritten from codebase inventory; extra README files deleted; all shipped features documented accurately.",
-			"relatedBranches": [
-				"docs/cleanup"
-			],
-			"sourceRefs": [
-				{
-					"type": "summary",
-					"id": "4b0f9fd779a7e8cbdc3dd702d41ad4f55eb2836a",
-					"timestamp": "2026-07-01T18:53:35.000Z",
-					"branch": "docs/cleanup"
-				}
-			],
-			"lastUpdatedAt": "2026-07-01T18:53:55.562Z"
-		},
-		{
-			"stableSlug": "random-board-shape-iron-snake-mode",
-			"title": "Random Board Shapes and Iron Snake Mode with Level Goals",
-			"summary": "Iron Snake Mode: irregular board shapes, level/goal progression, and countdown fruit colors for the final 3 fruits of each level.",
-			"relatedBranches": [
-				"feature/boardshape",
-				"feature/fruitcolor"
-			],
-			"sourceRefs": [
-				{
-					"type": "summary",
-					"id": "a00b5c620c8105d59d06c34e2567a3b78fbcd1ac",
-					"timestamp": "2026-07-02T01:07:24.000Z",
-					"branch": "feature/boardshape"
-				},
-				{
-					"type": "plan",
-					"id": "i-want-to-add-deep-eich-a00b5c62",
-					"timestamp": "2026-07-02T01:08:10.250Z",
-					"branch": "feature/boardshape"
-				},
-				{
-					"type": "plan",
-					"id": "also-use-jolli-memory-snazzy-kahan-132523e0",
-					"timestamp": "2026-07-02T03:37:22.753Z",
-					"branch": "feature/fruitcolor"
-				},
-				{
-					"type": "summary",
-					"id": "6aeabc387455a2e195e08ecce50f26d3eea1c19c",
-					"timestamp": "2026-07-01T20:40:06-07:00",
-					"branch": "feature/fruitcolor"
-				}
-			],
-			"lastUpdatedAt": "2026-07-02T03:44:47.159Z"
-		},
-		{
-			"stableSlug": "bot-pathfinding-fixes",
-			"title": "Bot Pathfinding Fixes: Infinite Loop Prevention and Starvation Timer",
-			"summary": "Loop guard breaks bot oscillation cycles via revisit detection + confinement ratio; starvation timer ends games when bots wander without eating.",
-			"relatedBranches": [
-				"bug/botupdate"
-			],
-			"sourceRefs": [
-				{
-					"type": "summary",
-					"id": "4e91f64cb71e1e858e3b492d8900d863fe447675",
-					"timestamp": "2026-07-02T02:03:27.000Z",
-					"branch": "bug/botupdate"
-				},
-				{
-					"type": "plan",
-					"id": "i-noticed-that-there-fluttering-frog-4e91f64c",
-					"timestamp": "2026-07-02T02:04:16.898Z",
-					"branch": "bug/botupdate"
-				}
-			],
-			"lastUpdatedAt": "2026-07-02T02:04:42.080Z"
-		},
-		{
-			"stableSlug": "freeze-on-death-loss-reason",
-			"title": "Freeze on Death with Loss Reason Display",
-			"summary": "On any snake death the board freezes, highlights the fatal cell at correct scene depth, shows a pulsing loss-reason banner, and waits for a key press before advancing to Game Over.",
-			"relatedBranches": [
-				"feature/lossreason",
-				"feature/progression"
-			],
-			"sourceRefs": [
-				{
-					"type": "summary",
-					"id": "b0cf976572670c1490b0c2fd604942e8b7243105",
-					"timestamp": "2026-07-02T03:20:13.000Z",
-					"branch": "feature/lossreason"
-				},
-				{
-					"type": "plan",
-					"id": "prancy-nibbling-phoenix-b0cf9765",
-					"timestamp": "2026-07-02T03:20:37.332Z",
-					"branch": "feature/lossreason"
-				},
-				{
-					"type": "summary",
-					"id": "5247d42bbd4122ab09cb0eea51a8573c84a7f626",
-					"timestamp": "2026-07-02T04:55:03.000Z",
-					"branch": "feature/progression"
-				}
-			],
-			"lastUpdatedAt": "2026-07-02T04:56:23.854Z"
-		},
-		{
-			"stableSlug": "claude-md-jolli-memory",
-			"title": "CLAUDE.md and Jolli Memory Development Workflow Notes",
-			"summary": "CLAUDE.md at repo root instructs Claude to use Jolli Memory for context recall, design questions, and PR descriptions across all sessions.",
-			"relatedBranches": [
-				"docs/claude-md-jolli-memory"
-			],
-			"sourceRefs": [
-				{
-					"type": "summary",
-					"id": "fb4d625d116e8463141265efc147fc41cbf7a8e6",
-					"timestamp": "2026-07-02T03:44:36.000Z",
-					"branch": "docs/claude-md-jolli-memory"
-				},
-				{
-					"type": "summary",
-					"id": "7fdbb7aefeb1311c20012868220c2b11de0597fd",
-					"timestamp": "2026-07-01T20:46:17-07:00",
-					"branch": "docs/claude-md-jolli-memory"
-				}
-			],
-			"lastUpdatedAt": "2026-07-02T04:56:23.854Z"
-		},
-		{
-			"stableSlug": "head-tail-graphics",
-			"title": "Snake Head and Tail Graphics: Visual Rendering of Distinct Head and Tail Segments",
-			"summary": "Head draws at 1.6× height with direction-facing eyes; tail tapers to a wedge point; both share isometric shading via a common drawPrism primitive.",
-			"relatedBranches": [
-				"feature/progression"
-			],
-			"sourceRefs": [
-				{
-					"type": "summary",
-					"id": "5247d42bbd4122ab09cb0eea51a8573c84a7f626",
-					"timestamp": "2026-07-02T04:55:03.000Z",
-					"branch": "feature/progression"
-				},
-				{
-					"type": "plan",
-					"id": "i-want-to-smooth-purrfect-pretzel-5247d42b",
-					"timestamp": "2026-07-02T04:55:55.506Z",
-					"branch": "feature/progression"
-				}
-			],
-			"lastUpdatedAt": "2026-07-02T04:56:23.854Z"
-		},
-		{
-			"stableSlug": "menu-preview-arrow-scroll-polish",
-			"title": "Menu Preview Polish and Arrow-Key Scroll Fix",
-			"summary": "Commit b7b116ef: upgraded landing-page snake preview with real graphics/bots/boards, removed vestigial bot controls, fixed arrow-key scroll and loop-guard.",
-			"relatedBranches": [
-				"chores/cleanup-bugs"
-			],
-			"sourceRefs": [
-				{
-					"type": "summary",
-					"id": "b7b116ef0101ee1b0420443bb2f1e79d57d50415",
-					"timestamp": "2026-07-02T05:48:21.000Z",
-					"branch": "chores/cleanup-bugs"
-				},
-				{
-					"type": "plan",
-					"id": "i-have-some-cleanup-fancy-yeti-b7b116ef",
-					"timestamp": "2026-07-02T05:49:10.249Z",
-					"branch": "chores/cleanup-bugs"
-				}
-			],
-			"lastUpdatedAt": "2026-07-02T13:49:05.294Z"
+			"lastUpdatedAt": "2026-07-02T21:12:13.686Z"
 		}
 	]
 }
