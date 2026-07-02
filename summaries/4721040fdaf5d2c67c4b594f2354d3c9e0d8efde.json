@@ -1,0 +1,72 @@
+{
+	"version": 5,
+	"commitHash": "4721040fdaf5d2c67c4b594f2354d3c9e0d8efde",
+	"commitMessage": "Add Playwright E2E test harness",
+	"commitAuthor": "Joe Hart",
+	"commitDate": "2026-07-02T22:19:30.000Z",
+	"branch": "test/playwright-harness",
+	"generatedAt": "2026-07-02T22:19:53.066Z",
+	"commitType": "commit",
+	"commitSource": "cli",
+	"transcriptEntries": 8,
+	"conversationTurns": 4,
+	"llm": {
+		"model": "claude-sonnet-4-6",
+		"inputTokens": 12791,
+		"outputTokens": 866,
+		"apiLatencyMs": 22505,
+		"stopReason": null,
+		"source": "jolli-proxy"
+	},
+	"stats": {
+		"filesChanged": 10,
+		"insertions": 313,
+		"deletions": 2
+	},
+	"topics": [
+		{
+			"title": "Playwright end-to-end test harness added to snake game",
+			"trigger": "The project's technical task list had a single outstanding item: set up a Playwright test harness. The developer wanted a structured plan reviewed before any code was written.",
+			"response": "- `playwright.config.ts` was created to configure Chromium as the sole browser target, auto-start the Vite dev server on a pinned port, and enable trace capture and screenshots on failure. Three npm scripts (`test`, `test:ui`, `test:report`) were added to `package.json`. The `.gitignore` was updated to exclude test artifacts.\n- Four spec files were written under `tests/e2e/`: `menu.spec.ts` covers initial menu rendering and leaderboard navigation; `gameplay.spec.ts` covers new-game readouts, pause toggle, and reset; `game-over.spec.ts` drives the snake into a wall to trigger a deterministic death and verifies the death-banner freeze and game-over screen flow; `iron-snake.spec.ts` verifies the HUD swap when Iron Snake mode is enabled. A shared `helpers.ts` provides reusable navigation flows and screen selectors.\n- A GitHub Actions workflow (`.github/workflows/playwright.yml`) was added to run the full suite on every push and pull request to `main`, uploading the HTML report as a build artifact retained for seven days.",
+			"decisions": "- **Chromium only to start**: The harness targets a single browser rather than the full Playwright cross-browser matrix. Adding Firefox and WebKit later is straightforward, but starting lean keeps CI fast and avoids flakiness from browser-specific quirks before the suite is proven stable.\n- **Keyboard-and-DOM testing strategy**: The game renders entirely on a canvas with no state exposed to the page, so tests cannot inspect game internals directly. The approach drives the game through keyboard input and asserts on observable DOM signals — screen visibility toggled by a CSS class, and text readouts for score, level, and goal — rather than canvas pixels. This keeps tests resilient to visual changes while still covering real user flows.\n- **Deterministic death over score-based assertions**: The game-over test steers the snake into the right wall from its fixed starting position rather than waiting for a score increment or fruit collection. Wall collision is guaranteed within a bounded number of game ticks, making the test reliable without any random-seed control or internal game hooks. A `window.__game` handle for deeper determinism was explicitly deferred as a follow-up.",
+			"todo": "- A `window.__game` dev-mode handle was discussed as a future addition to enable seeded fruit spawns and forced game states for deeper deterministic testing. Deferred by explicit agreement.",
+			"filesAffected": [
+				"playwright.config.ts",
+				"tests/e2e/helpers.ts",
+				"tests/e2e/game-over.spec.ts",
+				".github/workflows/playwright.yml",
+				"package.json"
+			],
+			"category": "test",
+			"importance": "major"
+		}
+	],
+	"recap": "The snake game now has a full automated test suite that runs on every code change. Eight end-to-end tests cover the main menu, single-player game startup, pause and reset behavior, death and game-over flow, and Iron Snake mode — all driven through keyboard input and verified against visible on-screen text and screen transitions. A mid-run fix was needed for the Iron Snake goal readout, which displays as a formatted string rather than a bare number.\n\nThe suite runs automatically in GitHub Actions on every push and pull request to the main branch at no cost, with the full test report saved as a downloadable artifact for seven days. Developers can also run the suite locally with a single command, or open an interactive visual runner to step through tests in a real browser.",
+	"diffStats": {
+		"filesChanged": 10,
+		"insertions": 313,
+		"deletions": 2
+	},
+	"references": [
+		{
+			"archivedKey": "notion:3914fc101d34803484fee08259a3ade0-4721040f",
+			"source": "notion",
+			"nativeId": "3914fc101d34803484fee08259a3ade0",
+			"title": "Snake Game Technical TODOs",
+			"url": "https://app.notion.com/p/3914fc101d34803484fee08259a3ade0",
+			"fields": [
+				{
+					"key": "entity-type",
+					"label": "Type",
+					"value": "page",
+					"icon": "symbol-class"
+				}
+			],
+			"referencedAt": "2026-07-02T22:03:31.896Z",
+			"sourceToolName": "mcp__claude_ai_Notion__notion-fetch"
+		}
+	],
+	"transcripts": [
+		"6b4885a9-2173-4b49-8fb2-af3da14e4841"
+	]
+}

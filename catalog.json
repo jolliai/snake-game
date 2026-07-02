@@ -308,6 +308,25 @@
 					]
 				}
 			]
+		},
+		{
+			"commitHash": "4721040fdaf5d2c67c4b594f2354d3c9e0d8efde",
+			"recap": "The snake game now has a full automated test suite that runs on every code change. Eight end-to-end tests cover the main menu, single-player game startup, pause and reset behavior, death and game-over flow, and Iron Snake mode — all driven through keyboard input and verified against visible on-screen text and screen transitions. A mid-run fix was needed for the Iron Snake goal readout, which displays as a formatted string rather than a bare number.\n\nThe suite runs automatically in GitHub Actions on every push and pull request to the main branch at no cost, with the full test report saved as a downloadable artifact for seven days. Developers can also run the suite locally with a single command, or open an interactive visual runner to step through tests in a real browser.",
+			"topics": [
+				{
+					"title": "Playwright end-to-end test harness added to snake game",
+					"decisions": "- **Chromium only to start**: The harness targets a single browser rather than the full Playwright cross-browser matrix. Adding Firefox and WebKit later is straightforward, but starting lean keeps CI fast and avoids flakiness from browser-specific quirks before the suite is proven stable.\n- **Keyboard-and-DOM testing strategy**: The game renders entirely on a canvas with no state exposed to the page, so tests cannot inspect game internals directly. The approach drives the game through keyboard input and asserts on observable DOM signals — screen visibility toggled by a CSS class, and text readouts for score, level, and goal — rather than canvas pixels. This keeps tests resilient to visual changes while still covering real user flows.\n- **Deterministic death over score-based assertions**: The game-over test steers the snake into the right wall from its fixed starting position rather than waiting for a score increment or fruit collection. Wall collision is guaranteed within a bounded number of game ticks, making the test reliable without any random-seed control or internal game hooks. A `window.__game` handle for deeper determinism was explicitly deferred as a follow-up.",
+					"category": "test",
+					"importance": "major",
+					"filesAffected": [
+						"playwright.config.ts",
+						"tests/e2e/helpers.ts",
+						"tests/e2e/game-over.spec.ts",
+						".github/workflows/playwright.yml",
+						"package.json"
+					]
+				}
+			]
 		}
 	]
 }
