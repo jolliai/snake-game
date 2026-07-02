@@ -1357,8 +1357,14 @@ class SnakeGame {
     }
 
     if (this.checkCollision(head)) {
-      const hitWall = !this.inBounds(head)
-      this.deathMessage = hitWall ? 'Hit the wall!' : 'Ran into itself!'
+      // A head inside the grid but off-board fell into an interior hole; fully
+      // off-grid is the outer wall; otherwise it collided with its own body.
+      const insideGrid = head.x >= 0 && head.x < this.gridSize && head.y >= 0 && head.y < this.gridSize
+      this.deathMessage = !insideGrid
+        ? 'Hit the wall!'
+        : !this.inBounds(head)
+          ? 'Fell into a hole!'
+          : 'Ran into itself!'
       this.deathCells = [{ x: head.x, y: head.y, who: 1 }]
       this.beginDeathFreeze(() => this.endGame())
       return
@@ -1418,20 +1424,24 @@ class SnakeGame {
     head2.x += vec2.x
     head2.y += vec2.y
 
-    // Check collisions for each snake
-    const p1HitsWall = !this.inBounds(head1)
+    // Check collisions for each snake. "Off-board" covers both the outer wall
+    // and an interior hole; an in-grid off-board cell is a hole (see describe).
+    const inGrid = (h: Position) => h.x >= 0 && h.x < this.gridSize && h.y >= 0 && h.y < this.gridSize
+    const p1OffBoard = !this.inBounds(head1)
+    const p1InGrid = inGrid(head1)
     const p1HitsSelf = this.snakeSet.has(`${head1.x},${head1.y}`)
     const p1HitsP2 = this.snakeSet2.has(`${head1.x},${head1.y}`)
 
-    const p2HitsWall = !this.inBounds(head2)
+    const p2OffBoard = !this.inBounds(head2)
+    const p2InGrid = inGrid(head2)
     const p2HitsSelf = this.snakeSet2.has(`${head2.x},${head2.y}`)
     const p2HitsP1 = this.snakeSet.has(`${head2.x},${head2.y}`)
 
     // Head-to-head collision
     const headToHead = head1.x === head2.x && head1.y === head2.y
 
-    const p1Dead = p1HitsWall || p1HitsSelf || p1HitsP2 || headToHead
-    const p2Dead = p2HitsWall || p2HitsSelf || p2HitsP1 || headToHead
+    const p1Dead = p1OffBoard || p1HitsSelf || p1HitsP2 || headToHead
+    const p2Dead = p2OffBoard || p2HitsSelf || p2HitsP1 || headToHead
 
     if (p1Dead || p2Dead) {
       this.deathCells = []
@@ -1440,16 +1450,16 @@ class SnakeGame {
       // Compose a per-snake reason so the banner reads sensibly however each
       // snake died. Head-on is a single shared cause; otherwise describe each
       // dead snake (wall > self > opponent, matching the p*Dead precedence).
-      const describe = (who: 1 | 2, hitsWall: boolean, hitsSelf: boolean): string =>
-        hitsWall ? `P${who} hit the wall`
+      const describe = (who: 1 | 2, offBoard: boolean, inGridCell: boolean, hitsSelf: boolean): string =>
+        offBoard ? (inGridCell ? `P${who} fell into a hole` : `P${who} hit the wall`)
           : hitsSelf ? `P${who} ran into itself`
           : `P${who} crashed into P${who === 1 ? 2 : 1}`
       if (headToHead) {
         this.deathMessage = 'Head-on collision!'
       } else {
         const parts: string[] = []
-        if (p1Dead) parts.push(describe(1, p1HitsWall, p1HitsSelf))
-        if (p2Dead) parts.push(describe(2, p2HitsWall, p2HitsSelf))
+        if (p1Dead) parts.push(describe(1, p1OffBoard, p1InGrid, p1HitsSelf))
+        if (p2Dead) parts.push(describe(2, p2OffBoard, p2InGrid, p2HitsSelf))
         this.deathMessage = parts.join(' · ')
       }
       this.beginDeathFreeze(() => this.endGameTwoPlayer(p1Dead, p2Dead))
@@ -1950,7 +1960,7 @@ class SnakeGame {
 
     if (this.ironSnakeMode) {
       const cells = this.isTwoSnakeMode() ? [...this.snake, ...this.snake2] : this.snake
-      const grown = growIronSnakeBoard(this.gridSize, cells)
+      const grown = growIronSnakeBoard(this.gridSize, cells, this.level)
       this.boardMask = grown.mask
       this.boardArea = grown.area
     } else {
