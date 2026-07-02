@@ -2,23 +2,6 @@
 	"version": 1,
 	"entries": [
 		{
-			"commitHash": "87ca35264f76ea255a9635c68249f566612b1c19",
-			"recap": "Iron Snake boards now contain interior holes — dark voids surrounded by the playable surface that the snake must navigate around. Colliding with a hole is immediately fatal, food never spawns inside one, and the bot correctly routes around them. The holes grow in number and size as the player advances through levels: early boards have one or two small single-cell gaps, while later boards host several larger cavities, giving the mode a natural difficulty ramp without any manual tuning.\n\nOn level transitions, holes are carved after the new board shape is finalized, and the area immediately around the snake is always protected, so a hole can never appear under the snake or directly in its path the moment play resumes. The death screen now distinguishes between hitting the outer wall and falling into an interior hole, in both single-player and two-player modes.",
-			"ticketId": "JOE-6",
-			"topics": [
-				{
-					"title": "Add interior obstacle holes to Iron Snake boards",
-					"decisions": "- **Reusing existing invariant checkers as hole validators**: Rather than writing new safety logic, the hole-carving pass reuses the same connectivity check and minimum-width morphological open that already guard the base shape. This means any hole that survives is automatically guaranteed to be a genuine interior gap with adequate clearance — the minimum-width check rejects holes placed within one cell of another wall, so thin corridors and edge bites are impossible without any extra code.\n- **Anchoring placement attempts on known playable cells**: Random placement across the full bounding grid wastes most of the attempt budget on off-board positions, since the playable blob covers only about 57% of the grid. Anchoring each attempt on an actual on-board cell and requiring the entire footprint to be surrounded by playable neighbors (the \"interior only\" constraint) was the change that made hole placement reliable on small early boards, where deep-interior positions are a minority.\n- **Level-scaled count and size rather than fixed tuning constants**: Tying hole count and maximum footprint to the current level means the difficulty increase is automatic as the arena grows across levels, and no separate difficulty curve needs to be maintained. The play-test feedback during the session (holes should be randomly larger and more numerous at later levels) was the direct prompt for this approach over the original area-only scaling.",
-					"category": "feature",
-					"importance": "major",
-					"filesAffected": [
-						"src/iron-snake.ts",
-						"src/main.ts"
-					]
-				}
-			]
-		},
-		{
 			"commitHash": "4721040fdaf5d2c67c4b594f2354d3c9e0d8efde",
 			"recap": "The snake game now has a full automated test suite that runs on every code change. Eight end-to-end tests cover the main menu, single-player game startup, pause and reset behavior, death and game-over flow, and Iron Snake mode — all driven through keyboard input and verified against visible on-screen text and screen transitions. A mid-run fix was needed for the Iron Snake goal readout, which displays as a formatted string rather than a bare number.\n\nThe suite runs automatically in GitHub Actions on every push and pull request to the main branch at no cost, with the full test report saved as a downloadable artifact for seven days. Developers can also run the suite locally with a single command, or open an interactive visual runner to step through tests in a real browser.",
 			"topics": [
@@ -323,6 +306,23 @@
 					"category": "feature",
 					"importance": "major",
 					"filesAffected": [
+						"src/main.ts"
+					]
+				}
+			]
+		},
+		{
+			"commitHash": "87ca35264f76ea255a9635c68249f566612b1c19",
+			"recap": "Iron Snake boards now contain interior holes — dark voids surrounded by the playable surface that the snake must navigate around. Colliding with a hole is immediately fatal, food never spawns inside one, and the bot correctly routes around them. The holes grow in number and size as the player advances through levels: early boards have one or two small single-cell gaps, while later boards host several larger cavities, giving the mode a natural difficulty ramp without any manual tuning.\n\nOn level transitions, holes are carved after the new board shape is finalized, and the area immediately around the snake is always protected, so a hole can never appear under the snake or directly in its path the moment play resumes. The death screen now distinguishes between hitting the outer wall and falling into an interior hole, in both single-player and two-player modes.",
+			"ticketId": "JOE-6",
+			"topics": [
+				{
+					"title": "Add interior obstacle holes to Iron Snake boards",
+					"decisions": "- **Reusing existing invariant checkers as hole validators**: Rather than writing new safety logic, the hole-carving pass reuses the same connectivity check and minimum-width morphological open that already guard the base shape. This means any hole that survives is automatically guaranteed to be a genuine interior gap with adequate clearance — the minimum-width check rejects holes placed within one cell of another wall, so thin corridors and edge bites are impossible without any extra code.\n- **Anchoring placement attempts on known playable cells**: Random placement across the full bounding grid wastes most of the attempt budget on off-board positions, since the playable blob covers only about 57% of the grid. Anchoring each attempt on an actual on-board cell and requiring the entire footprint to be surrounded by playable neighbors (the \"interior only\" constraint) was the change that made hole placement reliable on small early boards, where deep-interior positions are a minority.\n- **Level-scaled count and size rather than fixed tuning constants**: Tying hole count and maximum footprint to the current level means the difficulty increase is automatic as the arena grows across levels, and no separate difficulty curve needs to be maintained. The play-test feedback during the session (holes should be randomly larger and more numerous at later levels) was the direct prompt for this approach over the original area-only scaling.",
+					"category": "feature",
+					"importance": "major",
+					"filesAffected": [
+						"src/iron-snake.ts",
 						"src/main.ts"
 					]
 				}
