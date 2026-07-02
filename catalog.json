@@ -2,20 +2,6 @@
 	"version": 1,
 	"entries": [
 		{
-			"commitHash": "7fdbb7aefeb1311c20012868220c2b11de0597fd",
-			"topics": [
-				{
-					"title": "Add project guidance to use Jolli Memory when planning or coding",
-					"decisions": "- **Separate branch over bundling with the active feature branch**: The guidance file is unrelated to the progression feature in progress, so mixing it into that branch would add noise to the PR diff and tie a trivial doc change to a longer-running feature. Branching off the upstream default branch instead keeps the diff minimal and lets this land independently in minutes.\n- **Project-level guidance file over a memory entry or hook**: A project-level guidance file is loaded into context every session and applies to anyone working in the repo, making it the right home for judgment-based instructions like \"when appropriate.\" A hook would be too rigid for a \"when relevant\" guideline and would misfire on unrelated tasks.",
-					"category": "docs",
-					"importance": "minor",
-					"filesAffected": [
-						"CLAUDE.md"
-					]
-				}
-			]
-		},
-		{
 			"commitHash": "5247d42bbd4122ab09cb0eea51a8573c84a7f626",
 			"recap": "Iron Snake mode now carries the snake's full accumulated length across level advances. When a level goal is reached, the board grows to a size proportional to how long the snake will be by the next goal, and the snake reappears in the same shape it had at the end of the previous level — translated to a new position on the new board, or rotated if the exact placement won't fit. A Warnsdorff-guided layout handles the rare cases where even a rotated fit is impossible, preserving length even when the exact shape cannot be honored. The net effect is that progression feels continuous: the snake the player has grown over several levels carries forward, and the expanding board keeps later levels challenging without becoming impossible.\n\nThe snake's head and tail received distinct visual treatments in the same session. The head now rises noticeably above the body segments and displays eyes on the face pointing in the direction of travel, making it immediately clear which end is the front and where the snake is headed. The tail tapers to a narrow point rather than ending in a full-sized cube, giving the snake a clear visual start and finish. Both effects use the same underlying shading logic as the body, so they blend naturally into the isometric scene.",
 			"topics": [
@@ -324,6 +310,20 @@
 					"importance": "major",
 					"filesAffected": [
 						"src/main.ts"
+					]
+				}
+			]
+		},
+		{
+			"commitHash": "7fdbb7aefeb1311c20012868220c2b11de0597fd",
+			"topics": [
+				{
+					"title": "Add project guidance to use Jolli Memory when planning or coding",
+					"decisions": "- **Separate branch over bundling with the active feature branch**: The guidance file is unrelated to the progression feature in progress, so mixing it into that branch would add noise to the PR diff and tie a trivial doc change to a longer-running feature. Branching off the upstream default branch instead keeps the diff minimal and lets this land independently in minutes.\n- **Project-level guidance file over a memory entry or hook**: A project-level guidance file is loaded into context every session and applies to anyone working in the repo, making it the right home for judgment-based instructions like \"when appropriate.\" A hook would be too rigid for a \"when relevant\" guideline and would misfire on unrelated tasks.",
+					"category": "docs",
+					"importance": "minor",
+					"filesAffected": [
+						"CLAUDE.md"
 					]
 				}
 			]
