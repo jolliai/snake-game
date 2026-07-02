@@ -99,13 +99,23 @@
 		},
 		{
 			"commitHash": "132523e0e50ff66447342bb3460aab395bcc5eed",
-			"parentCommitHash": null,
+			"parentCommitHash": "6aeabc387455a2e195e08ecce50f26d3eea1c19c",
 			"treeHash": "d0b5199d7a445a911b9d7cc1cc3d36ba056c7daa",
 			"commitType": "commit",
 			"commitMessage": "Recolor fruit for last 3 fruits of an Iron Snake level",
 			"commitDate": "2026-07-02T03:37:03.000Z",
 			"branch": "feature/fruitcolor",
-			"generatedAt": "2026-07-02T03:37:36.546Z",
+			"generatedAt": "2026-07-02T03:37:36.546Z"
+		},
+		{
+			"commitHash": "6aeabc387455a2e195e08ecce50f26d3eea1c19c",
+			"parentCommitHash": null,
+			"treeHash": "d0b5199d7a445a911b9d7cc1cc3d36ba056c7daa",
+			"commitType": "rebase",
+			"commitMessage": "Recolor fruit for last 3 fruits of an Iron Snake level (#26)",
+			"commitDate": "2026-07-01T20:40:06-07:00",
+			"branch": "feature/fruitcolor",
+			"generatedAt": "2026-07-02T03:41:23.089Z",
 			"topicCount": 1,
 			"diffStats": {
 				"filesChanged": 1,
