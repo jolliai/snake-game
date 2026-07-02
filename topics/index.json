@@ -163,6 +163,29 @@
 				}
 			],
 			"lastUpdatedAt": "2026-07-02T04:56:23.854Z"
+		},
+		{
+			"stableSlug": "head-tail-graphics",
+			"title": "Snake Head and Tail Graphics: Visual Rendering of Distinct Head and Tail Segments",
+			"summary": "Head draws at 1.6× height with direction-facing eyes; tail tapers to a wedge point; both share isometric shading via a common drawPrism primitive.",
+			"relatedBranches": [
+				"feature/progression"
+			],
+			"sourceRefs": [
+				{
+					"type": "summary",
+					"id": "5247d42bbd4122ab09cb0eea51a8573c84a7f626",
+					"timestamp": "2026-07-02T04:55:03.000Z",
+					"branch": "feature/progression"
+				},
+				{
+					"type": "plan",
+					"id": "i-want-to-smooth-purrfect-pretzel-5247d42b",
+					"timestamp": "2026-07-02T04:55:55.506Z",
+					"branch": "feature/progression"
+				}
+			],
+			"lastUpdatedAt": "2026-07-02T04:56:23.854Z"
 		}
 	]
 }
