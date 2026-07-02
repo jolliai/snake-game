@@ -203,6 +203,29 @@
 				}
 			],
 			"lastUpdatedAt": "2026-07-02T22:19:53.166Z"
+		},
+		{
+			"stableSlug": "iron-snake-level-transition",
+			"title": "Iron Snake Level Transition Animation (Board Morph)",
+			"summary": "Iron Snake level transitions animate the board mask cell-by-cell at snake-move pace; the snake stays in place while the arena reshapes around it.",
+			"relatedBranches": [
+				"josephhart/joe-5-create-smooth-transition-from-level-to-level-in-iron-snake"
+			],
+			"sourceRefs": [
+				{
+					"type": "summary",
+					"id": "ee8ce65e95eb466316f41f0f744879957887d040",
+					"timestamp": "2026-07-02T21:10:51.000Z",
+					"branch": "josephhart/joe-5-create-smooth-transition-from-level-to-level-in-iron-snake"
+				},
+				{
+					"type": "plan",
+					"id": "i-have-a-linear-eager-biscuit-ee8ce65e",
+					"timestamp": "2026-07-02T21:59:30.140Z",
+					"branch": "josephhart/joe-5-create-smooth-transition-from-level-to-level-in-iron-snake"
+				}
+			],
+			"lastUpdatedAt": "2026-07-02T22:19:53.166Z"
 		}
 	]
 }
