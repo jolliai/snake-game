@@ -1,5 +1,6 @@
 import { AVAILABLE_BOTS, DEFAULT_BOT_ID, getBotById } from './bots'
 import type { BotHelpers, BotState, SnakeBot } from './bots/bot-types'
+import { applyLoopGuard, createLoopMemory, resetLoopMemory, type LoopMemory } from './bots/loop-guard'
 import {
   DIRECTIONS,
   DIRECTION_VECTORS,
@@ -27,6 +28,7 @@ export class MenuDemo {
   private gridSize: number = DEMO_GRID_SIZE
 
   private bot: SnakeBot
+  private loopMemory: LoopMemory = createLoopMemory()
   private isoAngle: number = Math.PI / 4
   private running: boolean = false
   private rafId: number | null = null
@@ -106,6 +108,7 @@ export class MenuDemo {
     this.snake = [{ x: center, y: center }]
     this.snakeSet = new Set([`${center},${center}`])
     this.direction = 'RIGHT'
+    resetLoopMemory(this.loopMemory)
     this.spawnFood()
   }
 
@@ -126,6 +129,7 @@ export class MenuDemo {
     this.snakeSet.add(`${head.x},${head.y}`)
 
     if (head.x === this.food.x && head.y === this.food.y) {
+      resetLoopMemory(this.loopMemory)
       this.spawnFood()
     } else {
       const tail = this.snake.pop()!
@@ -146,7 +150,8 @@ export class MenuDemo {
       getCandidateDirections: dir =>
         DIRECTIONS.filter(d => OPPOSITE_DIRECTIONS[dir] !== d)
     }
-    const dir = this.bot.chooseDirection(state, helpers)
+    const botDir = this.bot.chooseDirection(state, helpers)
+    const dir = applyLoopGuard(this.loopMemory, state, helpers, botDir)
     if (!dir || OPPOSITE_DIRECTIONS[this.direction] === dir) return null
     return dir
   }
