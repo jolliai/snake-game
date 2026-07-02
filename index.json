@@ -125,13 +125,23 @@
 		},
 		{
 			"commitHash": "fb4d625d116e8463141265efc147fc41cbf7a8e6",
-			"parentCommitHash": null,
+			"parentCommitHash": "7fdbb7aefeb1311c20012868220c2b11de0597fd",
 			"treeHash": "2bff0b209545ed9d93ddd3a608865761fe21ed73",
 			"commitType": "commit",
 			"commitMessage": "docs: add CLAUDE.md note to use Jolli Memory when planning/coding",
 			"commitDate": "2026-07-02T03:44:36.000Z",
 			"branch": "docs/claude-md-jolli-memory",
-			"generatedAt": "2026-07-02T03:44:47.024Z",
+			"generatedAt": "2026-07-02T03:44:47.024Z"
+		},
+		{
+			"commitHash": "7fdbb7aefeb1311c20012868220c2b11de0597fd",
+			"parentCommitHash": null,
+			"treeHash": "2bff0b209545ed9d93ddd3a608865761fe21ed73",
+			"commitType": "rebase",
+			"commitMessage": "docs: add CLAUDE.md note to use Jolli Memory when planning/coding (#27)",
+			"commitDate": "2026-07-01T20:46:17-07:00",
+			"branch": "docs/claude-md-jolli-memory",
+			"generatedAt": "2026-07-02T03:47:14.439Z",
 			"topicCount": 1,
 			"diffStats": {
 				"filesChanged": 1,
