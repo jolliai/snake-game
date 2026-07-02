@@ -1,0 +1,18 @@
+{
+	"schemaVersion": 1,
+	"stableSlug": "iron-snake-interior-holes",
+	"title": "Iron Snake Boards with Interior Holes",
+	"content": "## Overview\n\nIron Snake boards can contain interior holes — voids punched into the playable area that the snake must navigate around. Colliding with a hole is fatal, identical to hitting the outer wall. This feature was added at customer request (JOE-6).\n\n## Implementation\n\n### `carveHoles()` — `src/iron-snake.ts`\n\nA `carveHoles()` function punches small interior voids into an already-valid solid board shape. Before any hole is committed, it is validated against two criteria:\n\n1. **Single-component connectivity** — the remaining playable area must stay fully connected, ensuring all food positions remain reachable.\n2. **Minimum-width clearance** — the same morphological open used to guard the base shape is reused here. Any hole that would create a corridor narrower than the minimum-width threshold is rejected. This automatically prevents thin corridors and edge bites without additional code.\n\nBoth validators are reused verbatim from the base shape generator.\n\n### Integration with board generators\n\nHole carving is wired into both board generators:\n\n- **`generateIronSnakeBoard`** (level 1 boards): carves holes after the solid shape passes its own validation.\n- **`growIronSnakeBoard`** (level-transition boards): builds a protected-cell set covering every current snake cell plus its orthogonal neighbors before carving. This guarantees a hole can never open beneath a snake or immediately in front of a head when play resumes.\n\n### Placement strategy\n\nEach hole placement attempt is anchored on a known playable cell (rather than a random position across the full bounding grid). The entire hole footprint must be surrounded by playable neighbors — the \"interior only\" constraint. This approach was chosen because the playable blob covers only ~57% of the bounding grid, making unanchored random attempts wasteful and unreliable, especially on small early boards where deep-interior positions are a minority.\n\n### Difficulty scaling\n\nHole count and maximum footprint size scale with the Iron Snake level:\n\n| Stage | Holes | Max footprint |\n|---|---|---|\n| Early levels | 1–2 | Single-cell gaps |\n| Level 8–10 | Several | Up to ~4×4 cells |\n\nThis provides a natural difficulty ramp without a separate tuning pass. Scaling is tied directly to the current level so the difficulty curve is automatic as the arena grows.\n\n## Files\n\n- `src/iron-snake.ts` — `carveHoles()` function and integration into both board generators\n- `src/main.ts` — wiring changes",
+	"relatedBranches": [
+		"josephhart/joe-6-iron-snake-boards-with-holes-in-the-middle"
+	],
+	"sourceRefs": [
+		{
+			"type": "summary",
+			"id": "87ca35264f76ea255a9635c68249f566612b1c19",
+			"timestamp": "2026-07-02T21:51:22.000Z",
+			"branch": "josephhart/joe-6-iron-snake-boards-with-holes-in-the-middle"
+		}
+	],
+	"lastUpdatedAt": "2026-07-02T22:19:53.166Z"
+}
