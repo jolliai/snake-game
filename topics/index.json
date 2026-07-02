@@ -62,9 +62,10 @@
 		{
 			"stableSlug": "iron-snake-mode-board-shapes",
 			"title": "Iron Snake Mode: Random Board Shapes with Level Goals",
-			"summary": "Optional mode replacing the square grid with irregular random board shapes and a cumulative score-based level progression system.",
+			"summary": "Optional mode replacing the square grid with random irregular shapes, interior holes, and a triangular score-goal level progression system.",
 			"relatedBranches": [
-				"feature/boardshape"
+				"feature/boardshape",
+				"josephhart/joe-6-iron-snake-boards-with-holes-in-the-middle"
 			],
 			"sourceRefs": [
 				{
@@ -78,9 +79,15 @@
 					"id": "i-want-to-add-deep-eich-a00b5c62",
 					"timestamp": "2026-07-02T01:08:10.250Z",
 					"branch": "feature/boardshape"
+				},
+				{
+					"type": "summary",
+					"id": "87ca35264f76ea255a9635c68249f566612b1c19",
+					"timestamp": "2026-07-02T21:51:22.000Z",
+					"branch": "josephhart/joe-6-iron-snake-boards-with-holes-in-the-middle"
 				}
 			],
-			"lastUpdatedAt": "2026-07-02T21:12:13.686Z"
+			"lastUpdatedAt": "2026-07-02T21:51:48.651Z"
 		},
 		{
 			"stableSlug": "bot-loop-fix-starvation-timer",
