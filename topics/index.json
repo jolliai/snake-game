@@ -150,6 +150,29 @@
 				}
 			],
 			"lastUpdatedAt": "2026-07-02T21:12:13.686Z"
+		},
+		{
+			"stableSlug": "menu-bot-arrow-cleanup",
+			"title": "Cleanup: Menu Preview Polish, Bot Control Removal, Arrow-Key Scroll Fix",
+			"summary": "Polished landing-page demo with real snake graphics/Iron boards/random bots; removed vestigial bot controls; fixed arrow-key page scroll.",
+			"relatedBranches": [
+				"chores/cleanup-bugs"
+			],
+			"sourceRefs": [
+				{
+					"type": "summary",
+					"id": "b7b116ef0101ee1b0420443bb2f1e79d57d50415",
+					"timestamp": "2026-07-02T05:48:21.000Z",
+					"branch": "chores/cleanup-bugs"
+				},
+				{
+					"type": "plan",
+					"id": "i-have-some-cleanup-fancy-yeti-b7b116ef",
+					"timestamp": "2026-07-02T05:49:10.249Z",
+					"branch": "chores/cleanup-bugs"
+				}
+			],
+			"lastUpdatedAt": "2026-07-02T21:12:13.686Z"
 		}
 	]
 }
