@@ -1,0 +1,24 @@
+{
+	"schemaVersion": 1,
+	"stableSlug": "head-tail-graphics",
+	"title": "Snake Head and Tail Graphics: Visual Rendering of Distinct Head and Tail Segments",
+	"content": "## Overview\n\nThe snake sprite renders three visually distinct segment types: body blocks, a taller head with eyes, and a tapered tail wedge. All three share the same isometric shading logic through a common `drawPrism` primitive in `src/main.ts`.\n\n---\n\n## Head Rendering (`drawSnakeHead`)\n\n**Location:** `src/main.ts`\n\nThe head block draws at **1.6× the body's block height**, making it visually rise above the body in the isometric view. This height scale is passed as an optional parameter to `drawBlock`, which was extended specifically to support this.\n\n### Eyes\n\nEyes are drawn on the **leading vertical face** — the cube face pointing in the direction of travel — with white sclera and dark pupils.\n\n- When the leading face points **toward** the camera, eyes are rendered normally.\n- When the leading face points **away** from the camera, eyes are **omitted entirely** (no fallback to the top face). This means the snake shows its back with no eyes in those orientations.\n\nThis \"no fallback\" policy was a deliberate choice: an earlier version placed eyes on the top face when the leading face was hidden, but this looked unnatural (a snake staring at the sky). The user confirmed that showing no eyes in those cases was acceptable, keeping the rendering clean and the code simpler.\n\n---\n\n## Tail Rendering (`drawSnakeTail`, `tailDirection`)\n\n**Location:** `src/main.ts`\n\nThe tail segment draws as a **tapered wedge**:\n- Full width where it meets the adjacent body segment.\n- Narrows to a small tip in the direction the tail points.\n- Slightly shorter than a standard body block.\n\n`tailDirection()` computes the direction the tail points (away from the body) so `drawSnakeTail()` knows which way to orient the taper.\n\n### Shared Primitive: `drawPrism`\n\n`drawBlock` was refactored to extract a reusable `drawPrism` helper. Both the standard body blocks and the tapered tail wedge are rendered through this primitive, guaranteeing identical isometric shading (face visibility, front/back face coloring) regardless of orientation. Duplicating the shading logic inside `drawSnakeTail` was explicitly rejected because the isometric shading rules are non-trivial and divergence between the two renderers would accumulate over time.\n\n---\n\n## Painter's Algorithm Integration\n\nThe painter's-algorithm object list classifies segments by type before sorting:\n\n| Segment | Type tag |\n|---|---|\n| Head | `'head'` / `'head2'` |\n| Body | `'body'` / `'body2'` |\n| Tail (last segment) | `'tail'` / `'tail2'` |\n\nThe last segment of each snake is classified as `'tail'`/`'tail2'` and routed through `drawSnakeTail`. All other non-head segments use the standard body path. The death marker (`'death'` type) is also sorted into this list so it renders at the correct depth relative to surrounding segments (see death overlay behavior).\n\n---\n\n## File\n\n- `src/main.ts` — `drawSnakeHead`, `drawSnakeTail`, `tailDirection`, `drawPrism` (extracted from `drawBlock`), painter's-algorithm object list updates.",
+	"relatedBranches": [
+		"feature/progression"
+	],
+	"sourceRefs": [
+		{
+			"type": "summary",
+			"id": "5247d42bbd4122ab09cb0eea51a8573c84a7f626",
+			"timestamp": "2026-07-02T04:55:03.000Z",
+			"branch": "feature/progression"
+		},
+		{
+			"type": "plan",
+			"id": "i-want-to-smooth-purrfect-pretzel-5247d42b",
+			"timestamp": "2026-07-02T04:55:55.506Z",
+			"branch": "feature/progression"
+		}
+	],
+	"lastUpdatedAt": "2026-07-02T04:56:23.854Z"
+}
