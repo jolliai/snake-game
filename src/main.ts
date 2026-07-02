@@ -1,6 +1,7 @@
 import './style.css'
 import { AVAILABLE_BOTS, DEFAULT_BOT_ID, getBotById } from './bots'
 import type { BotHelpers, BotState, SnakeBot } from './bots/bot-types'
+import { applyLoopGuard, createLoopMemory, resetLoopMemory, type LoopMemory } from './bots/loop-guard'
 import { DIRECTIONS, DIRECTION_VECTORS, OPPOSITE_DIRECTIONS, type Direction, type Position } from './game-types'
 import {
   addEntry,
@@ -22,6 +23,20 @@ const ISO_MAX_WIDTH = 1200
 // Iron Snake Mode tuning.
 const IRON_SNAKE_MIN_SIZE = 12 // bounding box floor so shapes have room to be interesting
 const IRON_SNAKE_MIN_SPEED = 60 // fastest the loop interval ramps to (ms)
+
+// Starvation: a snake that goes too long without eating dies, so a bot that can
+// never reach walled-off food (or is hopelessly stuck) eventually loses instead
+// of forcing a watcher to stop the game. The limit resets on every food, so a
+// competent snake on a reachable board never approaches it — it's a backstop.
+// It scales with playable board area (bigger board => food can be legitimately
+// farther away). The snake tints toward a warning colour past WARN_FRACTION so
+// the eventual death reads as "starved", not as a glitch.
+const STARVATION_FLOOR = 100 // never starve in fewer than this many moves
+const STARVATION_AREA_FACTOR = 2 // moves-without-food budget per playable cell
+const STARVATION_WARN_FRACTION = 0.6 // hunger tint begins at this fraction of the limit
+// Warning palette the snake blends toward as it starves (top / right / left faces).
+const HUNGER_HEAD_COLORS: [string, string, string] = ['#f59e0b', '#d97706', '#b45309']
+const HUNGER_BODY_COLORS: [string, string, string] = ['#ef4444', '#dc2626', '#b91c1c']
 // Cumulative point goal to clear a level: 5, 15, 30, 50, 75, ... Each level
 // requires more points than the last (deltas 5, 10, 15, 20, ...).
 const ironSnakeGoalForLevel = (level: number): number => (5 * level * (level + 1)) / 2
@@ -94,11 +109,14 @@ class SnakeGame {
   private selectedBotId: string = DEFAULT_BOT_ID
   private activeBot: SnakeBot = getBotById(DEFAULT_BOT_ID) ?? AVAILABLE_BOTS[0]
   private botSelectors: HTMLSelectElement[] = []
+  // Anti-loop memory: detects and breaks bot oscillation cycles (see loop-guard).
+  private botLoopMemory: LoopMemory = createLoopMemory()
 
   // Bot state (P2)
   private selectedBotId2: string = AVAILABLE_BOTS.length > 1 ? AVAILABLE_BOTS[1].id : DEFAULT_BOT_ID
   private activeBot2: SnakeBot = AVAILABLE_BOTS.length > 1 ? AVAILABLE_BOTS[1] : (getBotById(DEFAULT_BOT_ID) ?? AVAILABLE_BOTS[0])
   private botSelectors2: HTMLSelectElement[] = []
+  private botLoopMemory2: LoopMemory = createLoopMemory()
 
   // Isometric rendering
   private isoAngle: number = Math.PI / 3 // z-rotation: 30° (45° = standard diamond)
@@ -127,6 +145,13 @@ class SnakeGame {
   private gameStartTime: number = 0
   private maxLength1: number = 1
   private maxLength2: number = 1
+
+  // Starvation tracking: moves each snake has taken since it last ate. Resets to
+  // 0 on eating / new game / reposition. Reaching starvationLimit() kills that
+  // snake. deathCause tells the game-over screen why the last death happened.
+  private movesSinceFood1: number = 0
+  private movesSinceFood2: number = 0
+  private deathCause: 'collision' | 'starved' = 'collision'
 
   // Leaderboard UI
   private leaderboardActiveMode: LeaderboardMode = 'single'
@@ -569,20 +594,32 @@ class SnakeGame {
       this.drawBlockShadow(obj.x, obj.y)
     }
 
+    // Hunger tint: blend each snake's colours toward the warning palette as it
+    // nears starvation, so the impending death is legible rather than abrupt.
+    const f1 = this.hungerFactor(this.movesSinceFood1)
+    const f2 = this.isTwoSnakeMode() ? this.hungerFactor(this.movesSinceFood2) : 0
+    const tint = (base: [string, string, string], warn: [string, string, string], f: number): [string, string, string] =>
+      f <= 0 ? base : [this.lerpHex(base[0], warn[0], f), this.lerpHex(base[1], warn[1], f), this.lerpHex(base[2], warn[2], f)]
+
+    const head1 = tint(['#4ade80', '#22c55e', '#16a34a'], HUNGER_HEAD_COLORS, f1)
+    const body1 = tint(['#22c55e', '#16a34a', '#15803d'], HUNGER_BODY_COLORS, f1)
+    const head2 = tint(['#60a5fa', '#3b82f6', '#2563eb'], HUNGER_HEAD_COLORS, f2)
+    const body2 = tint(['#3b82f6', '#2563eb', '#1d4ed8'], HUNGER_BODY_COLORS, f2)
+
     // Draw blocks
     for (const obj of objects) {
       switch (obj.type) {
         case 'head':
-          this.drawBlock(obj.x, obj.y, '#4ade80', '#22c55e', '#16a34a')
+          this.drawBlock(obj.x, obj.y, head1[0], head1[1], head1[2])
           break
         case 'body':
-          this.drawBlock(obj.x, obj.y, '#22c55e', '#16a34a', '#15803d')
+          this.drawBlock(obj.x, obj.y, body1[0], body1[1], body1[2])
           break
         case 'head2':
-          this.drawBlock(obj.x, obj.y, '#60a5fa', '#3b82f6', '#2563eb')
+          this.drawBlock(obj.x, obj.y, head2[0], head2[1], head2[2])
           break
         case 'body2':
-          this.drawBlock(obj.x, obj.y, '#3b82f6', '#2563eb', '#1d4ed8')
+          this.drawBlock(obj.x, obj.y, body2[0], body2[1], body2[2])
           break
         case 'food':
           this.drawBlock(obj.x, obj.y, '#ef4444', '#dc2626', '#b91c1c')
@@ -1062,6 +1099,11 @@ class SnakeGame {
     this.maxLength1 = this.snake.length
     this.maxLength2 = this.snake2.length
     this.pendingEntry = null
+    this.movesSinceFood1 = 0
+    this.movesSinceFood2 = 0
+    this.deathCause = 'collision'
+    resetLoopMemory(this.botLoopMemory)
+    resetLoopMemory(this.botLoopMemory2)
     this.spawnFood()
     this.updateUI()
     this.showScreen('game')
@@ -1126,14 +1168,23 @@ class SnakeGame {
 
     if (head.x === this.food.x && head.y === this.food.y) {
       this.score++
+      this.movesSinceFood1 = 0
+      resetLoopMemory(this.botLoopMemory)
       this.spawnFood()
       this.checkGridExpansion()
     } else {
+      this.movesSinceFood1++
       const tail = this.snake.pop()!
       this.snakeSet.delete(`${tail.x},${tail.y}`)
     }
 
     if (this.snake.length > this.maxLength1) this.maxLength1 = this.snake.length
+
+    if (this.movesSinceFood1 >= this.starvationLimit()) {
+      this.deathCause = 'starved'
+      this.endGame()
+      return
+    }
 
     this.draw()
     this.updateUI()
@@ -1194,7 +1245,11 @@ class SnakeGame {
 
     if (p1AteFood) this.score++
     if (p2AteFood) this.score2++
+    this.movesSinceFood1 = p1AteFood ? 0 : this.movesSinceFood1 + 1
+    this.movesSinceFood2 = p2AteFood ? 0 : this.movesSinceFood2 + 1
     if (p1AteFood || p2AteFood) {
+      resetLoopMemory(this.botLoopMemory)
+      resetLoopMemory(this.botLoopMemory2)
       this.spawnFood()
       this.checkGridExpansion()
     }
@@ -1211,6 +1266,17 @@ class SnakeGame {
 
     if (this.snake.length > this.maxLength1) this.maxLength1 = this.snake.length
     if (this.snake2.length > this.maxLength2) this.maxLength2 = this.snake2.length
+
+    // A snake that starves loses; if both starve on the same tick it's a draw.
+    // Reuse the existing win/loss/draw resolution by feeding starved snakes as dead.
+    const limit = this.starvationLimit()
+    const p1Starved = this.movesSinceFood1 >= limit
+    const p2Starved = this.movesSinceFood2 >= limit
+    if (p1Starved || p2Starved) {
+      this.deathCause = 'starved'
+      this.endGameTwoPlayer(p1Starved, p2Starved)
+      return
+    }
 
     this.draw()
     this.updateUI()
@@ -1233,7 +1299,8 @@ class SnakeGame {
       getCandidateDirections: currentDirection => this.getCandidateDirections(currentDirection)
     }
 
-    const direction = this.activeBot.chooseDirection(botState, botHelpers)
+    const botDirection = this.activeBot.chooseDirection(botState, botHelpers)
+    const direction = applyLoopGuard(this.botLoopMemory, botState, botHelpers, botDirection)
     if (!direction || !this.isValidDirection(direction, this.direction)) {
       return null
     }
@@ -1274,7 +1341,9 @@ class SnakeGame {
       getCandidateDirections: dir => this.getCandidateDirections(dir)
     }
 
-    const direction = bot.chooseDirection(botState, botHelpers)
+    const botDirection = bot.chooseDirection(botState, botHelpers)
+    const mem = player === 1 ? this.botLoopMemory : this.botLoopMemory2
+    const direction = applyLoopGuard(mem, botState, botHelpers, botDirection)
     if (!direction || !this.isValidDirection(direction, currentDirection)) {
       return null
     }
@@ -1452,6 +1521,38 @@ class SnakeGame {
     return this.wouldCollide(head, this.snake, this.snakeSet)
   }
 
+  // === Starvation ===
+
+  // Max moves a snake may go without eating before it starves. Scales with the
+  // playable board area (boardArea is kept current for both classic and Iron
+  // Snake boards), with a floor so small boards still allow room to maneuver.
+  private starvationLimit(): number {
+    return Math.max(STARVATION_FLOOR, this.boardArea * STARVATION_AREA_FACTOR)
+  }
+
+  // 0 while the snake is well-fed, ramping to 1 as movesSinceFood approaches the
+  // limit. Drives the warning tint; only nonzero past STARVATION_WARN_FRACTION.
+  private hungerFactor(movesSinceFood: number): number {
+    const limit = this.starvationLimit()
+    const warnStart = limit * STARVATION_WARN_FRACTION
+    if (movesSinceFood <= warnStart) return 0
+    return Math.min(1, (movesSinceFood - warnStart) / (limit - warnStart))
+  }
+
+  // Linear interpolate between two "#rrggbb" colours (t in [0,1]).
+  private lerpHex(from: string, to: string, t: number): string {
+    const parse = (hex: string) => [
+      parseInt(hex.slice(1, 3), 16),
+      parseInt(hex.slice(3, 5), 16),
+      parseInt(hex.slice(5, 7), 16)
+    ]
+    const a = parse(from)
+    const b = parse(to)
+    const channel = (i: number) => Math.round(a[i] + (b[i] - a[i]) * t)
+    const hex = (v: number) => v.toString(16).padStart(2, '0')
+    return `#${hex(channel(0))}${hex(channel(1))}${hex(channel(2))}`
+  }
+
   // === Grid expansion / level progression ===
 
   private checkGridExpansion() {
@@ -1473,6 +1574,7 @@ class SnakeGame {
 
   private expandGrid() {
     this.gridSize *= 2
+    this.boardArea = this.gridSize * this.gridSize
     this.level++
     this.gameSpeed = this.gameSpeed / 2
     this.updateCanvasSize()
@@ -1507,6 +1609,10 @@ class SnakeGame {
   // to length 1. Returns false only if placement is impossible (caller should
   // have already fallen back to a rectangle, where this always succeeds).
   private repositionSnakes(): boolean {
+    resetLoopMemory(this.botLoopMemory)
+    resetLoopMemory(this.botLoopMemory2)
+    this.movesSinceFood1 = 0
+    this.movesSinceFood2 = 0
     const N = this.gridSize
     if (this.isTwoSnakeMode()) {
       const occ = new Set<string>()
@@ -1633,6 +1739,34 @@ class SnakeGame {
       const suffix = remaining === 1 ? 'pt' : 'pts'
       document.getElementById('iron-snake-goal')!.textContent = `${remaining} ${suffix}`
     }
+
+    this.updateStarvationWarning()
+  }
+
+  // Show a pulsing alert the moment a snake enters the hunger (tinted) zone, so
+  // the player knows to race to the food before it starves. Text names which
+  // snake is at risk in two-player modes. The exact remaining-move count drives
+  // the tint; here a plain urgent message avoids per-tick number flicker.
+  private updateStarvationWarning() {
+    const warningEl = document.getElementById('starvation-warning')!
+    const p1Hungry = this.hungerFactor(this.movesSinceFood1) > 0
+    const p2Hungry = this.isTwoSnakeMode() && this.hungerFactor(this.movesSinceFood2) > 0
+
+    if (!p1Hungry && !p2Hungry) {
+      warningEl.classList.add('hidden')
+      return
+    }
+
+    let message: string
+    if (this.isTwoSnakeMode()) {
+      if (p1Hungry && p2Hungry) message = '⚠ Both snakes starving — reach the food!'
+      else if (p1Hungry) message = '⚠ P1 starving — reach the food!'
+      else message = '⚠ P2 starving — reach the food!'
+    } else {
+      message = '⚠ Starving — reach the food!'
+    }
+    warningEl.textContent = message
+    warningEl.classList.remove('hidden')
   }
 
   private updateModeUI() {
@@ -1677,7 +1811,8 @@ class SnakeGame {
       this.saveHighScore(this.score)
     }
 
-    document.getElementById('game-over-title')!.textContent = 'Game Over!'
+    document.getElementById('game-over-title')!.textContent =
+      this.deathCause === 'starved' ? 'Starved!' : 'Game Over!'
     document.getElementById('game-over-winner')!.classList.add('hidden')
     document.getElementById('single-final-score')!.classList.remove('hidden')
     document.getElementById('final-score')!.textContent = this.score.toString()
@@ -1732,7 +1867,15 @@ class SnakeGame {
       p2Result = 'loss'
     }
 
-    document.getElementById('game-over-title')!.textContent = 'Game Over!'
+    // When the death was starvation, name the cause so the outcome is legible.
+    if (this.deathCause === 'starved') {
+      if (p1Dead && p2Dead) winnerText = 'Draw — both starved!'
+      else if (p1Dead) winnerText = 'Player 2 Wins! (P1 starved)'
+      else winnerText = 'Player 1 Wins! (P2 starved)'
+    }
+
+    document.getElementById('game-over-title')!.textContent =
+      this.deathCause === 'starved' ? 'Starved!' : 'Game Over!'
     const winnerEl = document.getElementById('game-over-winner')!
     winnerEl.textContent = winnerText
     winnerEl.classList.remove('hidden')

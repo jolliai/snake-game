@@ -92,7 +92,10 @@
           <div id="game-bot-description" class="bot-description"></div>
         </div>
         <button id="toggle-bot" class="secondary-button">Enable Bot (B)</button>
-        <canvas id="canvas"></canvas>
+        <div class="canvas-wrap">
+          <canvas id="canvas"></canvas>
+          <div id="starvation-warning" class="starvation-warning hidden" role="alert"></div>
+        </div>
         <div class="controls" id="controls-text">Use Arrow Keys or WASD to move | Press P to Pause | Press R to Reset | +/- to change grid size | Press B to toggle bot | Press any direction to start</div>
       </div>
       <div id="game-over" class="screen hidden">
