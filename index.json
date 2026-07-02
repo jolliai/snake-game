@@ -180,6 +180,22 @@
 				"insertions": 289,
 				"deletions": 118
 			}
+		},
+		{
+			"commitHash": "ee8ce65e95eb466316f41f0f744879957887d040",
+			"parentCommitHash": null,
+			"treeHash": "8f4d5e9e660091d6d5a2f427a5b1201f59088c0a",
+			"commitType": "commit",
+			"commitMessage": "Animate Iron Snake level transitions with a board morph (JOE-5)",
+			"commitDate": "2026-07-02T21:10:51.000Z",
+			"branch": "josephhart/joe-5-create-smooth-transition-from-level-to-level-in-iron-snake",
+			"generatedAt": "2026-07-02T21:12:13.543Z",
+			"topicCount": 3,
+			"diffStats": {
+				"filesChanged": 2,
+				"insertions": 308,
+				"deletions": 231
+			}
 		}
 	],
 	"commitAliases": {

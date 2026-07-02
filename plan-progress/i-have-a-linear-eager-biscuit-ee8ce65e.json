@@ -1,0 +1,55 @@
+{
+	"version": 1,
+	"commitHash": "ee8ce65e95eb466316f41f0f744879957887d040",
+	"commitMessage": "Animate Iron Snake level transitions with a board morph (JOE-5)",
+	"commitDate": "2026-07-02T21:10:51.000Z",
+	"planSlug": "i-have-a-linear-eager-biscuit-ee8ce65e",
+	"originalSlug": "i-have-a-linear-eager-biscuit",
+	"summary": "The developer implemented the full JOE-5 level-to-level board morph for Iron Snake mode, including the animation loop, snake-stationary placement via grow-around-snake, and iterative fixes for issues found during testing (invisible transition due to reduced-motion gate, auto-rotation freezing, snake teleporting, and identical shapes repeating between levels).",
+	"steps": [
+		{
+			"id": "1",
+			"description": "Fields + constant: add `isTransitioning`, `transitionRafId`, and `LEVEL_TRANSITION_MS` near existing auto-rotate fields and tuning constants",
+			"status": "completed",
+			"note": "The diff adds `isTransitioning`, `transitionRafId`, `transitionStartTime`, and a full set of morph state fields (`morphWork`, `morphTargetReal`, `morphChanged`, `morphTargetDisplay`, `morphRevealed`, `morphSteps`, `morphStepMs`, `morphLastReveal`) near the auto-rotate fields. The plan's single `LEVEL_TRANSITION_MS` constant was replaced with four step-based constants (`LEVEL_MORPH_MIN_STEPS`, `LEVEL_MORPH_MAX_STEPS`, `LEVEL_MORPH_CELLS_PER_STEP`, `LEVEL_MORPH_MIN_STEP_MS`) after the user reported seeing no transition — the original 600ms wall-clock tween was invisible because the reduced-motion gate bypassed it, prompting a redesign to discrete steps paced at the snake's move cadence."
+		},
+		{
+			"id": "2",
+			"description": "Refactor `advanceLevel()`: short-circuit to instant swap if reduced-motion or `isTransitioning`; capture old mask + gridSize before mutations; run existing mutations without restarting the interval or calling `draw()`; then start the morph loop",
+			"status": "in_progress",
+			"note": "The diff refactors `advanceLevel()` into a thin wrapper that captures `prevMask`, `prevGridSize`, and `moveMs`, calls `applyLevelAdvance()` for all mutations, tears down the interval, and calls `startLevelMorph`. However, the reduced-motion short-circuit was deliberately removed after the user reported seeing no transition (the OS 'Reduce Motion' setting was causing the instant-swap path to always fire), so the plan's reduced-motion fallback is not present in the final diff. The re-entrancy guard (`isTransitioning` check) is also absent from `advanceLevel` itself, though `cancelLevelMorph` is called at teardown sites."
+		},
+		{
+			"id": "3",
+			"description": "New `startLevelMorph(...)` + `morphStep(timestamp)`: mirror `autoRotateStep` pattern; build start/target masks and wave-ordered `changed` list; per frame compute `p`, `revealCount`, update working mask incrementally, assign `this.boardMask`, call `draw()`; on completion restore `targetReal`, restart interval, clear flags",
+			"status": "completed",
+			"note": "The diff implements `startLevelMorph`, `morphStep`, `finishLevelMorph`, and `cancelLevelMorph`. The continuous smoothstep tween from the plan was replaced with discrete steps held at `morphStepMs` (the snake's move interval) after the user confirmed the 600ms animation was invisible — pacing to the snake's own cadence makes the reshape feel deliberate and game-native. The inside-out wave ordering (sort by distance from board center) was retained as designed. The `growIronSnakeBoard` helper in `iron-snake.ts` was added after the user reported some levels showing no shape change — the original grow-from-old-board approach produced identical shapes when the grid size didn't increase, so the seed was changed to the snake's bounding box to guarantee fresh shapes every level."
+		},
+		{
+			"id": "4",
+			"description": "Suppress the stray trailing `draw()` during a transition: gate both `updateSinglePlayer` and `updateTwoPlayer` tail draws with `if (!this.isTransitioning) this.draw()`",
+			"status": "completed",
+			"note": "Both tail draw calls in `updateSinglePlayer` (line ~1389) and `updateTwoPlayer` (line ~1505) are gated with `if (!this.isTransitioning) this.draw()` exactly as planned, with comments explaining that a morph in progress owns painting for that tick."
+		},
+		{
+			"id": "5",
+			"description": "Coordinate with auto-rotate: add `&& !this.isTransitioning` guard in `autoRotateStep` so camera rotation freezes during the morph",
+			"status": "completed",
+			"note": "The guard was initially added as planned, but the user reported the level switch appeared to reset the rotation — the ~1.5s camera freeze during the morph was perceptible as a view change. The guard was subsequently removed so auto-rotation continues uninterrupted through the morph. The diff shows a comment in `autoRotateStep` explaining the decision but no blocking condition, which is the opposite of what the plan specified but the correct final behavior."
+		},
+		{
+			"id": "6",
+			"description": "Teardown cleanup: in `startNewGame`, back-to-menu, and existing `clearInterval` sites, cancel any in-flight morph RAF and clear `isTransitioning`",
+			"status": "completed",
+			"note": "`cancelLevelMorph()` is called in `startNewGame`, the back-to-menu click handler, and the Escape key handler, covering all three teardown sites identified in the plan. The method cancels the RAF, nulls the id, clears `isTransitioning`, and resets all morph state fields."
+		}
+	],
+	"llm": {
+		"model": "claude-haiku-4-5-20251001",
+		"inputTokens": 29655,
+		"outputTokens": 1407,
+		"apiLatencyMs": 32281,
+		"stopReason": null,
+		"source": "jolli-proxy"
+	}
+}
