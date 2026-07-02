@@ -1,0 +1,49 @@
+{
+	"version": 1,
+	"commitHash": "4e91f64cb71e1e858e3b492d8900d863fe447675",
+	"commitMessage": "Fix bots getting stuck in infinite loops; add starvation timer",
+	"commitDate": "2026-07-02T02:03:27.000Z",
+	"planSlug": "i-noticed-that-there-fluttering-frog-4e91f64c",
+	"originalSlug": "i-noticed-that-there-fluttering-frog",
+	"summary": "The developer implemented a centralized loop guard module to break bot oscillation cycles in Iron Snake Mode, then added a complementary starvation timer so wandering bots eventually lose automatically, plus a pulsing visual warning banner when a snake enters the hunger zone.",
+	"steps": [
+		{
+			"id": "1",
+			"description": "New shared module: src/bots/loop-guard.ts — exports LoopMemory type, createLoopMemory, resetLoopMemory, recordHead, isLooping, chooseEscapeDirection",
+			"status": "completed",
+			"note": "Implemented exactly as planned, with one notable addition beyond the spec: a confinement-ratio detector (CONFINEMENT_SAMPLES=24, CONFINEMENT_RATIO=0.7) was added after testing revealed that a pure revisit-counter (3 hits in a window) cannot catch a ~20-cell 'approach, give up, wander back' circuit — on a period-20 loop no cell recurs 3x until 60 moves. The confinement signal was confirmed by a simulation where the guard broke a bot out of a 20-cell ring to explore 125 cells. The plan also specified a standalone `applyLoopGuard` wrapper function (not in the original spec) that was added to simplify harness wiring."
+		},
+		{
+			"id": "2",
+			"description": "Harness wiring in src/main.ts — botLoopMemory/botLoopMemory2 fields, applyLoopGuard in chooseBotDirection and chooseBotDirectionForPlayer, resetLoopMemory at all progress points",
+			"status": "completed",
+			"note": "All wiring points from the plan are present in the diff: memory fields initialized with createLoopMemory(), applyLoopGuard called in both chooseBotDirection and chooseBotDirectionForPlayer, and resetLoopMemory called at single-player food eat, two-player food eat, repositionSnakes, and the new-game reset path. The plan's escapeTicks decrement logic is encapsulated inside applyLoopGuard rather than inline in the harness, which is a cleaner factoring than the plan described."
+		},
+		{
+			"id": "3",
+			"description": "Menu demo wiring in src/menu-demo.ts — LoopMemory per demo snake, same loop-guard wiring reusing the shared module",
+			"status": "completed",
+			"note": "The diff shows loopMemory field added to MenuDemo, applyLoopGuard wired into the direction-choice call, and resetLoopMemory called on both resetSnake (restart) and food-eat events — matching the plan exactly. This was treated as in-scope from the start per the plan's 'Behavior decision' section."
+		},
+		{
+			"id": "4",
+			"description": "Verification — build/typecheck, Iron Snake bot observation, classic mode personality check, menu demo oscillation check",
+			"status": "in_progress",
+			"note": "The build/typecheck step (npm run build / tsc --noEmit) was run and passed clean, and 10 unit tests against the real loop-guard module were confirmed passing. However, the live runtime verification (watching Iron Snake bots in the browser, confirming classic personalities are unchanged, confirming menu demo stops oscillating) was explicitly deferred to a real playtest — the transcript notes 'puppeteer isn't cleanly installed here' and suggests the developer manually run npm run dev to observe. The human did not flag any concerns about this gap before committing."
+		},
+		{
+			"id": "5",
+			"description": "Possibly a small unit test for loop-guard if the repo has a test setup",
+			"status": "in_progress",
+			"note": "Ten mechanism tests were run inline during the session (detection threshold, no false-positive on forward progress, reset, escape steering, trap-avoidance, transparency in normal play, engage-and-commit on loop) and all passed, but these were ad-hoc Node/tsc scripts rather than committed test files in the repo's test suite. No test file appears in the diff, so the plan's conditional ('if the repo has a test setup') was not formally fulfilled."
+		}
+	],
+	"llm": {
+		"model": "claude-haiku-4-5-20251001",
+		"inputTokens": 21836,
+		"outputTokens": 1017,
+		"apiLatencyMs": 25014,
+		"stopReason": null,
+		"source": "jolli-proxy"
+	}
+}
