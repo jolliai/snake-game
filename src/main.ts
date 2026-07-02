@@ -12,11 +12,19 @@ import {
 } from './leaderboard'
 import type { LeaderboardEntry, LeaderboardMode, GameResult } from './leaderboard'
 import { MenuDemo } from './menu-demo'
+import { generateIronSnakeBoard } from './iron-snake'
 
 type GameMode = 'single' | 'pvp' | 'bvb'
 
 const ISO_MIN_WIDTH = 300
 const ISO_MAX_WIDTH = 1200
+
+// Iron Snake Mode tuning.
+const IRON_SNAKE_MIN_SIZE = 12 // bounding box floor so shapes have room to be interesting
+const IRON_SNAKE_MIN_SPEED = 60 // fastest the loop interval ramps to (ms)
+// Cumulative point goal to clear a level: 5, 15, 30, 50, 75, ... Each level
+// requires more points than the last (deltas 5, 10, 15, 20, ...).
+const ironSnakeGoalForLevel = (level: number): number => (5 * level * (level + 1)) / 2
 
 function formatDuration(seconds: number): string {
   const total = Math.max(0, Math.floor(seconds))
@@ -62,6 +70,14 @@ class SnakeGame {
   private food: Position = { x: 0, y: 0 }
   private gridSize: number = 10
   private initialGridSize: number = 10
+  // Iron Snake Mode: when enabled, the board is carved into an irregular shape.
+  // `boardMask` is a flat gridSize*gridSize array (1 = playable, 0 = wall);
+  // null means the classic full rectangle. `boardArea` is the playable-cell
+  // count (capacity metric); `levelGoal` is the cumulative score to advance.
+  private ironSnakeMode: boolean = false
+  private boardMask: Uint8Array | null = null
+  private boardArea: number = 100
+  private levelGoal: number = 0
   private level: number = 1
   private gameSpeed: number = 200
   private baseSpeed: number = 200
@@ -240,6 +256,9 @@ class SnakeGame {
 
     for (let gy = 0; gy < this.gridSize; gy++) {
       for (let gx = 0; gx < this.gridSize; gx++) {
+        // Skip off-board cells so the void shows the dark background.
+        if (this.boardMask !== null && this.boardMask[gy * this.gridSize + gx] !== 1) continue
+
         const top = this.isoCache[gy][gx]
         const right = this.isoCache[gy][gx + 1]
         const bottom = this.isoCache[gy + 1][gx + 1]
@@ -270,20 +289,44 @@ class SnakeGame {
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)'
     ctx.lineWidth = 0.5
 
-    // Lines along the gx axis (varying gy)
-    for (let gy = 0; gy <= this.gridSize; gy++) {
-      const start = this.isoCache[gy][0]
-      const end = this.isoCache[gy][this.gridSize]
-      ctx.moveTo(start.x, start.y)
-      ctx.lineTo(end.x, end.y)
-    }
-
-    // Lines along the gy axis (varying gx)
-    for (let gx = 0; gx <= this.gridSize; gx++) {
-      const start = this.isoCache[0][gx]
-      const end = this.isoCache[this.gridSize][gx]
-      ctx.moveTo(start.x, start.y)
-      ctx.lineTo(end.x, end.y)
+    if (this.boardMask === null) {
+      // Full-span lines (classic rectangle).
+      for (let gy = 0; gy <= this.gridSize; gy++) {
+        const start = this.isoCache[gy][0]
+        const end = this.isoCache[gy][this.gridSize]
+        ctx.moveTo(start.x, start.y)
+        ctx.lineTo(end.x, end.y)
+      }
+      for (let gx = 0; gx <= this.gridSize; gx++) {
+        const start = this.isoCache[0][gx]
+        const end = this.isoCache[this.gridSize][gx]
+        ctx.moveTo(start.x, start.y)
+        ctx.lineTo(end.x, end.y)
+      }
+    } else {
+      // Per-cell edges: draw each lattice edge once if it borders an on-board cell.
+      for (let gy = 0; gy <= this.gridSize; gy++) {
+        for (let gx = 0; gx < this.gridSize; gx++) {
+          // Horizontal edge between rows gy-1 and gy.
+          if (this.onBoard(gx, gy - 1) || this.onBoard(gx, gy)) {
+            const a = this.isoCache[gy][gx]
+            const b = this.isoCache[gy][gx + 1]
+            ctx.moveTo(a.x, a.y)
+            ctx.lineTo(b.x, b.y)
+          }
+        }
+      }
+      for (let gx = 0; gx <= this.gridSize; gx++) {
+        for (let gy = 0; gy < this.gridSize; gy++) {
+          // Vertical edge between columns gx-1 and gx.
+          if (this.onBoard(gx - 1, gy) || this.onBoard(gx, gy)) {
+            const a = this.isoCache[gy][gx]
+            const b = this.isoCache[gy + 1][gx]
+            ctx.moveTo(a.x, a.y)
+            ctx.lineTo(b.x, b.y)
+          }
+        }
+      }
     }
 
     ctx.stroke()
@@ -291,19 +334,57 @@ class SnakeGame {
 
   private drawGroundBorder() {
     const ctx = this.ctx
-    const topCorner = this.isoCache[0][0]
-    const rightCorner = this.isoCache[0][this.gridSize]
-    const bottomCorner = this.isoCache[this.gridSize][this.gridSize]
-    const leftCorner = this.isoCache[this.gridSize][0]
-
-    ctx.beginPath()
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)'
     ctx.lineWidth = 2
-    ctx.moveTo(topCorner.x, topCorner.y)
-    ctx.lineTo(rightCorner.x, rightCorner.y)
-    ctx.lineTo(bottomCorner.x, bottomCorner.y)
-    ctx.lineTo(leftCorner.x, leftCorner.y)
-    ctx.closePath()
+
+    if (this.boardMask === null) {
+      const topCorner = this.isoCache[0][0]
+      const rightCorner = this.isoCache[0][this.gridSize]
+      const bottomCorner = this.isoCache[this.gridSize][this.gridSize]
+      const leftCorner = this.isoCache[this.gridSize][0]
+
+      ctx.beginPath()
+      ctx.moveTo(topCorner.x, topCorner.y)
+      ctx.lineTo(rightCorner.x, rightCorner.y)
+      ctx.lineTo(bottomCorner.x, bottomCorner.y)
+      ctx.lineTo(leftCorner.x, leftCorner.y)
+      ctx.closePath()
+      ctx.stroke()
+      return
+    }
+
+    // Trace the true outline: stroke every side of an on-board cell whose
+    // neighbour across that side is off-board (includes interior holes).
+    ctx.beginPath()
+    for (let gy = 0; gy < this.gridSize; gy++) {
+      for (let gx = 0; gx < this.gridSize; gx++) {
+        if (!this.onBoard(gx, gy)) continue
+        if (!this.onBoard(gx, gy - 1)) {
+          const a = this.isoCache[gy][gx]
+          const b = this.isoCache[gy][gx + 1]
+          ctx.moveTo(a.x, a.y)
+          ctx.lineTo(b.x, b.y)
+        }
+        if (!this.onBoard(gx, gy + 1)) {
+          const a = this.isoCache[gy + 1][gx]
+          const b = this.isoCache[gy + 1][gx + 1]
+          ctx.moveTo(a.x, a.y)
+          ctx.lineTo(b.x, b.y)
+        }
+        if (!this.onBoard(gx - 1, gy)) {
+          const a = this.isoCache[gy][gx]
+          const b = this.isoCache[gy + 1][gx]
+          ctx.moveTo(a.x, a.y)
+          ctx.lineTo(b.x, b.y)
+        }
+        if (!this.onBoard(gx + 1, gy)) {
+          const a = this.isoCache[gy][gx + 1]
+          const b = this.isoCache[gy + 1][gx + 1]
+          ctx.moveTo(a.x, a.y)
+          ctx.lineTo(b.x, b.y)
+        }
+      }
+    }
     ctx.stroke()
   }
 
@@ -515,6 +596,12 @@ class SnakeGame {
   private setupEventListeners() {
     document.addEventListener('keydown', this.handleKeyPress.bind(this))
     this.setupBotSelectors()
+    const ironSnakeToggle = document.getElementById('iron-snake-toggle') as HTMLInputElement | null
+    if (ironSnakeToggle) {
+      ironSnakeToggle.addEventListener('change', () => {
+        this.ironSnakeMode = ironSnakeToggle.checked
+      })
+    }
     document.getElementById('new-game')!.addEventListener('click', () => this.startNewGame('single'))
     document.getElementById('two-player')!.addEventListener('click', () => this.startNewGame('pvp'))
     document.getElementById('bot-vs-bot')!.addEventListener('click', () => {
@@ -672,11 +759,22 @@ class SnakeGame {
       } else {
         this.initialGridSize = Math.max(this.initialGridSize - 5, 5)
       }
-      this.gridSize = this.initialGridSize
+      this.gridSize = this.ironSnakeMode
+        ? Math.max(this.initialGridSize, IRON_SNAKE_MIN_SIZE)
+        : this.initialGridSize
+      this.regenerateIronSnakeBoard()
       this.updateCanvasSize()
-      const center = Math.floor(this.gridSize / 2)
-      this.snake = [{ x: center, y: center }]
-      this.snakeSet = new Set([`${center},${center}`])
+      const placed = this.boardMask !== null && this.repositionSnakes()
+      if (!placed) {
+        if (this.boardMask !== null) {
+          this.boardMask = null
+          this.boardArea = this.gridSize * this.gridSize
+        }
+        const center = Math.floor(this.gridSize / 2)
+        this.snake = [{ x: center, y: center }]
+        this.snakeSet = new Set([`${center},${center}`])
+      }
+      this.levelGoal = this.ironSnakeMode ? ironSnakeGoalForLevel(1) : 0
       this.spawnFood()
       this.updateUI()
       this.draw()
@@ -904,40 +1002,57 @@ class SnakeGame {
     }
     this.botEverActive = this.botEnabled
 
-    this.gridSize = this.initialGridSize
+    // Iron Snake Mode uses a larger bounding box (so shapes have room) and carves
+    // an irregular mask; classic mode keeps the full rectangle (mask = null).
+    this.gridSize = this.ironSnakeMode
+      ? Math.max(this.initialGridSize, IRON_SNAKE_MIN_SIZE)
+      : this.initialGridSize
+    this.regenerateIronSnakeBoard()
     this.updateCanvasSize()
 
-    if (this.isTwoSnakeMode()) {
-      // Place snakes on opposite sides
-      const quarter = Math.floor(this.gridSize / 4)
-      const center = Math.floor(this.gridSize / 2)
-      const p2x = this.gridSize - 1 - quarter
-
-      // P1: left side, facing right
-      this.snake = [{ x: quarter, y: center }]
-      this.snakeSet = new Set([`${quarter},${center}`])
-      this.direction = 'RIGHT'
-      this.nextDirection = 'RIGHT'
-      this.score = 0
-
-      // P2: right side, facing left
-      this.snake2 = [{ x: p2x, y: center }]
-      this.snakeSet2 = new Set([`${p2x},${center}`])
-      this.direction2 = 'LEFT'
-      this.nextDirection2 = 'LEFT'
-      this.score2 = 0
-    } else {
-      const center = Math.floor(this.gridSize / 2)
-      this.snake = [{ x: center, y: center }]
-      this.snakeSet = new Set([`${center},${center}`])
-      this.direction = 'RIGHT'
-      this.nextDirection = 'RIGHT'
-      this.score = 0
+    this.score = 0
+    this.score2 = 0
+    if (!this.isTwoSnakeMode()) {
       this.snake2 = []
       this.snakeSet2 = new Set()
     }
 
+    // On an Iron Snake board, seat snakes on valid cells with room to move; if that
+    // fails (or in classic mode) use the fixed center/quarter positions.
+    const boardPlaced = this.boardMask !== null && this.repositionSnakes()
+    if (!boardPlaced) {
+      if (this.boardMask !== null) {
+        this.boardMask = null
+        this.boardArea = this.gridSize * this.gridSize
+      }
+      if (this.isTwoSnakeMode()) {
+        // Place snakes on opposite sides
+        const quarter = Math.floor(this.gridSize / 4)
+        const center = Math.floor(this.gridSize / 2)
+        const p2x = this.gridSize - 1 - quarter
+
+        // P1: left side, facing right
+        this.snake = [{ x: quarter, y: center }]
+        this.snakeSet = new Set([`${quarter},${center}`])
+        this.direction = 'RIGHT'
+        this.nextDirection = 'RIGHT'
+
+        // P2: right side, facing left
+        this.snake2 = [{ x: p2x, y: center }]
+        this.snakeSet2 = new Set([`${p2x},${center}`])
+        this.direction2 = 'LEFT'
+        this.nextDirection2 = 'LEFT'
+      } else {
+        const center = Math.floor(this.gridSize / 2)
+        this.snake = [{ x: center, y: center }]
+        this.snakeSet = new Set([`${center},${center}`])
+        this.direction = 'RIGHT'
+        this.nextDirection = 'RIGHT'
+      }
+    }
+
     this.level = 1
+    this.levelGoal = this.ironSnakeMode ? ironSnakeGoalForLevel(1) : 0
     this.baseSpeed = 200
     this.gameSpeed = this.baseSpeed
     this.isPaused = false
@@ -1198,8 +1313,59 @@ class SnakeGame {
     }
   }
 
+  // A cell is playable if it lies inside the grid and, when an Iron Snake mask
+  // is active, is marked on-board. This is the single source of truth for board
+  // extent: inBounds delegates here, so collision, food, and bot BFS all respect
+  // the Iron Snake shape automatically.
+  private onBoard(x: number, y: number): boolean {
+    if (x < 0 || x >= this.gridSize || y < 0 || y >= this.gridSize) return false
+    if (this.boardMask === null) return true
+    return this.boardMask[y * this.gridSize + x] === 1
+  }
+
   private inBounds(position: Position): boolean {
-    return position.x >= 0 && position.x < this.gridSize && position.y >= 0 && position.y < this.gridSize
+    return this.onBoard(position.x, position.y)
+  }
+
+  // Find a safe spawn on an arbitrary board: an on-board, unoccupied cell near
+  // `preferred` that has a direction with at least `clearance` clear cells
+  // ahead, so a freshly-placed snake won't immediately run into a wall.
+  // Returns null only on a pathological board (caller falls back to a rectangle).
+  private findStartCell(
+    preferred: Position,
+    occupied: Set<string>,
+    clearance: number = 3
+  ): { pos: Position; dir: Direction } | null {
+    const candidates: Position[] = []
+    for (let y = 0; y < this.gridSize; y++) {
+      for (let x = 0; x < this.gridSize; x++) {
+        if (!this.onBoard(x, y)) continue
+        if (occupied.has(`${x},${y}`)) continue
+        candidates.push({ x, y })
+      }
+    }
+    candidates.sort(
+      (a, b) =>
+        Math.abs(a.x - preferred.x) + Math.abs(a.y - preferred.y) -
+        (Math.abs(b.x - preferred.x) + Math.abs(b.y - preferred.y))
+    )
+
+    let fallback: { pos: Position; dir: Direction } | null = null
+    for (const pos of candidates) {
+      for (const dir of DIRECTIONS) {
+        const vec = DIRECTION_VECTORS[dir]
+        let clear = 0
+        for (let step = 1; step <= clearance; step++) {
+          const cx = pos.x + vec.x * step
+          const cy = pos.y + vec.y * step
+          if (!this.onBoard(cx, cy) || occupied.has(`${cx},${cy}`)) break
+          clear++
+        }
+        if (clear >= clearance) return { pos, dir }
+        if (!fallback && clear >= 1) fallback = { pos, dir }
+      }
+    }
+    return fallback
   }
 
   private positionToKey(position: Position): string {
@@ -1286,9 +1452,16 @@ class SnakeGame {
     return this.wouldCollide(head, this.snake, this.snakeSet)
   }
 
-  // === Grid expansion ===
+  // === Grid expansion / level progression ===
 
   private checkGridExpansion() {
+    // In Iron Snake Mode, reaching the point goal advances to a freshly
+    // generated shape instead of doubling the grid.
+    if (this.ironSnakeMode) {
+      this.checkLevelAdvance()
+      return
+    }
+
     const totalCells = this.gridSize * this.gridSize
     const combinedLength = this.snake.length + (this.isTwoSnakeMode() ? this.snake2.length : 0)
     const fillPercentage = combinedLength / totalCells
@@ -1310,17 +1483,107 @@ class SnakeGame {
     this.spawnFood()
   }
 
+  // === Iron Snake Mode ===
+
+  // Regenerate the board mask for the current gridSize. Falls back to the full
+  // rectangle (mask = null) if generation fails, so the game always launches.
+  private regenerateIronSnakeBoard() {
+    if (!this.ironSnakeMode) {
+      this.boardMask = null
+      this.boardArea = this.gridSize * this.gridSize
+      return
+    }
+    const result = generateIronSnakeBoard(this.gridSize)
+    if (result) {
+      this.boardMask = result.mask
+      this.boardArea = result.area
+    } else {
+      this.boardMask = null
+      this.boardArea = this.gridSize * this.gridSize
+    }
+  }
+
+  // Place snake(s) on valid on-board cells with room to move. Resets each snake
+  // to length 1. Returns false only if placement is impossible (caller should
+  // have already fallen back to a rectangle, where this always succeeds).
+  private repositionSnakes(): boolean {
+    const N = this.gridSize
+    if (this.isTwoSnakeMode()) {
+      const occ = new Set<string>()
+      const p1 = this.findStartCell({ x: N * 0.25, y: N / 2 }, occ)
+      if (!p1) return false
+      occ.add(`${p1.pos.x},${p1.pos.y}`)
+      const p2 = this.findStartCell({ x: N * 0.75, y: N / 2 }, occ)
+      if (!p2) return false
+
+      this.snake = [p1.pos]
+      this.snakeSet = new Set([`${p1.pos.x},${p1.pos.y}`])
+      this.direction = p1.dir
+      this.nextDirection = p1.dir
+
+      this.snake2 = [p2.pos]
+      this.snakeSet2 = new Set([`${p2.pos.x},${p2.pos.y}`])
+      this.direction2 = p2.dir
+      this.nextDirection2 = p2.dir
+    } else {
+      const s = this.findStartCell({ x: N / 2, y: N / 2 }, new Set())
+      if (!s) return false
+      this.snake = [s.pos]
+      this.snakeSet = new Set([`${s.pos.x},${s.pos.y}`])
+      this.direction = s.dir
+      this.nextDirection = s.dir
+    }
+    return true
+  }
+
+  private checkLevelAdvance() {
+    const combined = this.score + (this.isTwoSnakeMode() ? this.score2 : 0)
+    if (combined >= this.levelGoal) {
+      this.advanceLevel()
+    }
+  }
+
+  private advanceLevel() {
+    this.level++
+    this.regenerateIronSnakeBoard()
+
+    // Guarantee a valid layout even if a generated shape can't seat the snakes.
+    if (!this.repositionSnakes()) {
+      this.boardMask = null
+      this.boardArea = this.gridSize * this.gridSize
+      this.repositionSnakes()
+    }
+
+    this.maxLength1 = Math.max(this.maxLength1, this.snake.length)
+    this.maxLength2 = Math.max(this.maxLength2, this.snake2.length)
+
+    this.levelGoal = ironSnakeGoalForLevel(this.level)
+    // Gentle speed ramp (vs the classic /2 halving) since the board stays the
+    // same size each level.
+    this.gameSpeed = Math.max(IRON_SNAKE_MIN_SPEED, Math.round(this.baseSpeed * Math.pow(0.9, this.level - 1)))
+    this.updateCanvasSize()
+
+    if (this.gameLoop) clearInterval(this.gameLoop)
+    this.gameLoop = window.setInterval(() => this.update(), this.gameSpeed)
+
+    this.spawnFood()
+    this.updateUI()
+    this.draw()
+  }
+
   // === Food ===
 
   private spawnFood() {
-    const totalCells = this.gridSize * this.gridSize
     const combinedLength = this.snake.length + (this.isTwoSnakeMode() ? this.snake2.length : 0)
 
-    if (combinedLength > totalCells * 0.5) {
-      // At high fill ratios, collect empty cells directly
+    // Enumerate empty cells directly once the board is more than half full, or
+    // whenever an Iron Snake mask is active (rejection sampling would waste most
+    // draws on off-board cells). `boardArea` is the playable-cell count.
+    if (this.boardMask !== null || combinedLength > this.boardArea * 0.5) {
       const emptyCells: Position[] = []
       for (let y = 0; y < this.gridSize; y++) {
         for (let x = 0; x < this.gridSize; x++) {
+          if (!this.onBoard(x, y)) continue
           const key = `${x},${y}`
           if (!this.snakeSet.has(key) && (!this.isTwoSnakeMode() || !this.snakeSet2.has(key))) {
             emptyCells.push({ x, y })
@@ -1329,8 +1592,9 @@ class SnakeGame {
       }
       if (emptyCells.length > 0) {
         this.food = emptyCells[Math.floor(Math.random() * emptyCells.length)]
-        return
       }
+      // If no empty cell exists the board is full; leave food where it is.
+      return
     }
 
     let newFood: Position
@@ -1357,6 +1621,18 @@ class SnakeGame {
     }
     document.getElementById('level')!.textContent = this.level.toString()
     document.getElementById('grid-size')!.textContent = `${this.gridSize}x${this.gridSize}`
+
+    // In Iron Snake Mode, show goal progress instead of grid dimensions.
+    const gridDisplay = document.getElementById('grid-display')!
+    const goalDisplay = document.getElementById('iron-snake-goal-display')!
+    gridDisplay.classList.toggle('hidden', this.ironSnakeMode)
+    goalDisplay.classList.toggle('hidden', !this.ironSnakeMode)
+    if (this.ironSnakeMode) {
+      const combined = this.score + (this.isTwoSnakeMode() ? this.score2 : 0)
+      const remaining = Math.max(0, this.levelGoal - combined)
+      const suffix = remaining === 1 ? 'pt' : 'pts'
+      document.getElementById('iron-snake-goal')!.textContent = `${remaining} ${suffix}`
+    }
   }
 
   private updateModeUI() {
