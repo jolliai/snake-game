@@ -1,0 +1,18 @@
+{
+	"schemaVersion": 1,
+	"stableSlug": "e2e-test-harness",
+	"title": "Playwright End-to-End Test Harness",
+	"content": "## Overview\n\nThe project has a Playwright end-to-end test harness targeting the snake game. It uses Chromium as the sole browser, drives the game through keyboard input, and asserts on observable DOM signals rather than canvas pixels or internal game state.\n\n## Configuration\n\n`playwright.config.ts` configures:\n- **Chromium only** as the browser target (Firefox and WebKit are deferred to keep CI fast and avoid early flakiness)\n- **Auto-start of the Vite dev server** on a pinned port before the suite runs\n- **Trace capture and screenshots on failure** for post-mortem debugging\n\n## npm Scripts\n\nThree scripts were added to `package.json`:\n\n| Script | Purpose |\n|---|---|\n| `test` | Run the full Playwright suite headlessly |\n| `test:ui` | Open the Playwright UI runner |\n| `test:report` | Serve the last HTML report |\n\n## Test Files\n\nAll specs live under `tests/e2e/`:\n\n| File | Coverage |\n|---|---|\n| `menu.spec.ts` | Initial menu rendering and leaderboard navigation |\n| `gameplay.spec.ts` | New-game readouts (score, level, goal), pause toggle, and reset |\n| `game-over.spec.ts` | Deterministic wall-collision death, death-banner freeze, and game-over screen flow |\n| `iron-snake.spec.ts` | HUD swap when Iron Snake mode is enabled |\n| `helpers.ts` | Shared navigation flows and screen selectors used across specs |\n\n## Testing Strategy\n\nThe game renders entirely on a `<canvas>` with no state exposed to the page. Tests therefore:\n\n- **Drive input via keyboard events** rather than game API calls\n- **Assert on DOM signals**: screen visibility is toggled by a CSS class; score, level, and goal are read from text readouts in the HUD\n\nThis keeps tests resilient to visual changes while covering real user flows.\n\n### Deterministic Game-Over\n\nThe game-over test steers the snake into the right wall from its fixed starting position. Wall collision is guaranteed within a bounded number of game ticks, making the test reliable without random-seed control or internal hooks. A `window.__game` handle for deeper determinism was explicitly deferred as a future follow-up.\n\n## CI Integration\n\n`.github/workflows/playwright.yml` runs the full suite on every push and pull request to `main`. The HTML report is uploaded as a build artifact retained for seven days.\n\n## Ignored Artifacts\n\n`.gitignore` was updated to exclude Playwright test artifacts (traces, screenshots, reports).",
+	"relatedBranches": [
+		"test/playwright-harness"
+	],
+	"sourceRefs": [
+		{
+			"type": "summary",
+			"id": "4721040fdaf5d2c67c4b594f2354d3c9e0d8efde",
+			"timestamp": "2026-07-02T22:19:30.000Z",
+			"branch": "test/playwright-harness"
+		}
+	],
+	"lastUpdatedAt": "2026-07-02T22:19:53.166Z"
+}
