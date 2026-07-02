@@ -18,6 +18,7 @@ const RETRY_CAP = 30
 const MIN_ROOM = 3 // side >= 3 keeps every room wider than a 1-2 cell corridor
 const TARGET_FILL_LO = 0.4
 const TARGET_FILL_HI = 0.75
+const TARGET_FILL_MID = (TARGET_FILL_LO + TARGET_FILL_HI) / 2 // typical playable fraction (~0.575)
 const MIN_GRID = 6 // below this a meaningful irregular shape can't be carved
 
 const NEIGHBORS: ReadonlyArray<readonly [number, number]> = [
@@ -188,4 +189,16 @@ export function generateIronSnakeBoard(gridSize: number, rng: Rng = Math.random)
   }
 
   return null
+}
+
+/**
+ * Bounding-box `gridSize` whose generated shapes tend to yield roughly
+ * `targetArea` playable cells. Since a generated shape fills ~`TARGET_FILL_MID`
+ * of its bounding box, invert that: `gridSize ≈ sqrt(targetArea / midFill)`.
+ * Clamped to `MIN_GRID`. Callers (Iron Snake level scaling) use this to grow the
+ * board in proportion to how long the snake will be by the level's goal.
+ */
+export function ironSnakeGridSizeForArea(targetArea: number): number {
+  const g = Math.ceil(Math.sqrt(Math.max(1, targetArea) / TARGET_FILL_MID))
+  return Math.max(MIN_GRID, g)
 }

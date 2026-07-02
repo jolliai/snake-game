@@ -13,7 +13,7 @@ import {
 } from './leaderboard'
 import type { LeaderboardEntry, LeaderboardMode, GameResult } from './leaderboard'
 import { MenuDemo } from './menu-demo'
-import { generateIronSnakeBoard } from './iron-snake'
+import { generateIronSnakeBoard, ironSnakeGridSizeForArea } from './iron-snake'
 
 type GameMode = 'single' | 'pvp' | 'bvb'
 
@@ -23,6 +23,11 @@ const ISO_MAX_WIDTH = 1200
 // Iron Snake Mode tuning.
 const IRON_SNAKE_MIN_SIZE = 12 // bounding box floor so shapes have room to be interesting
 const IRON_SNAKE_MIN_SPEED = 60 // fastest the loop interval ramps to (ms)
+// The snake keeps its (cumulative) length across levels, so the board must grow
+// with the goal or a long snake eventually fills a fixed board. This is the
+// snake's target share of the playable area at the moment a level's goal is
+// reached; the per-level board area is sized to hit it (lower => roomier).
+const IRON_SNAKE_GOAL_FILL = 0.4
 
 // Starvation: a snake that goes too long without eating dies, so a bot that can
 // never reach walled-off food (or is hopelessly stuck) eventually loses instead
@@ -459,11 +464,9 @@ class SnakeGame {
     ctx.fill()
   }
 
-  private drawBlock(gx: number, gy: number, topColor: string, rightColor: string, leftColor: string) {
+  private drawBlock(gx: number, gy: number, topColor: string, rightColor: string, leftColor: string, heightScale: number = 1) {
     const inset = 0.05
-    const bh = this.getBlockHeight(gx, gy)
-    const ctx = this.ctx
-
+    const bh = this.getBlockHeight(gx, gy) * heightScale
     // Corners clockwise: TL, TR, BR, BL
     const c = [
       this.toIso(gx + inset, gy + inset),
@@ -471,6 +474,15 @@ class SnakeGame {
       this.toIso(gx + 1 - inset, gy + 1 - inset),
       this.toIso(gx + inset, gy + 1 - inset)
     ]
+    this.drawPrism(c, bh, topColor, rightColor, leftColor)
+  }
+
+  // Draw an extruded prism from 4 clockwise ground corners (already projected to
+  // iso screen space) raised by `bh`: back side faces first, then front side
+  // faces (so they paint over), then the top. Shared by drawBlock and the
+  // tapered tail so both shade identically.
+  private drawPrism(c: { x: number; y: number }[], bh: number, topColor: string, rightColor: string, leftColor: string) {
+    const ctx = this.ctx
 
     // 4 side faces defined by clockwise edges; classify as front or back
     // Outward normal Y = a.x - b.x; visible (front) when > 0
@@ -518,6 +530,88 @@ class SnakeGame {
     ctx.closePath()
     ctx.fillStyle = topColor
     ctx.fill()
+  }
+
+  // The head stands taller than the body so it reads at a glance.
+  private static readonly HEAD_HEIGHT_SCALE = 1.6
+
+  // Draw a snake head: a taller block with two eyes on the leading (travel-
+  // direction) vertical face, so the head clearly looks where it's going. When
+  // that face points away from the camera (or in the flat overhead view) it
+  // isn't visible, so no eyes are drawn — the snake just shows its back.
+  private drawSnakeHead(gx: number, gy: number, colors: [string, string, string], dir: Direction) {
+    const hs = this.overheadView ? 1 : SnakeGame.HEAD_HEIGHT_SCALE
+    this.drawBlock(gx, gy, colors[0], colors[1], colors[2], hs)
+
+    const bh = this.getBlockHeight(gx, gy) * hs
+    if (bh <= 0) return // flat overhead view: no vertical face to hold eyes
+
+    const inset = 0.05
+    // Ground-plane corners, matching drawBlock (TL, TR, BR, BL clockwise).
+    const c = [
+      this.toIso(gx + inset, gy + inset),
+      this.toIso(gx + 1 - inset, gy + inset),
+      this.toIso(gx + 1 - inset, gy + 1 - inset),
+      this.toIso(gx + inset, gy + 1 - inset)
+    ]
+
+    // The leading face is the grid edge whose outward normal is the travel
+    // direction: UP=c0->c1, RIGHT=c1->c2, DOWN=c2->c3, LEFT=c3->c0. Skip it when
+    // it faces away from the camera (same front-face test as drawBlock).
+    const EDGE: Record<Direction, number> = { UP: 0, RIGHT: 1, DOWN: 2, LEFT: 3 }
+    const a = c[EDGE[dir]], b = c[(EDGE[dir] + 1) % 4]
+    if (a.x <= b.x) return // leading face hidden — show no eyes
+
+    const ctx = this.ctx
+    const eyeR = Math.hypot(c[2].x - c[0].x, c[2].y - c[0].y) * 0.1
+    const h = 0.6 // eye height up the face
+    for (const t of [0.3, 0.7]) {
+      const ex = a.x + (b.x - a.x) * t
+      const ey = a.y + (b.y - a.y) * t - bh * h
+      ctx.beginPath()
+      ctx.ellipse(ex, ey, eyeR, eyeR, 0, 0, Math.PI * 2)
+      ctx.fillStyle = '#ffffff'
+      ctx.fill()
+      ctx.beginPath()
+      ctx.ellipse(ex, ey + eyeR * 0.28, eyeR * 0.5, eyeR * 0.5, 0, 0, Math.PI * 2)
+      ctx.fillStyle = '#0f172a'
+      ctx.fill()
+    }
+  }
+
+  // The tail is a bit shorter than the body so it reads as tapering off.
+  private static readonly TAIL_HEIGHT_SCALE = 0.7
+
+  // Direction the tail points: from the second-to-last segment toward the last.
+  private tailDirection(snake: Position[]): Direction {
+    const t = snake[snake.length - 1], p = snake[snake.length - 2]
+    return this.vectorToDirection({ x: t.x - p.x, y: t.y - p.y })
+  }
+
+  // Draw the tail: a block that is full-width where it meets the body and
+  // narrows to a small tip in `awayDir` (the way the tail points), shorter than
+  // a body block, so the snake tapers to a point instead of ending in a stub.
+  private drawSnakeTail(gx: number, gy: number, colors: [string, string, string], awayDir: Direction) {
+    const bh = this.getBlockHeight(gx, gy) * SnakeGame.TAIL_HEIGHT_SCALE
+    const f = DIRECTION_VECTORS[awayDir]
+    const p = { x: -f.y, y: f.x } // lateral
+    const cx = gx + 0.5, cy = gy + 0.5
+    const body = 0.45  // half-length to the full-width body edge (matches inset)
+    const tip = 0.45   // half-length to the tip edge
+    const halfBody = 0.45
+    const halfTip = 0.12 // narrow tip
+    const corners = [
+      { x: cx - f.x * body + p.x * halfBody, y: cy - f.y * body + p.y * halfBody },
+      { x: cx - f.x * body - p.x * halfBody, y: cy - f.y * body - p.y * halfBody },
+      { x: cx + f.x * tip - p.x * halfTip, y: cy + f.y * tip - p.y * halfTip },
+      { x: cx + f.x * tip + p.x * halfTip, y: cy + f.y * tip + p.y * halfTip }
+    ]
+    // Keep clockwise winding (positive shoelace in grid space) so drawPrism's
+    // front/back face test matches drawBlock for any tail direction.
+    let area = 0
+    for (let i = 0; i < 4; i++) { const a = corners[i], b = corners[(i + 1) % 4]; area += a.x * b.y - b.x * a.y }
+    if (area < 0) corners.reverse()
+    this.drawPrism(corners.map(g => this.toIso(g.x, g.y)), bh, colors[0], colors[1], colors[2])
   }
 
   // === Auto-rotation ===
@@ -590,21 +684,46 @@ class SnakeGame {
     this.drawGroundBorder()
 
     // Collect all objects to render
-    const objects: { x: number; y: number; type: 'head' | 'body' | 'food' | 'head2' | 'body2' }[] = []
+    type DrawType = 'head' | 'body' | 'tail' | 'food' | 'head2' | 'body2' | 'tail2' | 'death'
+    const objects: { x: number; y: number; type: DrawType }[] = []
+
+    const segType = (index: number, len: number): DrawType =>
+      index === 0 ? 'head' : index === len - 1 ? 'tail' : 'body'
 
     this.snake.forEach((segment, index) => {
-      objects.push({ x: segment.x, y: segment.y, type: index === 0 ? 'head' : 'body' })
+      objects.push({ x: segment.x, y: segment.y, type: segType(index, this.snake.length) })
     })
 
     if (this.isTwoSnakeMode()) {
       this.snake2.forEach((segment, index) => {
-        objects.push({ x: segment.x, y: segment.y, type: index === 0 ? 'head2' : 'body2' })
+        const t = segType(index, this.snake2.length)
+        objects.push({ x: segment.x, y: segment.y, type: t === 'head' ? 'head2' : t === 'tail' ? 'tail2' : 'body2' })
       })
     }
 
     objects.push({ x: this.food.x, y: this.food.y, type: 'food' })
 
-    // Sort back-to-front (painter's algorithm): lower projected Y drawn first
+    // Death freeze: the fatal cell(s) are drawn in the amber "impact" palette,
+    // added to the object list so they respect painter's depth order (a segment
+    // in front of the fatal cell correctly occludes it) rather than floating on
+    // top. Off-grid classic wall deaths are anchored on the head cell here and
+    // the out-of-bounds sliver is drawn separately afterwards. Stable sort keeps
+    // a death marker after the segment sharing its cell, so it paints over it.
+    if (this.awaitingDeathAck) {
+      for (const dc of this.deathCells) {
+        const offGrid = dc.x < 0 || dc.x >= this.gridSize || dc.y < 0 || dc.y >= this.gridSize
+        if (offGrid) {
+          const head = dc.who === 1 ? this.snake[0] : this.snake2[0]
+          if (head) objects.push({ x: head.x, y: head.y, type: 'death' })
+        } else {
+          objects.push({ x: dc.x, y: dc.y, type: 'death' })
+        }
+      }
+    }
+
+    // Sort back-to-front (painter's algorithm): lower projected Y drawn first.
+    // Array.prototype.sort is stable, so equal-depth ties keep insertion order
+    // (death markers, pushed last, stay above the segment in the same cell).
     objects.sort((a, b) =>
       (a.x * this.basisXy + a.y * this.basisYy) - (b.x * this.basisXy + b.y * this.basisYy)
     )
@@ -635,44 +754,39 @@ class SnakeGame {
     for (const obj of objects) {
       switch (obj.type) {
         case 'head':
-          this.drawBlock(obj.x, obj.y, head1[0], head1[1], head1[2])
+          this.drawSnakeHead(obj.x, obj.y, head1, this.direction)
           break
         case 'body':
           this.drawBlock(obj.x, obj.y, body1[0], body1[1], body1[2])
           break
+        case 'tail':
+          this.drawSnakeTail(obj.x, obj.y, body1, this.tailDirection(this.snake))
+          break
         case 'head2':
-          this.drawBlock(obj.x, obj.y, head2[0], head2[1], head2[2])
+          this.drawSnakeHead(obj.x, obj.y, head2, this.direction2)
           break
         case 'body2':
           this.drawBlock(obj.x, obj.y, body2[0], body2[1], body2[2])
           break
+        case 'tail2':
+          this.drawSnakeTail(obj.x, obj.y, body2, this.tailDirection(this.snake2))
+          break
         case 'food':
           this.drawBlock(obj.x, obj.y, foodColors[0], foodColors[1], foodColors[2])
+          break
+        case 'death':
+          this.drawBlock(obj.x, obj.y, '#facc15', '#eab308', '#a16207')
           break
       }
     }
 
-    // Death freeze: highlight the fatal cell(s) on top of everything else, in an
-    // amber "impact" palette distinct from the green/blue snakes and red food, so
-    // the player sees exactly how they lost. Starvation has no fatal cell.
+    // Classic wall death: the true fatal cell is off-grid and projects mostly
+    // off-canvas, so draw a sliver at the out-of-bounds coord on top so a bit
+    // pokes past the border (the on-grid anchor marker was depth-sorted above).
     if (this.awaitingDeathAck) {
       for (const dc of this.deathCells) {
         const offGrid = dc.x < 0 || dc.x >= this.gridSize || dc.y < 0 || dc.y >= this.gridSize
-        if (offGrid) {
-          // Classic wall death: the true cell projects mostly off-canvas and
-          // clips, so anchor a visible marker on this snake's last valid cell
-          // (still snake[0] — the fatal head was never unshifted), and also draw
-          // at the true out-of-bounds coord so a sliver pokes past the border.
-          const head = dc.who === 1 ? this.snake[0] : this.snake2[0]
-          this.drawBlockShadow(head.x, head.y)
-          this.drawBlock(head.x, head.y, '#facc15', '#eab308', '#a16207')
-          this.drawBlock(dc.x, dc.y, '#facc15', '#eab308', '#a16207')
-        } else {
-          // Self / opponent / head-to-head, or an Iron Snake masked-void cell:
-          // projects on-canvas, drawn on top of the collided segment.
-          this.drawBlockShadow(dc.x, dc.y)
-          this.drawBlock(dc.x, dc.y, '#facc15', '#eab308', '#a16207')
-        }
+        if (offGrid) this.drawBlock(dc.x, dc.y, '#facc15', '#eab308', '#a16207')
       }
     }
   }
@@ -868,7 +982,7 @@ class SnakeGame {
         this.initialGridSize = Math.max(this.initialGridSize - 5, 5)
       }
       this.gridSize = this.ironSnakeMode
-        ? Math.max(this.initialGridSize, IRON_SNAKE_MIN_SIZE)
+        ? this.ironSnakeGridSizeForLevel(1)
         : this.initialGridSize
       this.regenerateIronSnakeBoard()
       this.updateCanvasSize()
@@ -1113,7 +1227,7 @@ class SnakeGame {
     // Iron Snake Mode uses a larger bounding box (so shapes have room) and carves
     // an irregular mask; classic mode keeps the full rectangle (mask = null).
     this.gridSize = this.ironSnakeMode
-      ? Math.max(this.initialGridSize, IRON_SNAKE_MIN_SIZE)
+      ? this.ironSnakeGridSizeForLevel(1)
       : this.initialGridSize
     this.regenerateIronSnakeBoard()
     this.updateCanvasSize()
@@ -1503,11 +1617,10 @@ class SnakeGame {
   // `preferred` that has a direction with at least `clearance` clear cells
   // ahead, so a freshly-placed snake won't immediately run into a wall.
   // Returns null only on a pathological board (caller falls back to a rectangle).
-  private findStartCell(
-    preferred: Position,
-    occupied: Set<string>,
-    clearance: number = 3
-  ): { pos: Position; dir: Direction } | null {
+  // On-board, unoccupied cells sorted by Manhattan distance to `preferred`.
+  // Shared by findStartCell (single-cell spawn) and the shape-preserving
+  // placement below (anchor search).
+  private sortedCandidates(preferred: Position, occupied: Set<string>): Position[] {
     const candidates: Position[] = []
     for (let y = 0; y < this.gridSize; y++) {
       for (let x = 0; x < this.gridSize; x++) {
@@ -1521,6 +1634,15 @@ class SnakeGame {
         Math.abs(a.x - preferred.x) + Math.abs(a.y - preferred.y) -
         (Math.abs(b.x - preferred.x) + Math.abs(b.y - preferred.y))
     )
+    return candidates
+  }
+
+  private findStartCell(
+    preferred: Position,
+    occupied: Set<string>,
+    clearance: number = 3
+  ): { pos: Position; dir: Direction } | null {
+    const candidates = this.sortedCandidates(preferred, occupied)
 
     let fallback: { pos: Position; dir: Direction } | null = null
     for (const pos of candidates) {
@@ -1538,6 +1660,185 @@ class SnakeGame {
       }
     }
     return fallback
+  }
+
+  // Rotate a relative offset by `k` quarter-turns (k in 0..3). Rigid, so it
+  // preserves the snake's shape exactly (k=0 is the identity).
+  private rotateOffset(p: Position, k: number): Position {
+    switch (((k % 4) + 4) % 4) {
+      case 1: return { x: -p.y, y: p.x }
+      case 2: return { x: -p.x, y: -p.y }
+      case 3: return { x: p.y, y: -p.x }
+      default: return { x: p.x, y: p.y }
+    }
+  }
+
+  private vectorToDirection(v: Position): Direction {
+    for (const d of DIRECTIONS) {
+      const vec = DIRECTION_VECTORS[d]
+      if (vec.x === v.x && vec.y === v.y) return d
+    }
+    return 'RIGHT' // unreachable for unit vectors
+  }
+
+  private rotateDirection(dir: Direction, k: number): Direction {
+    return this.vectorToDirection(this.rotateOffset(DIRECTION_VECTORS[dir], k))
+  }
+
+  // Try to place a snake of the given `shape` (relative offsets from the head,
+  // shape[0] === {0,0}) onto the current board without changing its geometry:
+  // translate the head to an anchor near `preferred`, trying the identity
+  // orientation first (visually unchanged) then 90/180/270° rotations. A
+  // placement is valid only if every segment lands on-board and unoccupied.
+  // Prefers a head with full forward `clearance`; falls back to >=1 clear cell.
+  private placeRigid(
+    shape: Position[],
+    dir: Direction,
+    preferred: Position,
+    occupied: Set<string>,
+    clearance: number = 3
+  ): { body: Position[]; dir: Direction } | null {
+    const candidates = this.sortedCandidates(preferred, occupied)
+    let fallback: { body: Position[]; dir: Direction } | null = null
+
+    for (const anchor of candidates) {
+      for (let k = 0; k < 4; k++) {
+        const body: Position[] = []
+        const bodyKeys = new Set<string>()
+        let ok = true
+        for (const off of shape) {
+          const r = this.rotateOffset(off, k)
+          const cell = { x: anchor.x + r.x, y: anchor.y + r.y }
+          const key = `${cell.x},${cell.y}`
+          if (!this.onBoard(cell.x, cell.y) || occupied.has(key)) { ok = false; break }
+          body.push(cell)
+          bodyKeys.add(key)
+        }
+        if (!ok) continue
+
+        const rotDir = this.rotateDirection(dir, k)
+        const vec = DIRECTION_VECTORS[rotDir]
+        let clear = 0
+        for (let step = 1; step <= clearance; step++) {
+          const cx = anchor.x + vec.x * step
+          const cy = anchor.y + vec.y * step
+          const key = `${cx},${cy}`
+          if (!this.onBoard(cx, cy) || occupied.has(key) || bodyKeys.has(key)) break
+          clear++
+        }
+        if (clear >= clearance) return { body, dir: rotDir }
+        if (!fallback && clear >= 1) fallback = { body, dir: rotDir }
+      }
+    }
+    return fallback
+  }
+
+  // Length-preserving fallback when the exact shape can't be seated: a
+  // self-avoiding walk of `length` cells starting at the head, preferring to
+  // continue straight so the body reads as a natural snake. Reserves the head's
+  // forward clearance so it can move after spawning. Returns null if the board
+  // is too cramped to lay out the full length.
+  private layoutBody(
+    head: Position,
+    dir: Direction,
+    length: number,
+    occupied: Set<string>
+  ): Position[] | null {
+    const headKey = `${head.x},${head.y}`
+    if (!this.onBoard(head.x, head.y) || occupied.has(headKey)) return null
+    if (length <= 1) return [head]
+
+    const reserved = new Set<string>()
+    const fwd = DIRECTION_VECTORS[dir]
+    for (let step = 1; step <= 3; step++) {
+      const cx = head.x + fwd.x * step
+      const cy = head.y + fwd.y * step
+      if (!this.onBoard(cx, cy) || occupied.has(`${cx},${cy}`)) break
+      reserved.add(`${cx},${cy}`)
+    }
+
+    const body: Position[] = [head]
+    const placed = new Set<string>([headKey])
+    let budget = 50000 // guard against pathological backtracking blowups
+
+    const isFree = (x: number, y: number): boolean => {
+      const k = `${x},${y}`
+      return this.onBoard(x, y) && !occupied.has(k) && !placed.has(k) && !reserved.has(k)
+    }
+    const freeDegree = (x: number, y: number): number => {
+      let n = 0
+      if (isFree(x + 1, y)) n++
+      if (isFree(x - 1, y)) n++
+      if (isFree(x, y + 1)) n++
+      if (isFree(x, y - 1)) n++
+      return n
+    }
+
+    const extend = (): boolean => {
+      if (body.length === length) return true
+      if (budget-- <= 0) return false
+      const last = body[body.length - 1]
+      const prev = body.length >= 2 ? body[body.length - 2] : { x: last.x + fwd.x, y: last.y + fwd.y }
+      const straight = { x: last.x + (last.x - prev.x), y: last.y + (last.y - prev.y) }
+      const options = [
+        { x: last.x + 1, y: last.y },
+        { x: last.x - 1, y: last.y },
+        { x: last.x, y: last.y + 1 },
+        { x: last.x, y: last.y - 1 }
+      ].filter(n => isFree(n.x, n.y))
+      // Warnsdorff: extend toward the most-constrained cell first (fewest onward
+      // free neighbours) so a long walk doesn't wall itself off; break ties by
+      // continuing straight so the body still reads as a natural snake.
+      options.sort((a, b) => {
+        const da = freeDegree(a.x, a.y), db = freeDegree(b.x, b.y)
+        if (da !== db) return da - db
+        const sa = a.x === straight.x && a.y === straight.y ? 0 : 1
+        const sb = b.x === straight.x && b.y === straight.y ? 0 : 1
+        return sa - sb
+      })
+      for (const n of options) {
+        const key = `${n.x},${n.y}`
+        body.push(n)
+        placed.add(key)
+        if (extend()) return true
+        body.pop()
+        placed.delete(key)
+      }
+      return false
+    }
+
+    return extend() ? body : null
+  }
+
+  // Seat one snake on the current board keeping its length, preferring to keep
+  // its exact shape (placeRigid); if that fails, keep at least the length via a
+  // self-avoiding layout.
+  private placeSnakeKeepingShape(
+    shape: Position[],
+    dir: Direction,
+    preferred: Position,
+    occupied: Set<string>,
+    clearance: number = 3
+  ): { body: Position[]; dir: Direction } | null {
+    const rigid = this.placeRigid(shape, dir, preferred, occupied, clearance)
+    if (rigid) return rigid
+    const start = this.findStartCell(preferred, occupied, clearance)
+    if (!start) return null
+    const body = this.layoutBody(start.pos, start.dir, shape.length, occupied)
+    return body ? { body, dir: start.dir } : null
+  }
+
+  // Bounding-box gridSize for an Iron Snake level. The snake keeps its length,
+  // so size the board to the snake's length at the level's goal
+  // (endLen = goal + heads), targeting IRON_SNAKE_GOAL_FILL occupancy. Floored
+  // at max(min size, the user's chosen size) and monotonic in level, so the
+  // board never shrinks between levels.
+  private ironSnakeGridSizeForLevel(level: number): number {
+    const goal = ironSnakeGoalForLevel(level)
+    const endLen = this.isTwoSnakeMode() ? goal + 2 : goal + 1
+    const targetArea = endLen / IRON_SNAKE_GOAL_FILL
+    const floor = Math.max(IRON_SNAKE_MIN_SIZE, this.initialGridSize)
+    return Math.max(floor, ironSnakeGridSizeForArea(targetArea))
   }
 
   private positionToKey(position: Position): string {
@@ -1753,6 +2054,48 @@ class SnakeGame {
     return true
   }
 
+  // Re-seat the snake(s) on the current board carrying their length across a
+  // level advance, keeping each snake's shape where possible. Returns false if
+  // the board can't seat them (caller retries on a bigger / rectangle board).
+  private reseatKeepingShape(
+    shape1: Position[],
+    dir1: Direction,
+    shape2: Position[] | null,
+    dir2: Direction
+  ): boolean {
+    resetLoopMemory(this.botLoopMemory)
+    resetLoopMemory(this.botLoopMemory2)
+    this.movesSinceFood1 = 0
+    this.movesSinceFood2 = 0
+    const N = this.gridSize
+    if (this.isTwoSnakeMode() && shape2) {
+      const occ = new Set<string>()
+      const r1 = this.placeSnakeKeepingShape(shape1, dir1, { x: N * 0.25, y: N / 2 }, occ)
+      if (!r1) return false
+      for (const c of r1.body) occ.add(`${c.x},${c.y}`)
+      const r2 = this.placeSnakeKeepingShape(shape2, dir2, { x: N * 0.75, y: N / 2 }, occ)
+      if (!r2) return false
+
+      this.snake = r1.body
+      this.snakeSet = new Set(r1.body.map(c => `${c.x},${c.y}`))
+      this.direction = r1.dir
+      this.nextDirection = r1.dir
+
+      this.snake2 = r2.body
+      this.snakeSet2 = new Set(r2.body.map(c => `${c.x},${c.y}`))
+      this.direction2 = r2.dir
+      this.nextDirection2 = r2.dir
+    } else {
+      const r = this.placeSnakeKeepingShape(shape1, dir1, { x: N / 2, y: N / 2 }, new Set())
+      if (!r) return false
+      this.snake = r.body
+      this.snakeSet = new Set(r.body.map(c => `${c.x},${c.y}`))
+      this.direction = r.dir
+      this.nextDirection = r.dir
+    }
+    return true
+  }
+
   private checkLevelAdvance() {
     const combined = this.score + (this.isTwoSnakeMode() ? this.score2 : 0)
     if (combined >= this.levelGoal) {
@@ -1761,11 +2104,33 @@ class SnakeGame {
   }
 
   private advanceLevel() {
-    this.level++
-    this.regenerateIronSnakeBoard()
+    // Capture each snake's shape (offsets from its head) before regenerating the
+    // board, so it can be carried onto the new shape at its current length.
+    const two = this.isTwoSnakeMode()
+    const shape1 = this.snake.map(s => ({ x: s.x - this.snake[0].x, y: s.y - this.snake[0].y }))
+    const dir1 = this.direction
+    const shape2 = two ? this.snake2.map(s => ({ x: s.x - this.snake2[0].x, y: s.y - this.snake2[0].y })) : null
+    const dir2 = this.direction2
 
-    // Guarantee a valid layout even if a generated shape can't seat the snakes.
-    if (!this.repositionSnakes()) {
+    this.level++
+
+    // Grow the board with the goal. If a generated shape can't seat the snakes,
+    // bump the bounding box a little and retry (more room => easier to fit).
+    const baseGrid = this.ironSnakeGridSizeForLevel(this.level)
+    let placed = false
+    for (let extra = 0; extra <= 3 && !placed; extra++) {
+      this.gridSize = baseGrid + extra
+      this.regenerateIronSnakeBoard()
+      placed = this.reseatKeepingShape(shape1, dir1, shape2, dir2)
+    }
+    // Last resort: a full rectangle, where the self-avoiding layout always fits.
+    if (!placed) {
+      this.boardMask = null
+      this.boardArea = this.gridSize * this.gridSize
+      placed = this.reseatKeepingShape(shape1, dir1, shape2, dir2)
+    }
+    // Absolute backstop (should be unreachable): reset to length 1 on a rectangle.
+    if (!placed) {
       this.boardMask = null
       this.boardArea = this.gridSize * this.gridSize
       this.repositionSnakes()
@@ -1775,8 +2140,8 @@ class SnakeGame {
     this.maxLength2 = Math.max(this.maxLength2, this.snake2.length)
 
     this.levelGoal = ironSnakeGoalForLevel(this.level)
-    // Gentle speed ramp (vs the classic /2 halving) since the board stays the
-    // same size each level.
+    // Gentle speed ramp (vs the classic /2 halving); the board grows with the
+    // level, so difficulty comes from the bigger arena plus a slight speed-up.
     this.gameSpeed = Math.max(IRON_SNAKE_MIN_SPEED, Math.round(this.baseSpeed * Math.pow(0.9, this.level - 1)))
     this.updateCanvasSize()
 
