@@ -104,6 +104,29 @@
 				}
 			],
 			"lastUpdatedAt": "2026-07-02T21:12:13.686Z"
+		},
+		{
+			"stableSlug": "iron-snake-fruit-color",
+			"title": "Iron Snake Mode: Final-Stretch Fruit Recoloring",
+			"summary": "In Iron Snake Mode, the fruit recolors for the last 3 fruits of each level: violet (3 left), magenta (2), white (1).",
+			"relatedBranches": [
+				"feature/fruitcolor"
+			],
+			"sourceRefs": [
+				{
+					"type": "plan",
+					"id": "also-use-jolli-memory-snazzy-kahan-132523e0",
+					"timestamp": "2026-07-02T03:37:22.753Z",
+					"branch": "feature/fruitcolor"
+				},
+				{
+					"type": "summary",
+					"id": "6aeabc387455a2e195e08ecce50f26d3eea1c19c",
+					"timestamp": "2026-07-01T20:40:06-07:00",
+					"branch": "feature/fruitcolor"
+				}
+			],
+			"lastUpdatedAt": "2026-07-02T21:12:13.686Z"
 		}
 	]
 }
