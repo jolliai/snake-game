@@ -28,3 +28,8 @@ dist-ssr
 
 # Jolli
 .jolli/
+
+# Playwright
+test-results/
+playwright-report/
+playwright/.cache/
