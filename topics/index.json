@@ -34,6 +34,30 @@
 				}
 			],
 			"lastUpdatedAt": "2026-07-02T21:12:13.686Z"
+		},
+		{
+			"stableSlug": "docs-readme-consolidation",
+			"title": "Documentation: Consolidate READMEs and Update Feature List",
+			"summary": "README rewritten from source inventory; README2/3 deleted; CLAUDE.md added with Jolli Memory guidance.",
+			"relatedBranches": [
+				"docs/cleanup",
+				"docs/claude-md-jolli-memory"
+			],
+			"sourceRefs": [
+				{
+					"type": "summary",
+					"id": "4b0f9fd779a7e8cbdc3dd702d41ad4f55eb2836a",
+					"timestamp": "2026-07-01T18:53:35.000Z",
+					"branch": "docs/cleanup"
+				},
+				{
+					"type": "summary",
+					"id": "7fdbb7aefeb1311c20012868220c2b11de0597fd",
+					"timestamp": "2026-07-01T20:46:17-07:00",
+					"branch": "docs/claude-md-jolli-memory"
+				}
+			],
+			"lastUpdatedAt": "2026-07-02T21:12:13.686Z"
 		}
 	]
 }
