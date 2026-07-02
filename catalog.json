@@ -2,9 +2,6 @@
 	"version": 1,
 	"entries": [
 		{
-			"commitHash": "31d93c3f670b49f2eb5583d128ce61bdc2a98299"
-		},
-		{
 			"commitHash": "4b0f9fd779a7e8cbdc3dd702d41ad4f55eb2836a",
 			"topics": [
 				{
@@ -327,6 +324,9 @@
 					]
 				}
 			]
+		},
+		{
+			"commitHash": "31d93c3f670b49f2eb5583d128ce61bdc2a98299"
 		}
 	]
 }
