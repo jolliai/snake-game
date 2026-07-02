@@ -827,7 +827,6 @@ class SnakeGame {
       this.botEnabled = true
       this.startNewGame('single')
     })
-    document.getElementById('toggle-bot')!.addEventListener('click', () => this.toggleBot())
     document.getElementById('play-again')!.addEventListener('click', () => this.startNewGame())
     document.getElementById('back-to-menu')!.addEventListener('click', () => {
       if (this.gameLoop) clearInterval(this.gameLoop)
@@ -866,11 +865,10 @@ class SnakeGame {
   }
 
   private setupBotSelectors() {
-    // Bot 1 selectors (game screen, BvB expand panel, Demo expand panel)
-    const gameSelect = document.getElementById('game-bot-select') as HTMLSelectElement | null
+    // Bot 1 selectors (BvB expand panel, Demo expand panel) — chosen pre-game only.
     const bvbBot1Select = document.getElementById('bvb-bot1-select') as HTMLSelectElement | null
     const demoBotSelect = document.getElementById('demo-bot-select') as HTMLSelectElement | null
-    this.botSelectors = [gameSelect, bvbBot1Select, demoBotSelect].filter((select): select is HTMLSelectElement => select !== null)
+    this.botSelectors = [bvbBot1Select, demoBotSelect].filter((select): select is HTMLSelectElement => select !== null)
 
     for (const select of this.botSelectors) {
       select.innerHTML = ''
@@ -912,6 +910,13 @@ class SnakeGame {
     const target = e.target as HTMLElement | null
     if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT')) {
       return
+    }
+
+    // Arrow keys otherwise scroll the page when it overflows the viewport; the
+    // game uses them for movement, so suppress the browser default. (WASD needs
+    // no such guard.) Text fields are already exempted by the guard above.
+    if (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+      e.preventDefault()
     }
 
     // Death freeze: any key dismisses the frozen board and runs the deferred
@@ -962,13 +967,6 @@ class SnakeGame {
     if (e.key === 'p' || e.key === 'P') {
       if (!this.isGameOver && this.gameLoop !== null) {
         this.togglePause()
-      }
-      return
-    }
-
-    if (e.key === 'b' || e.key === 'B') {
-      if (!this.isTwoSnakeMode()) {
-        this.toggleBot()
       }
       return
     }
@@ -1122,23 +1120,6 @@ class SnakeGame {
     }
   }
 
-  private toggleBot() {
-    this.botEnabled = !this.botEnabled
-    if (this.botEnabled) this.botEverActive = true
-    this.updateBotUI()
-
-    if (this.botEnabled) {
-      this.startAutoRotate()
-    } else {
-      this.stopAutoRotate()
-    }
-
-    const gameScreenVisible = !document.getElementById('game')!.classList.contains('hidden')
-    if (this.botEnabled && gameScreenVisible && this.snake.length > 0 && !this.isGameOver && !this.isPaused) {
-      this.startLoopIfNeeded()
-    }
-  }
-
   // === Bot selection ===
 
   private handleBotSelection(botId: string) {
@@ -1172,7 +1153,7 @@ class SnakeGame {
   }
 
   private updateBotDescriptions() {
-    const bot1Ids = ['game-bot-description', 'bvb-bot1-description', 'demo-bot-description']
+    const bot1Ids = ['bvb-bot1-description', 'demo-bot-description']
     for (const id of bot1Ids) {
       const el = document.getElementById(id)
       if (el) el.textContent = this.activeBot.description
@@ -1195,15 +1176,11 @@ class SnakeGame {
 
   private updateBotUI() {
     const status = document.getElementById('bot-status')
-    const toggle = document.getElementById('toggle-bot')
-    const demoButton = document.getElementById('start-demo')
-    if (!status || !toggle || !demoButton) return
+    if (!status) return
 
     status.textContent = this.botEnabled ? `ON (${this.activeBot.name})` : `OFF (${this.activeBot.name})`
     status.classList.toggle('on', this.botEnabled)
     status.classList.toggle('off', !this.botEnabled)
-    toggle.textContent = this.botEnabled ? `Disable Bot (B)` : `Enable Bot (B)`
-    demoButton.textContent = 'Solo Bot'
   }
 
   // === Game loop ===
@@ -2264,23 +2241,19 @@ class SnakeGame {
     const p1ScoreDisplay = document.getElementById('p1-score-display')!
     const p2ScoreDisplay = document.getElementById('p2-score-display')!
     const botStatusDisplay = document.getElementById('bot-status-display')!
-    const gameBotSelection = document.getElementById('game-bot-selection')!
-    const toggleBot = document.getElementById('toggle-bot')!
     const controlsText = document.getElementById('controls-text')!
 
     scoreDisplay.classList.toggle('hidden', isTwoPlayer)
     p1ScoreDisplay.classList.toggle('hidden', !isTwoPlayer)
     p2ScoreDisplay.classList.toggle('hidden', !isTwoPlayer)
     botStatusDisplay.classList.toggle('hidden', isTwoPlayer)
-    gameBotSelection.classList.toggle('hidden', isTwoPlayer)
-    toggleBot.classList.toggle('hidden', isTwoPlayer)
 
     if (this.gameMode === 'pvp') {
       controlsText.textContent = 'P1: WASD | P2: Arrow Keys | P to Pause | R to Reset | Q/E to rotate | T to pause rotation | O for overhead view'
     } else if (this.gameMode === 'bvb') {
       controlsText.textContent = `${this.activeBot.name} vs ${this.activeBot2.name} | P to Pause | R to Reset | Q/E to rotate | T to pause rotation | O for overhead view`
     } else {
-      controlsText.textContent = 'Use Arrow Keys or WASD to move | Press P to Pause | Press R to Reset | +/- to change grid size | Press B to toggle bot | Press O for overhead view | Press any direction to start'
+      controlsText.textContent = 'Use Arrow Keys or WASD to move | Press P to Pause | Press R to Reset | +/- to change grid size | Press O for overhead view | Press any direction to start'
     }
   }
 

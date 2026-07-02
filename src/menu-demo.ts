@@ -1,6 +1,7 @@
-import { AVAILABLE_BOTS, DEFAULT_BOT_ID, getBotById } from './bots'
+import { AVAILABLE_BOTS } from './bots'
 import type { BotHelpers, BotState, SnakeBot } from './bots/bot-types'
 import { applyLoopGuard, createLoopMemory, resetLoopMemory, type LoopMemory } from './bots/loop-guard'
+import { generateIronSnakeBoard } from './iron-snake'
 import {
   DIRECTIONS,
   DIRECTION_VECTORS,
@@ -9,13 +10,21 @@ import {
   type Position
 } from './game-types'
 
-const DEMO_GRID_SIZE = 12
+const DEMO_GRID_SIZE = 14
 const DEMO_CANVAS_WIDTH = 360
 const DEMO_PERSPECTIVE_RATIO = 0.5
 const DEMO_PERSPECTIVE_STRENGTH = 0.4
 const DEMO_ROTATE_SPEED = 0.25 // radians per second
 const DEMO_MOVE_INTERVAL = 110 // ms per snake step
 const DEMO_DEATH_PAUSE = 700 // ms to linger after death before restarting
+const DEMO_IRON_CHANCE = 0.5 // odds a page load runs Iron Snake boards (vs. plain rectangles) — decided once at load
+const DEMO_HEAD_HEIGHT_SCALE = 1.6 // head stands taller than the body, like the real game
+const DEMO_TAIL_HEIGHT_SCALE = 0.7 // tail is a bit shorter so it reads as tapering off
+
+// Snake/food colours mirror the real game's P1 palette: [top, right, left].
+const DEMO_HEAD_COLORS: [string, string, string] = ['#4ade80', '#22c55e', '#16a34a']
+const DEMO_BODY_COLORS: [string, string, string] = ['#22c55e', '#16a34a', '#15803d']
+const DEMO_FOOD_COLORS: [string, string, string] = ['#ef4444', '#dc2626', '#b91c1c']
 
 export class MenuDemo {
   private canvas: HTMLCanvasElement
@@ -27,7 +36,14 @@ export class MenuDemo {
   private direction: Direction = 'RIGHT'
   private gridSize: number = DEMO_GRID_SIZE
 
-  private bot: SnakeBot
+  private bot!: SnakeBot
+  private boardMask: Uint8Array | null = null
+  // Iron vs. classic is decided once per page load so a given visit consistently
+  // shows one style (a fresh shape each life), rather than flickering between the
+  // two — on which the snake would linger on the roomy rectangle and rarely show
+  // Iron boards.
+  private useIron: boolean = false
+  private botLabelEl: HTMLElement | null = null
   private loopMemory: LoopMemory = createLoopMemory()
   private isoAngle: number = Math.PI / 4
   private running: boolean = false
@@ -52,7 +68,8 @@ export class MenuDemo {
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas
     this.ctx = canvas.getContext('2d')!
-    this.bot = getBotById(DEFAULT_BOT_ID) ?? AVAILABLE_BOTS[0]
+    this.botLabelEl = document.getElementById('menu-demo-bot-label')
+    this.useIron = Math.random() < DEMO_IRON_CHANCE
     this.resetSnake()
     this.updateProjection()
   }
@@ -103,13 +120,50 @@ export class MenuDemo {
     this.rafId = requestAnimationFrame(t => this.frame(t))
   }
 
+  // Each fresh life: pick a random bot, randomly carve an Iron Snake board (or a
+  // full rectangle), and seat a length-1 snake on a valid cell — so the menu
+  // preview showcases the real game's bots and Iron Snake shapes.
   private resetSnake() {
-    const center = Math.floor(this.gridSize / 2)
-    this.snake = [{ x: center, y: center }]
-    this.snakeSet = new Set([`${center},${center}`])
+    this.bot = AVAILABLE_BOTS[Math.floor(Math.random() * AVAILABLE_BOTS.length)]
+    this.updateBotLabel()
+
+    if (this.useIron) {
+      const board = generateIronSnakeBoard(this.gridSize)
+      this.boardMask = board ? board.mask : null
+    } else {
+      this.boardMask = null
+    }
+
+    const start = this.pickStartCell()
+    this.snake = [start]
+    this.snakeSet = new Set([`${start.x},${start.y}`])
     this.direction = 'RIGHT'
     resetLoopMemory(this.loopMemory)
     this.spawnFood()
+  }
+
+  // The full-rectangle centre may be off-board on a carved shape, so pick the
+  // on-board cell nearest the centre — the snake always starts somewhere valid.
+  private pickStartCell(): Position {
+    const c = Math.floor(this.gridSize / 2)
+    if (this.boardMask === null) return { x: c, y: c }
+    let best: Position | null = null
+    let bestDist = Infinity
+    for (let y = 0; y < this.gridSize; y++) {
+      for (let x = 0; x < this.gridSize; x++) {
+        if (this.boardMask[y * this.gridSize + x] !== 1) continue
+        const dist = (x - c) * (x - c) + (y - c) * (y - c)
+        if (dist < bestDist) {
+          bestDist = dist
+          best = { x, y }
+        }
+      }
+    }
+    return best ?? { x: c, y: c }
+  }
+
+  private updateBotLabel() {
+    if (this.botLabelEl) this.botLabelEl.textContent = `Bot: ${this.bot.name}`
   }
 
   private step() {
@@ -214,15 +268,23 @@ export class MenuDemo {
     return { reachableArea: visited.size, canReachTail, pathToFood }
   }
 
+  // Single source of truth for playable cells: inside the box AND (on an Iron
+  // Snake board) not a carved-out wall. Collision, pathfinding and food spawning
+  // all route through inBounds, so they respect the shape automatically.
+  private onBoard(x: number, y: number): boolean {
+    if (x < 0 || x >= this.gridSize || y < 0 || y >= this.gridSize) return false
+    return this.boardMask === null || this.boardMask[y * this.gridSize + x] === 1
+  }
+
   private inBounds(p: Position): boolean {
-    return p.x >= 0 && p.x < this.gridSize && p.y >= 0 && p.y < this.gridSize
+    return this.onBoard(p.x, p.y)
   }
 
   private spawnFood() {
     const empties: Position[] = []
     for (let y = 0; y < this.gridSize; y++) {
       for (let x = 0; x < this.gridSize; x++) {
-        if (!this.snakeSet.has(`${x},${y}`)) empties.push({ x, y })
+        if (!this.snakeSet.has(`${x},${y}`) && this.onBoard(x, y)) empties.push({ x, y })
       }
     }
     if (empties.length === 0) {
@@ -314,9 +376,11 @@ export class MenuDemo {
     this.drawGridLines()
     this.drawGroundBorder()
 
-    const objects: { x: number; y: number; type: 'head' | 'body' | 'food' }[] = []
+    const len = this.snake.length
+    const objects: { x: number; y: number; type: 'head' | 'body' | 'tail' | 'food' }[] = []
     this.snake.forEach((seg, i) => {
-      objects.push({ x: seg.x, y: seg.y, type: i === 0 ? 'head' : 'body' })
+      const type: 'head' | 'body' | 'tail' = i === 0 ? 'head' : i === len - 1 ? 'tail' : 'body'
+      objects.push({ x: seg.x, y: seg.y, type })
     })
     objects.push({ x: this.food.x, y: this.food.y, type: 'food' })
 
@@ -327,9 +391,10 @@ export class MenuDemo {
     for (const obj of objects) this.drawBlockShadow(obj.x, obj.y)
     for (const obj of objects) {
       switch (obj.type) {
-        case 'head': this.drawBlock(obj.x, obj.y, '#4ade80', '#22c55e', '#16a34a'); break
-        case 'body': this.drawBlock(obj.x, obj.y, '#22c55e', '#16a34a', '#15803d'); break
-        case 'food': this.drawBlock(obj.x, obj.y, '#ef4444', '#dc2626', '#b91c1c'); break
+        case 'head': this.drawSnakeHead(obj.x, obj.y, DEMO_HEAD_COLORS, this.direction); break
+        case 'body': this.drawBlock(obj.x, obj.y, DEMO_BODY_COLORS[0], DEMO_BODY_COLORS[1], DEMO_BODY_COLORS[2]); break
+        case 'tail': this.drawSnakeTail(obj.x, obj.y, DEMO_BODY_COLORS, this.tailDirection(this.snake)); break
+        case 'food': this.drawBlock(obj.x, obj.y, DEMO_FOOD_COLORS[0], DEMO_FOOD_COLORS[1], DEMO_FOOD_COLORS[2]); break
       }
     }
   }
@@ -340,6 +405,9 @@ export class MenuDemo {
     const dark = new Path2D()
     for (let gy = 0; gy < this.gridSize; gy++) {
       for (let gx = 0; gx < this.gridSize; gx++) {
+        // Skip off-board cells so the void shows the dark background.
+        if (this.boardMask !== null && this.boardMask[gy * this.gridSize + gx] !== 1) continue
+
         const t = this.isoCache[gy][gx]
         const r = this.isoCache[gy][gx + 1]
         const b = this.isoCache[gy + 1][gx + 1]
@@ -365,30 +433,84 @@ export class MenuDemo {
     ctx.beginPath()
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)'
     ctx.lineWidth = 0.5
-    for (let gy = 0; gy <= this.gridSize; gy++) {
-      const s = this.isoCache[gy][0]
-      const e = this.isoCache[gy][this.gridSize]
-      ctx.moveTo(s.x, s.y); ctx.lineTo(e.x, e.y)
-    }
-    for (let gx = 0; gx <= this.gridSize; gx++) {
-      const s = this.isoCache[0][gx]
-      const e = this.isoCache[this.gridSize][gx]
-      ctx.moveTo(s.x, s.y); ctx.lineTo(e.x, e.y)
+
+    if (this.boardMask === null) {
+      // Full-span lines (classic rectangle).
+      for (let gy = 0; gy <= this.gridSize; gy++) {
+        const s = this.isoCache[gy][0]
+        const e = this.isoCache[gy][this.gridSize]
+        ctx.moveTo(s.x, s.y); ctx.lineTo(e.x, e.y)
+      }
+      for (let gx = 0; gx <= this.gridSize; gx++) {
+        const s = this.isoCache[0][gx]
+        const e = this.isoCache[this.gridSize][gx]
+        ctx.moveTo(s.x, s.y); ctx.lineTo(e.x, e.y)
+      }
+    } else {
+      // Per-cell edges: draw each lattice edge once if it borders an on-board cell.
+      for (let gy = 0; gy <= this.gridSize; gy++) {
+        for (let gx = 0; gx < this.gridSize; gx++) {
+          if (this.onBoard(gx, gy - 1) || this.onBoard(gx, gy)) {
+            const a = this.isoCache[gy][gx]
+            const b = this.isoCache[gy][gx + 1]
+            ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y)
+          }
+        }
+      }
+      for (let gx = 0; gx <= this.gridSize; gx++) {
+        for (let gy = 0; gy < this.gridSize; gy++) {
+          if (this.onBoard(gx - 1, gy) || this.onBoard(gx, gy)) {
+            const a = this.isoCache[gy][gx]
+            const b = this.isoCache[gy + 1][gx]
+            ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y)
+          }
+        }
+      }
     }
     ctx.stroke()
   }
 
   private drawGroundBorder() {
     const ctx = this.ctx
-    const a = this.isoCache[0][0]
-    const b = this.isoCache[0][this.gridSize]
-    const c = this.isoCache[this.gridSize][this.gridSize]
-    const d = this.isoCache[this.gridSize][0]
-    ctx.beginPath()
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)'
     ctx.lineWidth = 1.5
-    ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.lineTo(c.x, c.y); ctx.lineTo(d.x, d.y)
-    ctx.closePath()
+
+    if (this.boardMask === null) {
+      const a = this.isoCache[0][0]
+      const b = this.isoCache[0][this.gridSize]
+      const c = this.isoCache[this.gridSize][this.gridSize]
+      const d = this.isoCache[this.gridSize][0]
+      ctx.beginPath()
+      ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.lineTo(c.x, c.y); ctx.lineTo(d.x, d.y)
+      ctx.closePath()
+      ctx.stroke()
+      return
+    }
+
+    // Trace the true outline: stroke every side of an on-board cell whose
+    // neighbour across that side is off-board (includes interior holes).
+    ctx.beginPath()
+    for (let gy = 0; gy < this.gridSize; gy++) {
+      for (let gx = 0; gx < this.gridSize; gx++) {
+        if (!this.onBoard(gx, gy)) continue
+        if (!this.onBoard(gx, gy - 1)) {
+          const a = this.isoCache[gy][gx]; const b = this.isoCache[gy][gx + 1]
+          ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y)
+        }
+        if (!this.onBoard(gx, gy + 1)) {
+          const a = this.isoCache[gy + 1][gx]; const b = this.isoCache[gy + 1][gx + 1]
+          ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y)
+        }
+        if (!this.onBoard(gx - 1, gy)) {
+          const a = this.isoCache[gy][gx]; const b = this.isoCache[gy + 1][gx]
+          ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y)
+        }
+        if (!this.onBoard(gx + 1, gy)) {
+          const a = this.isoCache[gy][gx + 1]; const b = this.isoCache[gy + 1][gx + 1]
+          ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y)
+        }
+      }
+    }
     ctx.stroke()
   }
 
@@ -406,16 +528,23 @@ export class MenuDemo {
     ctx.fill()
   }
 
-  private drawBlock(gx: number, gy: number, topColor: string, rightColor: string, leftColor: string) {
+  private drawBlock(gx: number, gy: number, topColor: string, rightColor: string, leftColor: string, heightScale: number = 1) {
     const inset = 0.05
-    const bh = this.getBlockHeight(gx, gy)
-    const ctx = this.ctx
+    const bh = this.getBlockHeight(gx, gy) * heightScale
     const c = [
       this.toIso(gx + inset, gy + inset),
       this.toIso(gx + 1 - inset, gy + inset),
       this.toIso(gx + 1 - inset, gy + 1 - inset),
       this.toIso(gx + inset, gy + 1 - inset)
     ]
+    this.drawPrism(c, bh, topColor, rightColor, leftColor)
+  }
+
+  // Extrude a prism from 4 clockwise ground corners (already projected to iso
+  // screen space) raised by `bh`: back faces first, then front faces (so they
+  // paint over), then the top. Shared by drawBlock and the tapered tail.
+  private drawPrism(c: { x: number; y: number }[], bh: number, topColor: string, rightColor: string, leftColor: string) {
+    const ctx = this.ctx
     const backFaces: number[] = []
     const frontFaces: number[] = []
     for (let i = 0; i < 4; i++) {
@@ -448,5 +577,82 @@ export class MenuDemo {
     ctx.closePath()
     ctx.fillStyle = topColor
     ctx.fill()
+  }
+
+  // A taller block with two eyes on the leading (travel-direction) face so the
+  // head clearly looks where it's going; eyes are skipped when that face points
+  // away from the camera. Mirrors the real game's drawSnakeHead.
+  private drawSnakeHead(gx: number, gy: number, colors: [string, string, string], dir: Direction) {
+    this.drawBlock(gx, gy, colors[0], colors[1], colors[2], DEMO_HEAD_HEIGHT_SCALE)
+
+    const bh = this.getBlockHeight(gx, gy) * DEMO_HEAD_HEIGHT_SCALE
+    if (bh <= 0) return
+
+    const inset = 0.05
+    const c = [
+      this.toIso(gx + inset, gy + inset),
+      this.toIso(gx + 1 - inset, gy + inset),
+      this.toIso(gx + 1 - inset, gy + 1 - inset),
+      this.toIso(gx + inset, gy + 1 - inset)
+    ]
+    // Leading face is the grid edge whose outward normal is the travel direction:
+    // UP=c0->c1, RIGHT=c1->c2, DOWN=c2->c3, LEFT=c3->c0. Skip when camera-hidden.
+    const EDGE: Record<Direction, number> = { UP: 0, RIGHT: 1, DOWN: 2, LEFT: 3 }
+    const a = c[EDGE[dir]], b = c[(EDGE[dir] + 1) % 4]
+    if (a.x <= b.x) return
+
+    const ctx = this.ctx
+    const eyeR = Math.hypot(c[2].x - c[0].x, c[2].y - c[0].y) * 0.1
+    const h = 0.6 // eye height up the face
+    for (const t of [0.3, 0.7]) {
+      const ex = a.x + (b.x - a.x) * t
+      const ey = a.y + (b.y - a.y) * t - bh * h
+      ctx.beginPath()
+      ctx.ellipse(ex, ey, eyeR, eyeR, 0, 0, Math.PI * 2)
+      ctx.fillStyle = '#ffffff'
+      ctx.fill()
+      ctx.beginPath()
+      ctx.ellipse(ex, ey + eyeR * 0.28, eyeR * 0.5, eyeR * 0.5, 0, 0, Math.PI * 2)
+      ctx.fillStyle = '#0f172a'
+      ctx.fill()
+    }
+  }
+
+  // Direction the tail points: from the second-to-last segment toward the last.
+  private tailDirection(snake: Position[]): Direction {
+    const t = snake[snake.length - 1], p = snake[snake.length - 2]
+    return this.vectorToDirection({ x: t.x - p.x, y: t.y - p.y })
+  }
+
+  // A shorter block that is full-width where it meets the body and narrows to a
+  // small tip in `awayDir`, so the snake tapers to a point instead of a stub.
+  private drawSnakeTail(gx: number, gy: number, colors: [string, string, string], awayDir: Direction) {
+    const bh = this.getBlockHeight(gx, gy) * DEMO_TAIL_HEIGHT_SCALE
+    const f = DIRECTION_VECTORS[awayDir]
+    const p = { x: -f.y, y: f.x } // lateral
+    const cx = gx + 0.5, cy = gy + 0.5
+    const body = 0.45
+    const tip = 0.45
+    const halfBody = 0.45
+    const halfTip = 0.12
+    const corners = [
+      { x: cx - f.x * body + p.x * halfBody, y: cy - f.y * body + p.y * halfBody },
+      { x: cx - f.x * body - p.x * halfBody, y: cy - f.y * body - p.y * halfBody },
+      { x: cx + f.x * tip - p.x * halfTip, y: cy + f.y * tip - p.y * halfTip },
+      { x: cx + f.x * tip + p.x * halfTip, y: cy + f.y * tip + p.y * halfTip }
+    ]
+    // Keep clockwise winding so drawPrism's front/back test matches drawBlock.
+    let area = 0
+    for (let i = 0; i < 4; i++) { const a = corners[i], b = corners[(i + 1) % 4]; area += a.x * b.y - b.x * a.y }
+    if (area < 0) corners.reverse()
+    this.drawPrism(corners.map(g => this.toIso(g.x, g.y)), bh, colors[0], colors[1], colors[2])
+  }
+
+  private vectorToDirection(v: Position): Direction {
+    for (const d of DIRECTIONS) {
+      const vec = DIRECTION_VECTORS[d]
+      if (vec.x === v.x && vec.y === v.y) return d
+    }
+    return 'RIGHT' // unreachable for unit vectors
   }
 }

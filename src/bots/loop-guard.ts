@@ -131,9 +131,11 @@ export function chooseEscapeDirection(
   return pick.direction
 }
 
-// Wraps a bot's chosen direction with loop detection. Records the current head,
-// and if the snake is looping (or mid-escape), substitutes an escape move.
-// Returns the direction to use (never null when `botDirection` is non-null).
+// Wraps a bot's chosen direction with loop detection. The escape is a temporary
+// detour, not a new permanent mode: on a fresh loop detection the guard commits
+// to escape moves for ESCAPE_DURATION ticks, then hands control straight back to
+// the bot's own algorithm. Returns the direction to use (never null when
+// `botDirection` is non-null).
 export function applyLoopGuard(
   mem: LoopMemory,
   state: BotState,
@@ -142,12 +144,21 @@ export function applyLoopGuard(
 ): Direction | null {
   recordHead(mem, state.snake[0])
 
-  if (mem.escapeTicks > 0 || isLooping(mem)) {
+  // Only *start* an escape when a new loop is detected and we're not already in
+  // one — otherwise the timer would reset every tick and the escape would never
+  // end, trapping the snake in escape mode instead of returning to the bot.
+  if (mem.escapeTicks === 0 && isLooping(mem)) {
+    mem.escapeTicks = ESCAPE_DURATION
+  }
+
+  if (mem.escapeTicks > 0) {
     const escape = chooseEscapeDirection(state, helpers, mem)
-    if (escape) {
-      mem.escapeTicks = ESCAPE_DURATION
-    }
-    if (mem.escapeTicks > 0) mem.escapeTicks--
+    mem.escapeTicks--
+    // Escape window just closed: wipe the visit history so the bot resumes its
+    // own algorithm with a clean slate rather than immediately re-detecting the
+    // same stale loop and escaping again. It can still re-trigger later if a
+    // genuinely new loop forms.
+    if (mem.escapeTicks === 0) mem.recentHeads.length = 0
     return escape ?? botDirection
   }
 

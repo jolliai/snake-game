@@ -45,6 +45,23 @@ h1 {
   mask-image: radial-gradient(ellipse 75% 80% at 50% 55%, #000 60%, transparent 100%);
 }
 
+.menu-demo-bot-label {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(74, 222, 128, 0.35);
+  color: #cbd5e1;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  pointer-events: none;
+  z-index: 2;
+}
+
 .menu-hero-overlay {
   margin-top: -0.5rem;
   display: flex;
@@ -100,31 +117,6 @@ h1 {
   font-size: 1.5em;
   color: #fbbf24;
   font-weight: 600;
-}
-
-.bot-selection {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-  align-items: center;
-}
-
-.bot-selection label {
-  color: #cbd5e1;
-  font-size: 0.95rem;
-  font-weight: 600;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-}
-
-.bot-selection select {
-  min-width: 240px;
-  border-radius: 8px;
-  border: 1px solid #475569;
-  background-color: #0f172a;
-  color: #f1f5f9;
-  font-size: 1rem;
-  padding: 0.5rem 0.75rem;
 }
 
 .bot-description {
@@ -619,12 +611,6 @@ button.footer-link:active {
   .game-info {
     flex-direction: column;
     gap: 0.5rem;
-  }
-
-  .bot-selection select {
-    min-width: 200px;
-    width: 100%;
-    max-width: 320px;
   }
 
   button {
