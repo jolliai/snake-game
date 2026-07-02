@@ -1,0 +1,18 @@
+{
+	"schemaVersion": 1,
+	"stableSlug": "claude-md-jolli-memory",
+	"title": "CLAUDE.md and Jolli Memory Development Workflow Notes",
+	"content": "## Overview\n\nA `CLAUDE.md` file exists at the repo root to provide persistent, project-level guidance to Claude across all sessions. Its primary instruction is to use **Jolli Memory** when planning or coding in this project.\n\n## File\n\n**`CLAUDE.md`** (repo root)\n\nContains a \"Use Jolli Memory\" section with three specific directives:\n\n1. **Before planning**: Recall prior branch context from Jolli Memory rather than re-deriving it from scratch.\n2. **When design questions arise**: Search across branches in Jolli Memory to surface relevant prior decisions.\n3. **When opening pull requests**: Use the Jolli PR skill to generate PR descriptions.\n\n## Rationale\n\n- **Why a project-level guidance file**: `CLAUDE.md` is loaded into context every session and applies to anyone working in the repo. This makes it the correct home for judgment-based instructions like \"when appropriate.\" A memory entry alone would not be reliably surfaced, and a hook would be too rigid for a \"when relevant\" guideline—it would misfire on unrelated tasks.\n- **Why a separate branch**: The guidance file is unrelated to any active feature work. Bundling it into a feature branch would add noise to that PR's diff and tie a trivial doc change to a longer-running feature. Branching off the upstream default branch keeps the diff minimal and allows independent, fast landing.",
+	"relatedBranches": [
+		"docs/claude-md-jolli-memory"
+	],
+	"sourceRefs": [
+		{
+			"type": "summary",
+			"id": "fb4d625d116e8463141265efc147fc41cbf7a8e6",
+			"timestamp": "2026-07-02T03:44:36.000Z",
+			"branch": "docs/claude-md-jolli-memory"
+		}
+	],
+	"lastUpdatedAt": "2026-07-02T03:44:47.159Z"
+}
