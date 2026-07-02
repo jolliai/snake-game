@@ -1,0 +1,86 @@
+{
+	"version": 5,
+	"commitHash": "a00b5c620c8105d59d06c34e2567a3b78fbcd1ac",
+	"commitMessage": "Add Iron Snake Mode: random board shapes with level goals",
+	"commitAuthor": "Joe Hart",
+	"commitDate": "2026-07-02T01:07:24.000Z",
+	"branch": "feature/boardshape",
+	"generatedAt": "2026-07-02T01:08:38.070Z",
+	"commitType": "commit",
+	"commitSource": "cli",
+	"transcriptEntries": 16,
+	"conversationTurns": 8,
+	"llm": {
+		"model": "claude-sonnet-4-6",
+		"inputTokens": 24376,
+		"outputTokens": 1760,
+		"apiLatencyMs": 45512,
+		"stopReason": null,
+		"source": "jolli-proxy"
+	},
+	"stats": {
+		"filesChanged": 4,
+		"insertions": 547,
+		"deletions": 63
+	},
+	"topics": [
+		{
+			"title": "Iron Snake Mode: irregular random board shapes with level goals",
+			"trigger": "The user wanted a new optional game mode where the board is carved into a random, irregular shape instead of the usual square grid, with a level progression system replacing the grid-doubling mechanic.",
+			"response": "- A new board generator (`src/iron-snake.ts`) was created using an \"overlapping rooms\" algorithm: several rectangles of minimum side 3 are unioned, pruned to the largest connected region via flood fill, and validated with a 3×3 morphological open to reject any corridors narrower than 3 cells. The generator retries up to 30 times and returns null on failure so callers can always fall back to a full rectangle. Verified across 8,000 trials with 100% connectivity and zero corridor failures.\n- In `src/main.ts`, a new `onBoard()` helper was introduced as the single source of truth for playable cells, and `inBounds()` was rewritten to delegate to it. This means collision detection, food spawning, and bot pathfinding (which all route through `inBounds`) automatically respect the irregular shape with no changes to bot logic. A `findStartCell()` helper places snakes on valid on-board cells with a configurable forward-clearance check to prevent immediate wall collisions.\n- The level/goal system replaces grid-doubling when Iron Snake Mode is active: cumulative score goals follow the curve `5·L(L+1)/2` (5, 15, 30, 50, 75…), giving strictly increasing per-level requirements. On level advance, a fresh board shape is generated, snakes are repositioned to length 1, and game speed ramps gently at 10% per level rather than halving.",
+			"decisions": "- **Single collision chokepoint over distributed guards**: Rather than updating bot code, movement loops, and food spawning separately, the mask check was injected only into `inBounds()`, which every collision path already funnels through. This kept the bot API completely unchanged and made the irregular shape an automatic constraint everywhere at once, at the cost of a slightly less transparent call chain.\n- **Overlapping rectangles over cellular automata or random walks**: Rectangular rooms with a minimum side of 3 make the no-narrow-corridor property nearly free by construction, overlap guarantees connectivity between rooms, and area is easy to tune. Cellular automata caves and random-walk accretion were considered but rejected as harder to control for minimum corridor width and fill ratio without extensive tuning.\n- **Cumulative score goals over per-level resets**: Goals are thresholds on the running total score rather than points earned within a level. This keeps the leaderboard score honest (it is always the true final score), means each goal is crossed exactly once as the snake keeps eating, and avoids a confusing score reset mid-game. The trade-off is that early levels feel shorter since the snake already has momentum.",
+			"todo": "Leaderboard entries from Iron Snake Mode are recorded into the same single/pvp/bvb boards as classic games. Tagging entries with an `ironSnake: true` flag for separate ranking was explicitly deferred.",
+			"filesAffected": [
+				"src/iron-snake.ts",
+				"src/main.ts",
+				"index.html",
+				"src/style.css"
+			],
+			"category": "feature",
+			"importance": "major"
+		},
+		{
+			"title": "Iron Snake Mode toggle label and placement refined",
+			"trigger": "The user found the initial menu toggle awkward: it had unnecessary parentheses in the label and was positioned at the top of the menu rather than the bottom.",
+			"response": "The toggle was moved to the bottom of the menu button group (below \"Bot vs Bot\", above the footer) and the label was simplified. The name went through two user-driven iterations — \"Random Arena\" → \"Iron Man Mode\" → \"Iron Snake Mode\" — and all internal identifiers (element ids, CSS classes, state fields, module name, exported function names, and constants) were renamed from `arena`/`randomArena` to `ironSnake`/`ironSnakeMode` to match, with a `grep -i arena` check confirming zero mixed vocabulary remained.",
+			"decisions": "- **Rename internals to match the final user-facing name**: Keeping internal identifiers as `arena` while the label read \"Iron Snake Mode\" would have created a confusing mismatch for future contributors. The full rename (file, exports, DOM ids, CSS classes, state fields, constants) was done in one pass to keep the vocabulary consistent, accepting a slightly larger diff in exchange for a coherent codebase.",
+			"filesAffected": [
+				"index.html",
+				"src/main.ts",
+				"src/iron-snake.ts",
+				"src/style.css"
+			],
+			"category": "ux",
+			"importance": "minor"
+		},
+		{
+			"title": "Level goals made larger with strictly increasing per-level requirements",
+			"trigger": "The initial goal values of 2–3 points per level were too small to feel meaningful, and the user wanted each level to demand noticeably more than the last.",
+			"response": "The goal formula was changed to `5·L(L+1)/2`, producing cumulative thresholds of 5, 15, 30, 50, 75… with per-level deltas of 5, 10, 15, 20, 25… — each level strictly harder than the previous. The HUD was updated to show a live countdown (\"To goal: N pts / 1 pt\") that decrements as the player eats and resets on level advance, replacing the static grid-size display when Iron Snake Mode is active.",
+			"decisions": "- **Triangular number curve over a flat increment or exponential**: A triangular progression (`5·L(L+1)/2`) gives deltas that grow linearly (5, 10, 15…), which feels fair and predictable to players — each level is harder by a fixed additional amount rather than doubling or jumping unpredictably. A flat increment was rejected as too easy at high levels; an exponential was considered too punishing.\n- **Cumulative threshold with a countdown display**: Showing \"points remaining to next goal\" rather than \"points scored this level\" lets players track progress against a single moving target without needing to remember what the level started at. The countdown also naturally handles the multiplayer combined-score case with no extra UI.",
+			"filesAffected": [
+				"src/main.ts",
+				"index.html"
+			],
+			"category": "ux",
+			"importance": "major"
+		}
+	],
+	"recap": "Iron Snake Mode was added as an optional toggle on the game's main menu, composing with all three existing play configurations (single-player, two-player, and bot-vs-bot). When enabled, each game starts on a freshly generated irregular board shape — a connected region free of narrow one-or-two-cell corridors — rather than the usual square grid. The board outline and grid lines update to trace the true playable area, food only appears on reachable cells, and bots navigate the new shape automatically without any changes to their logic.\n\nProgression works through a level system that replaces the grid-doubling mechanic active in classic mode. Players advance by reaching cumulative score thresholds that grow with each level — 5 points to clear level one, 15 for level two, 30 for level three, and so on — with each level demanding more than the last. On advancing, a brand-new board shape is generated, snakes reset to length one on safe starting positions, and game speed increases slightly. A live countdown in the heads-up display shows exactly how many points remain until the next level, updating with every piece of food eaten.",
+	"diffStats": {
+		"filesChanged": 4,
+		"insertions": 547,
+		"deletions": 63
+	},
+	"plans": [
+		{
+			"slug": "i-want-to-add-deep-eich-a00b5c62",
+			"title": "Random Arena — Randomly-Shaped Board with Level Goals",
+			"addedAt": "2026-07-02T00:33:12.734Z",
+			"updatedAt": "2026-07-02T01:08:10.201Z"
+		}
+	],
+	"transcripts": [
+		"b80babd6-ce4e-40fd-bf6f-ed7b8de96573"
+	]
+}

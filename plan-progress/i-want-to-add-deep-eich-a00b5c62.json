@@ -1,0 +1,61 @@
+{
+	"version": 1,
+	"commitHash": "a00b5c620c8105d59d06c34e2567a3b78fbcd1ac",
+	"commitMessage": "Add Iron Snake Mode: random board shapes with level goals",
+	"commitDate": "2026-07-02T01:07:24.000Z",
+	"planSlug": "i-want-to-add-deep-eich-a00b5c62",
+	"originalSlug": "i-want-to-add-deep-eich",
+	"summary": "The developer implemented the full 'Iron Snake Mode' feature: an irregular random board shape generator, level/goal progression system, rendering guards, HUD updates, and menu toggle — then refined the naming, goal curve, and countdown display based on user feedback before committing and opening a PR.",
+	"steps": [
+		{
+			"id": "1",
+			"description": "src/arena.ts (pure, test first) — generateArenaMask, connectivity, min-width, area",
+			"status": "completed",
+			"note": "Implemented as src/iron-snake.ts (renamed from arena.ts after user requested full internal rename to match 'Iron Snake Mode' branding). The overlapping-rectangles algorithm was chosen over cellular automata and random-walk accretion because min-side-3 rooms make the no-narrow-corridor property nearly free by construction, and overlap guarantees connectivity. Verified across 8000 trials: 100% connected, 100% corridor-free, zero fallbacks. The file was renamed in one pass to keep vocabulary consistent, accepting a larger diff."
+		},
+		{
+			"id": "2",
+			"description": "main.ts state + onBoard + inBounds",
+			"status": "completed",
+			"note": "boardMask, ironSnakeMode, boardArea, and levelGoal state fields added; onBoard() implemented as the single source of truth; inBounds() rewritten to delegate to onBoard(). The single-chokepoint injection strategy was chosen over distributed guards so bot code, movement loops, and food spawning all respect the shape automatically with zero bot-API changes — the trade-off being a slightly less transparent call chain."
+		},
+		{
+			"id": "3",
+			"description": "spawnFood + branch selector",
+			"status": "completed",
+			"note": "spawnFood updated to always use the enumeration path when boardMask is active (rejection sampling would waste draws on off-board cells), and the branch threshold now compares against boardArea instead of gridSize². The onBoard guard was added to the empty-cell filter, and the empty-list edge case is handled."
+		},
+		{
+			"id": "4",
+			"description": "findStartCell + placement in startNewGame",
+			"status": "completed",
+			"note": "findStartCell implemented with forward-clearance check (default 3 cells) and Manhattan-distance sorting toward a preferred region; repositionSnakes() uses left-third/right-third centroids for two-player mode. Mutual reachability is guaranteed by the single-connected-component property of the mask. startNewGame restructured to attempt board placement first and fall back to classic center/quarter positions if placement fails."
+		},
+		{
+			"id": "5",
+			"description": "Level/goal (goalForLevel, checkLevelAdvance, advanceLevel, dispatcher)",
+			"status": "completed",
+			"note": "Goal curve changed from the initial small values to a triangular number formula (5·L(L+1)/2) after user feedback that 2-3 point goals were too small — this gives strictly-increasing per-level deltas (5, 10, 15, 20…). Cumulative thresholds were chosen over per-level resets to keep leaderboard scores honest. checkGridExpansion now dispatches to checkLevelAdvance in Iron Snake mode; advanceLevel regenerates the mask, repositions snakes, ramps speed gently (0.9^(level-1) vs classic halving), and restarts the interval."
+		},
+		{
+			"id": "6",
+			"description": "Render guards (drawGroundPlane, drawGridLines, drawGroundBorder)",
+			"status": "completed",
+			"note": "All three draw routines updated: drawGroundPlane skips off-board cells so void shows dark background; drawGridLines switches to per-cell edge drawing when mask is active; drawGroundBorder traces the true outline by stroking every side of an on-board cell whose neighbor is off-board. Classic mode keeps the fast full-span path with no branching overhead."
+		},
+		{
+			"id": "7",
+			"description": "HTML toggle + listener + HUD + +/- branch",
+			"status": "completed",
+			"note": "Toggle label went through two user-driven iterations: 'Random Arena' → 'Iron Man Mode' → 'Iron Snake Mode', with the final full internal rename (file, exports, DOM ids, CSS classes, state fields, constants) done in one pass. The HUD was updated to show a countdown ('To goal: N pts') rather than a raw score/goal ratio, which the user requested — this naturally handles the multiplayer combined-score case. The +/- key handler branches on ironSnakeMode to regenerate the mask instead of just resizing. Leaderboard tagging (ironSnake: true flag) was explicitly deferred as a follow-up."
+		}
+	],
+	"llm": {
+		"model": "claude-haiku-4-5-20251001",
+		"inputTokens": 20851,
+		"outputTokens": 1166,
+		"apiLatencyMs": 27818,
+		"stopReason": null,
+		"source": "jolli-proxy"
+	}
+}
