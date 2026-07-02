@@ -21,6 +21,37 @@ const TARGET_FILL_HI = 0.75
 const TARGET_FILL_MID = (TARGET_FILL_LO + TARGET_FILL_HI) / 2 // typical playable fraction (~0.575)
 const MIN_GRID = 6 // below this a meaningful irregular shape can't be carved
 
+// Interior holes (JOE-6). After a solid, valid shape is carved we punch a few
+// small holes into its middle that the snake must navigate around. Holes are
+// kept subtle — small footprints, count scaled to the board area — and every
+// candidate is validated against the SAME two invariants the base shape
+// guarantees: the playable region stays a single 4-connected component (so all
+// food is reachable) and no <3-wide corridor is created (passesMinWidth).
+// Because passesMinWidth rejects any hole placed within a cell of another wall,
+// surviving holes are always genuine, well-separated interior gaps. Area scales
+// with Iron Snake level, so later boards get more holes for free.
+const HOLE_MAX = 8 // absolute cap on holes attempted per board
+const HOLE_RETRY_CAP = 40 // placement tries per target hole; deep-interior anchors are a
+// minority on a lean board and larger footprints fail the invariants often, so
+// a generous budget is needed to reliably hit the target. Attempts are ~O(n^2)
+// and sub-millisecond, and the loop stops as soon as `target` holes are placed.
+const HOLE_MAX_DIM = 5 // largest hole side; reached only at higher levels
+const HOLE_SPACING_CELLS = 22 // ~playable cells a hole+margin consumes; caps count on small boards
+
+// Holes scale with the Iron Snake level: later (larger) boards get more of them,
+// and their max footprint grows too, so the interior stays interesting as the
+// arena expands. Each hole's actual size is randomised up to the per-level cap,
+// giving a mix of small gaps and larger cavities.
+function holeCountForLevel(level: number, area: number): number {
+  const byLevel = 1 + Math.floor(level / 2) // L1:1, L2:2, L4:3, L6:4, ...
+  const areaCap = Math.max(1, Math.floor(area / HOLE_SPACING_CELLS))
+  return Math.min(HOLE_MAX, byLevel, areaCap)
+}
+
+function holeMaxDimForLevel(level: number): number {
+  return Math.min(HOLE_MAX_DIM, 3 + Math.floor((level - 1) / 2)) // L1-2:3, L3-4:4, L5+:5
+}
+
 const NEIGHBORS: ReadonlyArray<readonly [number, number]> = [
   [1, 0],
   [-1, 0],
@@ -144,6 +175,134 @@ function onBoardCells(mask: Uint8Array): number[] {
   return cells
 }
 
+// True iff every playable cell forms a single 4-connected component. Used to
+// reject a hole that would orphan part of the board (making some food
+// unreachable). Non-mutating, unlike keepLargestComponent.
+function isConnected(mask: Uint8Array, n: number): boolean {
+  const total = n * n
+  let start = -1
+  let count = 0
+  for (let i = 0; i < total; i++) {
+    if (mask[i] === 1) {
+      count++
+      if (start < 0) start = i
+    }
+  }
+  if (count === 0) return false
+
+  const seen = new Uint8Array(total)
+  const stack = [start]
+  seen[start] = 1
+  let reached = 0
+  while (stack.length > 0) {
+    const cell = stack.pop()!
+    reached++
+    const x = cell % n
+    const y = (cell - x) / n
+    for (const [dx, dy] of NEIGHBORS) {
+      const nx = x + dx
+      const ny = y + dy
+      if (nx < 0 || nx >= n || ny < 0 || ny >= n) continue
+      const ni = ny * n + nx
+      if (mask[ni] === 1 && seen[ni] === 0) {
+        seen[ni] = 1
+        stack.push(ni)
+      }
+    }
+  }
+  return reached === count
+}
+
+/**
+ * Punch a few small interior holes into an already-valid solid board. Holes are
+ * area-scaled and each is validated before it sticks: the region must stay a
+ * single 4-connected component and pass the min-width open, so no hole ever
+ * isolates food or carves a thin corridor. `protectedCells` (flat indices) are
+ * never carved — callers pass the snakes' cells (plus a neighbour margin) on a
+ * level transition so a hole never opens under, or immediately in front of, a
+ * snake. Mutates `mask` in place.
+ */
+function carveHoles(mask: Uint8Array, n: number, rng: Rng, level: number, protectedCells?: Set<number>): void {
+  const target = holeCountForLevel(level, onBoardCells(mask).length)
+  if (target <= 0) return
+
+  // Cap the footprint by BOTH the level and the board size: a hole needs ~2
+  // cells of clearance to survive the min-width open, so a big hole can't fit a
+  // small board. This keeps small early boards attempting placeable holes while
+  // large late boards host genuine cavities. Size is still randomised up to the
+  // cap for variety.
+  const maxDim = Math.min(holeMaxDimForLevel(level), Math.max(1, Math.floor(n / 5)))
+
+  // Anchor each attempt on an actual on-board cell (like the room generator
+  // does) instead of a random grid position — the playable region is only ~57%
+  // of the bounding box, so fully-random anchors waste most of the budget on
+  // off-board cells. This makes placement reliable even on tight boards.
+  const anchors = onBoardCells(mask)
+  if (anchors.length === 0) return
+
+  // Keep trying until `target` holes are actually placed (or the budget runs
+  // out) rather than giving each slot a single shot — some attempts still land
+  // on protected cells or fail the invariants, so a single try under-delivers.
+  let placed = 0
+  const budget = target * HOLE_RETRY_CAP
+  for (let attempt = 0; attempt < budget && placed < target; attempt++) {
+    const hw = randInt(rng, 1, maxDim)
+    const hh = randInt(rng, 1, maxDim)
+    const anchor = anchors[randInt(rng, 0, anchors.length - 1)]
+    const ax = anchor % n
+    const ay = (anchor - ax) / n
+    // Place the footprint so it covers the (on-board) anchor, offset randomly.
+    const x0 = clamp(ax - randInt(rng, 0, hw - 1), 0, n - hw)
+    const y0 = clamp(ay - randInt(rng, 0, hh - 1), 0, n - hh)
+
+    // Footprint must be entirely playable and clear of protected cells.
+    const cells: number[] = []
+    let ok = true
+    for (let y = y0; y < y0 + hh && ok; y++) {
+      for (let x = x0; x < x0 + hw; x++) {
+        const idx = y * n + x
+        if (mask[idx] !== 1 || (protectedCells !== undefined && protectedCells.has(idx))) {
+          ok = false
+          break
+        }
+        cells.push(idx)
+      }
+    }
+    if (!ok) continue
+
+    // Require the footprint to be fully interior: every cell orthogonally
+    // bordering it must be on-board. Otherwise the "hole" is just a bite out of
+    // the board's edge (it merges with the outer void) rather than a hole in the
+    // middle — which is the whole point. Most on-board cells sit on the lean
+    // blob's perimeter, so this is the constraint that actually matters.
+    const inFootprint = (x: number, y: number) => x >= x0 && x < x0 + hw && y >= y0 && y < y0 + hh
+    let interior = true
+    for (const idx of cells) {
+      const cx = idx % n
+      const cy = (idx - cx) / n
+      for (const [dx, dy] of NEIGHBORS) {
+        const nx = cx + dx
+        const ny = cy + dy
+        if (inFootprint(nx, ny)) continue
+        if (nx < 0 || nx >= n || ny < 0 || ny >= n || mask[ny * n + nx] !== 1) {
+          interior = false
+          break
+        }
+      }
+      if (!interior) break
+    }
+    if (!interior) continue
+
+    // Tentatively carve; keep only if both invariants still hold.
+    for (const idx of cells) mask[idx] = 0
+    if (isConnected(mask, n) && passesMinWidth(mask, n)) {
+      placed++
+      continue
+    }
+    for (const idx of cells) mask[idx] = 1 // revert and try elsewhere
+  }
+}
+
 /**
  * Generate a random Iron Snake board mask for a `gridSize x gridSize` board.
  * Returns `null` if no valid shape could be produced within the retry budget;
@@ -185,7 +344,10 @@ export function generateIronSnakeBoard(gridSize: number, rng: Rng = Math.random)
     if (fill < TARGET_FILL_LO || fill > TARGET_FILL_HI) continue
     if (!passesMinWidth(mask, n)) continue
 
-    return { mask, area }
+    // Solid shape is valid — punch interior holes and report the reduced area.
+    // generateIronSnakeBoard only builds the level-1 board (advances use grow).
+    carveHoles(mask, n, rng, 1)
+    return { mask, area: onBoardCells(mask).length }
   }
 
   return null
@@ -207,6 +369,7 @@ export type Cell = { x: number; y: number }
 export function growIronSnakeBoard(
   gridSize: number,
   snakeCells: Cell[],
+  level: number = 1,
   rng: Rng = Math.random
 ): IronSnakeBoard {
   const n = gridSize
@@ -254,8 +417,22 @@ export function growIronSnakeBoard(
     fillRoom(mask, n, x0, y0, w, h)
   }
 
-  const area = keepLargestComponent(mask, n)
-  return { mask, area }
+  keepLargestComponent(mask, n)
+
+  // Protect every snake cell plus its orthogonal neighbours so a hole never
+  // opens under a snake on a level transition, nor immediately in front of a
+  // head (which would be an unfair death the instant the loop resumes).
+  const protectedCells = new Set<number>()
+  for (const c of snakeCells) {
+    const mark = (x: number, y: number) => {
+      if (x >= 0 && x < n && y >= 0 && y < n) protectedCells.add(y * n + x)
+    }
+    mark(c.x, c.y)
+    for (const [dx, dy] of NEIGHBORS) mark(c.x + dx, c.y + dy)
+  }
+  carveHoles(mask, n, rng, level, protectedCells)
+
+  return { mask, area: onBoardCells(mask).length }
 }
 
 /**
