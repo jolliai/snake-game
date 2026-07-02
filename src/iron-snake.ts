@@ -191,6 +191,73 @@ export function generateIronSnakeBoard(gridSize: number, rng: Rng = Math.random)
   return null
 }
 
+export type Cell = { x: number; y: number }
+
+/**
+ * Build a fresh Iron Snake board for the next level that keeps the given snake
+ * cells exactly where they are (they must not move between levels).
+ *
+ * A clear room is seeded around the snakes' combined bounding box (padded by 1),
+ * guaranteeing every snake cell stays playable, connected, and with room for the
+ * heads to move. Fresh overlapping rooms then grow outward from it until the
+ * board reaches the size's typical fill — so the shape genuinely changes every
+ * level (unlike growing the previous board, which is a no-op once it is already
+ * at target fill). Never fails: the seed room always yields a valid region.
+ */
+export function growIronSnakeBoard(
+  gridSize: number,
+  snakeCells: Cell[],
+  rng: Rng = Math.random
+): IronSnakeBoard {
+  const n = gridSize
+  const total = n * n
+  const mask = new Uint8Array(total)
+
+  // Seed: a clear rectangle around the snake(s), padded by 1 so heads can move.
+  if (snakeCells.length > 0) {
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity
+    for (const c of snakeCells) {
+      if (c.x < minX) minX = c.x
+      if (c.x > maxX) maxX = c.x
+      if (c.y < minY) minY = c.y
+      if (c.y > maxY) maxY = c.y
+    }
+    let x0 = Math.max(0, minX - 1)
+    let y0 = Math.max(0, minY - 1)
+    let w = Math.min(n, maxX + 1 - x0 + 1)
+    let h = Math.min(n, maxY + 1 - y0 + 1)
+    // Keep the seed at least MIN_ROOM on each side, staying within the grid.
+    if (w < MIN_ROOM) { w = Math.min(MIN_ROOM, n); x0 = clamp(x0, 0, n - w) }
+    if (h < MIN_ROOM) { h = Math.min(MIN_ROOM, n); y0 = clamp(y0, 0, n - h) }
+    fillRoom(mask, n, x0, y0, w, h)
+  } else {
+    const s = Math.min(MIN_ROOM, n)
+    fillRoom(mask, n, Math.floor((n - s) / 2), Math.floor((n - s) / 2), s, s)
+  }
+
+  // Grow outward: union overlapping rooms anchored on existing cells (so the
+  // region stays connected) until we reach the typical fill for this size.
+  const maxRoom = Math.max(MIN_ROOM, Math.floor(n * 0.6))
+  const targetArea = Math.round(TARGET_FILL_MID * total)
+  let guard = 0
+  while (onBoardCells(mask).length < targetArea && guard < 80) {
+    guard++
+    const cells = onBoardCells(mask)
+    const anchor = cells[randInt(rng, 0, cells.length - 1)]
+    const ax = anchor % n
+    const ay = (anchor - ax) / n
+    const w = randInt(rng, MIN_ROOM, Math.min(maxRoom, n))
+    const h = randInt(rng, MIN_ROOM, Math.min(maxRoom, n))
+    // Cover the anchor cell so the new room overlaps the existing region.
+    const x0 = clamp(ax - randInt(rng, 0, w - 1), 0, n - w)
+    const y0 = clamp(ay - randInt(rng, 0, h - 1), 0, n - h)
+    fillRoom(mask, n, x0, y0, w, h)
+  }
+
+  const area = keepLargestComponent(mask, n)
+  return { mask, area }
+}
+
 /**
  * Bounding-box `gridSize` whose generated shapes tend to yield roughly
  * `targetArea` playable cells. Since a generated shape fills ~`TARGET_FILL_MID`
