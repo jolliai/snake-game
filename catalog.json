@@ -128,6 +128,21 @@
 					]
 				}
 			]
+		},
+		{
+			"commitHash": "132523e0e50ff66447342bb3460aab395bcc5eed",
+			"recap": "Iron Snake Mode now gives players a clear visual countdown for the final three fruits of every level. The fruit shifts from its normal red to violet with three remaining, then magenta with two, then near-white on the very last fruit before the level completes. After eating the final fruit and advancing to the next level, the fruit returns to red immediately. The effect applies in both single-player and two-player Iron Snake sessions, where the countdown tracks the combined score of both players against the shared level goal.",
+			"topics": [
+				{
+					"title": "Iron Snake level finale signaled by three countdown fruit colors",
+					"decisions": "- **Three distinct colors rather than a blend or single warning color**: A smooth color interpolation or a single flat \"warning\" color would not communicate which specific fruit the player is on. Three visually distinct hues — violet, magenta, white — give the player an unambiguous per-fruit countdown, making the level transition feel earned and readable at a glance. The progression toward white on the final fruit was chosen to feel climactic and unmistakable against the dark isometric board.\n- **Reusing the existing hunger-tint pattern rather than a new rendering path**: The codebase already computed a color triad before the render switch and passed it into the block-draw call for hunger tinting. Mirroring that exact pattern kept the change minimal and consistent with established conventions, avoiding any new rendering infrastructure or per-object state.\n- **Leaving the menu demo screen fruit unchanged**: The animated start-screen background draws decorative fruit with no connection to level state. Touching it would have introduced a dependency where none belongs, and the visual consistency of the menu is unrelated to the in-game countdown cue.",
+					"category": "feature",
+					"importance": "major",
+					"filesAffected": [
+						"src/main.ts"
+					]
+				}
+			]
 		}
 	]
 }
