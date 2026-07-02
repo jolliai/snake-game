@@ -13,7 +13,7 @@ import {
 } from './leaderboard'
 import type { LeaderboardEntry, LeaderboardMode, GameResult } from './leaderboard'
 import { MenuDemo } from './menu-demo'
-import { generateIronSnakeBoard, ironSnakeGridSizeForArea } from './iron-snake'
+import { generateIronSnakeBoard, growIronSnakeBoard, ironSnakeGridSizeForArea } from './iron-snake'
 
 type GameMode = 'single' | 'pvp' | 'bvb'
 
@@ -28,6 +28,14 @@ const IRON_SNAKE_MIN_SPEED = 60 // fastest the loop interval ramps to (ms)
 // snake's target share of the playable area at the moment a level's goal is
 // reached; the per-level board area is sized to hit it (lower => roomier).
 const IRON_SNAKE_GOAL_FILL = 0.4
+// Level-to-level board morph (Iron Snake). The playable region reshapes in
+// discrete steps — each held for roughly one snake-move — so the arena visibly
+// "grows" a step at a time from the old board into the new one, rather than
+// jumping in a single frame. Bigger reshapes get more (capped) steps.
+const LEVEL_MORPH_MIN_STEPS = 3
+const LEVEL_MORPH_MAX_STEPS = 7
+const LEVEL_MORPH_CELLS_PER_STEP = 6 // aim for ~this many cells revealed per step
+const LEVEL_MORPH_MIN_STEP_MS = 130 // step-hold floor so fast late levels still show it
 
 // Starvation: a snake that goes too long without eating dies, so a bot that can
 // never reach walled-off food (or is hopelessly stuck) eventually loses instead
@@ -189,6 +197,21 @@ class SnakeGame {
   private autoRotateSpeed: number = 0.15 // radians per second
   private autoRotatePausedUntil: number = 0 // timestamp when manual override expires
   private autoRotatePaused: boolean = false // user-toggled pause (T key)
+
+  // Level transition (Iron Snake board morph). While a morph runs the logic loop
+  // is torn down and `boardMask` is temporarily driven by the morph frames.
+  private isTransitioning: boolean = false
+  private transitionRafId: number | null = null
+  private transitionStartTime: number = 0
+  // Per-morph state, populated by startLevelMorph and consumed by morphStep.
+  private morphWork: Uint8Array | null = null // reused display buffer fed to draw()
+  private morphTargetReal: Uint8Array | null = null // real new mask to restore on finish
+  private morphChanged: number[] = [] // flat indices that differ start->target, wave-ordered
+  private morphTargetDisplay: Uint8Array | null = null // target values at those indices
+  private morphRevealed: number = 0 // how many of morphChanged already applied
+  private morphSteps: number = 0 // number of discrete reshape steps for this morph
+  private morphStepMs: number = 0 // real time each step is held (≈ one snake move)
+  private morphLastReveal: number = 0 // last revealed count actually drawn
 
   // Menu demo (small rotating snake on the start screen)
   private menuDemo: MenuDemo | null = null
@@ -661,6 +684,9 @@ class SnakeGame {
   private autoRotateStep(timestamp: number) {
     if (!this.autoRotating) return
 
+    // Keep rotating through a level morph — the transition shouldn't disturb the
+    // camera. autoRotateStep reads the same boardMask the morph is updating, so it
+    // renders the in-progress reshape at the current angle without conflict.
     if (!this.autoRotatePaused && !this.overheadView && this.autoRotateLastTime > 0 && timestamp > this.autoRotatePausedUntil) {
       const dt = (timestamp - this.autoRotateLastTime) / 1000
       this.isoAngle += this.autoRotateSpeed * dt
@@ -831,6 +857,7 @@ class SnakeGame {
     document.getElementById('back-to-menu')!.addEventListener('click', () => {
       if (this.gameLoop) clearInterval(this.gameLoop)
       this.gameLoop = null
+      this.cancelLevelMorph()
       this.stopAutoRotate()
       this.botEnabled = false
       this.updateBotUI()
@@ -957,6 +984,7 @@ class SnakeGame {
       if (!document.getElementById('menu')!.classList.contains('hidden')) return
       if (this.gameLoop) clearInterval(this.gameLoop)
       this.gameLoop = null
+      this.cancelLevelMorph()
       this.stopAutoRotate()
       this.botEnabled = false
       this.updateBotUI()
@@ -1193,6 +1221,9 @@ class SnakeGame {
   }
 
   startNewGame(mode?: GameMode) {
+    // Abandon any in-flight board morph; this game sets up its own board below.
+    this.cancelLevelMorph()
+
     if (mode !== undefined) this.gameMode = mode
 
     // Reset bot flag for two-snake modes
@@ -1358,7 +1389,9 @@ class SnakeGame {
       return
     }
 
-    this.draw()
+    // A level-advance this tick starts a board morph and owns painting; skip the
+    // normal repaint so it doesn't overwrite the morph's first frame.
+    if (!this.isTransitioning) this.draw()
     this.updateUI()
   }
 
@@ -1472,7 +1505,8 @@ class SnakeGame {
       return
     }
 
-    this.draw()
+    // See updateSinglePlayer: a morph in progress owns painting this tick.
+    if (!this.isTransitioning) this.draw()
     this.updateUI()
   }
 
@@ -1639,170 +1673,13 @@ class SnakeGame {
     return fallback
   }
 
-  // Rotate a relative offset by `k` quarter-turns (k in 0..3). Rigid, so it
-  // preserves the snake's shape exactly (k=0 is the identity).
-  private rotateOffset(p: Position, k: number): Position {
-    switch (((k % 4) + 4) % 4) {
-      case 1: return { x: -p.y, y: p.x }
-      case 2: return { x: -p.x, y: -p.y }
-      case 3: return { x: p.y, y: -p.x }
-      default: return { x: p.x, y: p.y }
-    }
-  }
-
+  // Map a unit step vector to its Direction (used to derive facing from geometry).
   private vectorToDirection(v: Position): Direction {
     for (const d of DIRECTIONS) {
       const vec = DIRECTION_VECTORS[d]
       if (vec.x === v.x && vec.y === v.y) return d
     }
     return 'RIGHT' // unreachable for unit vectors
-  }
-
-  private rotateDirection(dir: Direction, k: number): Direction {
-    return this.vectorToDirection(this.rotateOffset(DIRECTION_VECTORS[dir], k))
-  }
-
-  // Try to place a snake of the given `shape` (relative offsets from the head,
-  // shape[0] === {0,0}) onto the current board without changing its geometry:
-  // translate the head to an anchor near `preferred`, trying the identity
-  // orientation first (visually unchanged) then 90/180/270° rotations. A
-  // placement is valid only if every segment lands on-board and unoccupied.
-  // Prefers a head with full forward `clearance`; falls back to >=1 clear cell.
-  private placeRigid(
-    shape: Position[],
-    dir: Direction,
-    preferred: Position,
-    occupied: Set<string>,
-    clearance: number = 3
-  ): { body: Position[]; dir: Direction } | null {
-    const candidates = this.sortedCandidates(preferred, occupied)
-    let fallback: { body: Position[]; dir: Direction } | null = null
-
-    for (const anchor of candidates) {
-      for (let k = 0; k < 4; k++) {
-        const body: Position[] = []
-        const bodyKeys = new Set<string>()
-        let ok = true
-        for (const off of shape) {
-          const r = this.rotateOffset(off, k)
-          const cell = { x: anchor.x + r.x, y: anchor.y + r.y }
-          const key = `${cell.x},${cell.y}`
-          if (!this.onBoard(cell.x, cell.y) || occupied.has(key)) { ok = false; break }
-          body.push(cell)
-          bodyKeys.add(key)
-        }
-        if (!ok) continue
-
-        const rotDir = this.rotateDirection(dir, k)
-        const vec = DIRECTION_VECTORS[rotDir]
-        let clear = 0
-        for (let step = 1; step <= clearance; step++) {
-          const cx = anchor.x + vec.x * step
-          const cy = anchor.y + vec.y * step
-          const key = `${cx},${cy}`
-          if (!this.onBoard(cx, cy) || occupied.has(key) || bodyKeys.has(key)) break
-          clear++
-        }
-        if (clear >= clearance) return { body, dir: rotDir }
-        if (!fallback && clear >= 1) fallback = { body, dir: rotDir }
-      }
-    }
-    return fallback
-  }
-
-  // Length-preserving fallback when the exact shape can't be seated: a
-  // self-avoiding walk of `length` cells starting at the head, preferring to
-  // continue straight so the body reads as a natural snake. Reserves the head's
-  // forward clearance so it can move after spawning. Returns null if the board
-  // is too cramped to lay out the full length.
-  private layoutBody(
-    head: Position,
-    dir: Direction,
-    length: number,
-    occupied: Set<string>
-  ): Position[] | null {
-    const headKey = `${head.x},${head.y}`
-    if (!this.onBoard(head.x, head.y) || occupied.has(headKey)) return null
-    if (length <= 1) return [head]
-
-    const reserved = new Set<string>()
-    const fwd = DIRECTION_VECTORS[dir]
-    for (let step = 1; step <= 3; step++) {
-      const cx = head.x + fwd.x * step
-      const cy = head.y + fwd.y * step
-      if (!this.onBoard(cx, cy) || occupied.has(`${cx},${cy}`)) break
-      reserved.add(`${cx},${cy}`)
-    }
-
-    const body: Position[] = [head]
-    const placed = new Set<string>([headKey])
-    let budget = 50000 // guard against pathological backtracking blowups
-
-    const isFree = (x: number, y: number): boolean => {
-      const k = `${x},${y}`
-      return this.onBoard(x, y) && !occupied.has(k) && !placed.has(k) && !reserved.has(k)
-    }
-    const freeDegree = (x: number, y: number): number => {
-      let n = 0
-      if (isFree(x + 1, y)) n++
-      if (isFree(x - 1, y)) n++
-      if (isFree(x, y + 1)) n++
-      if (isFree(x, y - 1)) n++
-      return n
-    }
-
-    const extend = (): boolean => {
-      if (body.length === length) return true
-      if (budget-- <= 0) return false
-      const last = body[body.length - 1]
-      const prev = body.length >= 2 ? body[body.length - 2] : { x: last.x + fwd.x, y: last.y + fwd.y }
-      const straight = { x: last.x + (last.x - prev.x), y: last.y + (last.y - prev.y) }
-      const options = [
-        { x: last.x + 1, y: last.y },
-        { x: last.x - 1, y: last.y },
-        { x: last.x, y: last.y + 1 },
-        { x: last.x, y: last.y - 1 }
-      ].filter(n => isFree(n.x, n.y))
-      // Warnsdorff: extend toward the most-constrained cell first (fewest onward
-      // free neighbours) so a long walk doesn't wall itself off; break ties by
-      // continuing straight so the body still reads as a natural snake.
-      options.sort((a, b) => {
-        const da = freeDegree(a.x, a.y), db = freeDegree(b.x, b.y)
-        if (da !== db) return da - db
-        const sa = a.x === straight.x && a.y === straight.y ? 0 : 1
-        const sb = b.x === straight.x && b.y === straight.y ? 0 : 1
-        return sa - sb
-      })
-      for (const n of options) {
-        const key = `${n.x},${n.y}`
-        body.push(n)
-        placed.add(key)
-        if (extend()) return true
-        body.pop()
-        placed.delete(key)
-      }
-      return false
-    }
-
-    return extend() ? body : null
-  }
-
-  // Seat one snake on the current board keeping its length, preferring to keep
-  // its exact shape (placeRigid); if that fails, keep at least the length via a
-  // self-avoiding layout.
-  private placeSnakeKeepingShape(
-    shape: Position[],
-    dir: Direction,
-    preferred: Position,
-    occupied: Set<string>,
-    clearance: number = 3
-  ): { body: Position[]; dir: Direction } | null {
-    const rigid = this.placeRigid(shape, dir, preferred, occupied, clearance)
-    if (rigid) return rigid
-    const start = this.findStartCell(preferred, occupied, clearance)
-    if (!start) return null
-    const body = this.layoutBody(start.pos, start.dir, shape.length, occupied)
-    return body ? { body, dir: start.dir } : null
   }
 
   // Bounding-box gridSize for an Iron Snake level. The snake keeps its length,
@@ -2031,48 +1908,6 @@ class SnakeGame {
     return true
   }
 
-  // Re-seat the snake(s) on the current board carrying their length across a
-  // level advance, keeping each snake's shape where possible. Returns false if
-  // the board can't seat them (caller retries on a bigger / rectangle board).
-  private reseatKeepingShape(
-    shape1: Position[],
-    dir1: Direction,
-    shape2: Position[] | null,
-    dir2: Direction
-  ): boolean {
-    resetLoopMemory(this.botLoopMemory)
-    resetLoopMemory(this.botLoopMemory2)
-    this.movesSinceFood1 = 0
-    this.movesSinceFood2 = 0
-    const N = this.gridSize
-    if (this.isTwoSnakeMode() && shape2) {
-      const occ = new Set<string>()
-      const r1 = this.placeSnakeKeepingShape(shape1, dir1, { x: N * 0.25, y: N / 2 }, occ)
-      if (!r1) return false
-      for (const c of r1.body) occ.add(`${c.x},${c.y}`)
-      const r2 = this.placeSnakeKeepingShape(shape2, dir2, { x: N * 0.75, y: N / 2 }, occ)
-      if (!r2) return false
-
-      this.snake = r1.body
-      this.snakeSet = new Set(r1.body.map(c => `${c.x},${c.y}`))
-      this.direction = r1.dir
-      this.nextDirection = r1.dir
-
-      this.snake2 = r2.body
-      this.snakeSet2 = new Set(r2.body.map(c => `${c.x},${c.y}`))
-      this.direction2 = r2.dir
-      this.nextDirection2 = r2.dir
-    } else {
-      const r = this.placeSnakeKeepingShape(shape1, dir1, { x: N / 2, y: N / 2 }, new Set())
-      if (!r) return false
-      this.snake = r.body
-      this.snakeSet = new Set(r.body.map(c => `${c.x},${c.y}`))
-      this.direction = r.dir
-      this.nextDirection = r.dir
-    }
-    return true
-  }
-
   private checkLevelAdvance() {
     const combined = this.score + (this.isTwoSnakeMode() ? this.score2 : 0)
     if (combined >= this.levelGoal) {
@@ -2081,37 +1916,53 @@ class SnakeGame {
   }
 
   private advanceLevel() {
-    // Capture each snake's shape (offsets from its head) before regenerating the
-    // board, so it can be carried onto the new shape at its current length.
-    const two = this.isTwoSnakeMode()
-    const shape1 = this.snake.map(s => ({ x: s.x - this.snake[0].x, y: s.y - this.snake[0].y }))
-    const dir1 = this.direction
-    const shape2 = two ? this.snake2.map(s => ({ x: s.x - this.snake2[0].x, y: s.y - this.snake2[0].y })) : null
-    const dir2 = this.direction2
+    // Snapshot the board being left behind (its mask + size) before we mutate
+    // anything, so the morph can start from the old shape and grow into the new.
+    const prevMask = this.boardMask
+    const prevGridSize = this.gridSize
+    // The just-cleared level's move interval; each morph step is held this long
+    // so the reshape unfolds at the snake's own pace.
+    const moveMs = this.gameSpeed
 
+    this.applyLevelAdvance()
+
+    // Animate the board reshaping from the old mask into the new one. Logic ticks
+    // are paused for the morph; finishLevelMorph restarts the loop.
+    if (this.gameLoop) clearInterval(this.gameLoop)
+    this.gameLoop = null
+    this.startLevelMorph(prevMask, prevGridSize, moveMs)
+  }
+
+  // Mutate all game state for the next level (board shape/size, snake placement,
+  // goal, speed, food, HUD). Deliberately does NOT restart the loop or draw —
+  // advanceLevel owns that so it can insert a morph between the old and new board.
+  private applyLevelAdvance() {
     this.level++
 
-    // Grow the board with the goal. If a generated shape can't seat the snakes,
-    // bump the bounding box a little and retry (more room => easier to fit).
-    const baseGrid = this.ironSnakeGridSizeForLevel(this.level)
-    let placed = false
-    for (let extra = 0; extra <= 3 && !placed; extra++) {
-      this.gridSize = baseGrid + extra
-      this.regenerateIronSnakeBoard()
-      placed = this.reseatKeepingShape(shape1, dir1, shape2, dir2)
-    }
-    // Last resort: a full rectangle, where the self-avoiding layout always fits.
-    if (!placed) {
+    // Build a fresh board *around* the snakes instead of re-seating them: keep
+    // every snake exactly where it is and grow a new random shape around it. Each
+    // snake is first translated by the centring offset (so it stays put on screen
+    // as the box grows), then the board is generated to keep those cells playable.
+    const prevGridSize = this.gridSize
+    this.gridSize = this.ironSnakeGridSizeForLevel(this.level)
+    const offset = Math.floor((this.gridSize - prevGridSize) / 2)
+    if (offset !== 0) this.translateSnakes(offset)
+
+    if (this.ironSnakeMode) {
+      const cells = this.isTwoSnakeMode() ? [...this.snake, ...this.snake2] : this.snake
+      const grown = growIronSnakeBoard(this.gridSize, cells)
+      this.boardMask = grown.mask
+      this.boardArea = grown.area
+    } else {
       this.boardMask = null
       this.boardArea = this.gridSize * this.gridSize
-      placed = this.reseatKeepingShape(shape1, dir1, shape2, dir2)
     }
-    // Absolute backstop (should be unreachable): reset to length 1 on a rectangle.
-    if (!placed) {
-      this.boardMask = null
-      this.boardArea = this.gridSize * this.gridSize
-      this.repositionSnakes()
-    }
+
+    // Fresh starvation budget / loop memory for the new (larger) level.
+    resetLoopMemory(this.botLoopMemory)
+    resetLoopMemory(this.botLoopMemory2)
+    this.movesSinceFood1 = 0
+    this.movesSinceFood2 = 0
 
     this.maxLength1 = Math.max(this.maxLength1, this.snake.length)
     this.maxLength2 = Math.max(this.maxLength2, this.snake2.length)
@@ -2122,12 +1973,171 @@ class SnakeGame {
     this.gameSpeed = Math.max(IRON_SNAKE_MIN_SPEED, Math.round(this.baseSpeed * Math.pow(0.9, this.level - 1)))
     this.updateCanvasSize()
 
-    if (this.gameLoop) clearInterval(this.gameLoop)
-    this.gameLoop = window.setInterval(() => this.update(), this.gameSpeed)
-
     this.spawnFood()
     this.updateUI()
+  }
+
+  // Shift both snakes (and their occupancy sets) by `offset` on each axis, so a
+  // snake keeps its exact shape and heading while the board grows centred around
+  // it. Directions are unchanged; the snake does not visually move.
+  private translateSnakes(offset: number) {
+    const shift = (snake: Position[]) => snake.map(s => ({ x: s.x + offset, y: s.y + offset }))
+    this.snake = shift(this.snake)
+    this.snakeSet = new Set(this.snake.map(s => `${s.x},${s.y}`))
+    if (this.isTwoSnakeMode()) {
+      this.snake2 = shift(this.snake2)
+      this.snakeSet2 = new Set(this.snake2.map(s => `${s.x},${s.y}`))
+    }
+  }
+
+  // === Level transition (board morph) ===
+
+  // Build the start/target display masks and the wave-ordered list of cells that
+  // differ, then drive an RAF loop that reveals them so the playable region
+  // reshapes cell-by-cell. `prevMask`/`prevGridSize` describe the old board.
+  private startLevelMorph(prevMask: Uint8Array | null, prevGridSize: number, moveMs: number) {
+    const N = this.gridSize
+    const targetReal = this.boardMask
+
+    // Target as a concrete mask (a null real mask = full rectangle => all playable).
+    const targetDisplay = new Uint8Array(N * N)
+    if (targetReal === null) targetDisplay.fill(1)
+    else targetDisplay.set(targetReal)
+
+    // Start = the old board's cells, centre-aligned into the (usually larger) new
+    // grid. A null old mask means the old board was a full rectangle.
+    const startDisplay = new Uint8Array(N * N)
+    const O = prevGridSize
+    const off = Math.floor((N - O) / 2)
+    for (let oy = 0; oy < O; oy++) {
+      for (let ox = 0; ox < O; ox++) {
+        const wasPlayable = prevMask === null || prevMask[oy * O + ox] === 1
+        if (!wasPlayable) continue
+        const nx = ox + off
+        const ny = oy + off
+        if (nx >= 0 && nx < N && ny >= 0 && ny < N) startDisplay[ny * N + nx] = 1
+      }
+    }
+    // Ground every cell the snakes and food currently occupy (they sit at their
+    // new positions already) so nothing is ever drawn floating over the void.
+    const ground = (x: number, y: number) => {
+      if (x >= 0 && x < N && y >= 0 && y < N) startDisplay[y * N + x] = 1
+    }
+    for (const s of this.snake) ground(s.x, s.y)
+    if (this.isTwoSnakeMode()) for (const s of this.snake2) ground(s.x, s.y)
+    ground(this.food.x, this.food.y)
+
+    // Cells that must change, ordered as an inside-out wave from the board centre
+    // (the shape grows outward and old-only cells peel away as the wave passes).
+    const changed: number[] = []
+    for (let i = 0; i < N * N; i++) {
+      if (startDisplay[i] !== targetDisplay[i]) changed.push(i)
+    }
+    const c = N / 2
+    const dist2 = (i: number) => {
+      const x = (i % N) + 0.5 - c
+      const y = Math.floor(i / N) + 0.5 - c
+      return x * x + y * y
+    }
+    changed.sort((a, b) => dist2(a) - dist2(b))
+
+    // Pace the reshape to the snake's rhythm: a few steps, each held for about one
+    // move; scale the count with the reshape size, capped so it never drags.
+    this.morphSteps = Math.min(
+      LEVEL_MORPH_MAX_STEPS,
+      Math.max(LEVEL_MORPH_MIN_STEPS, Math.ceil(changed.length / LEVEL_MORPH_CELLS_PER_STEP))
+    )
+    this.morphStepMs = Math.max(LEVEL_MORPH_MIN_STEP_MS, moveMs)
+    this.morphLastReveal = 0
+
+    this.morphWork = startDisplay
+    this.morphTargetReal = targetReal
+    this.morphTargetDisplay = targetDisplay
+    this.morphChanged = changed
+    this.morphRevealed = 0
+    this.isTransitioning = true
+    this.transitionStartTime = 0
+
+    // Nothing to reshape (same shape and size) — skip straight to the clean state.
+    if (changed.length === 0) {
+      this.finishLevelMorph()
+      return
+    }
+
+    // Paint the start frame now (updateCanvasSize cleared the resized canvas), then
+    // let the RAF loop reveal the changes.
+    this.boardMask = this.morphWork
     this.draw()
+    this.transitionRafId = requestAnimationFrame(t => this.morphStep(t))
+  }
+
+  private morphStep(timestamp: number) {
+    if (!this.isTransitioning) return
+    if (this.transitionStartTime === 0) this.transitionStartTime = timestamp
+
+    const elapsed = timestamp - this.transitionStartTime
+    // Discrete steps: the first chunk shows immediately, one more each step, and
+    // each state is held for morphStepMs so the reshape reads as deliberate beats.
+    const step = Math.min(this.morphSteps, 1 + Math.floor(elapsed / this.morphStepMs))
+    const revealTarget = Math.round((step / this.morphSteps) * this.morphChanged.length)
+
+    // Only repaint when a step actually reveals new cells (the board is static in
+    // between), so the hold between steps is free.
+    if (revealTarget !== this.morphLastReveal) {
+      for (; this.morphRevealed < revealTarget; this.morphRevealed++) {
+        const idx = this.morphChanged[this.morphRevealed]
+        this.morphWork![idx] = this.morphTargetDisplay![idx]
+      }
+      this.morphLastReveal = revealTarget
+      this.boardMask = this.morphWork
+      this.draw()
+    }
+
+    // Finish once the final step has been held for its full duration.
+    if (elapsed >= this.morphSteps * this.morphStepMs) {
+      this.finishLevelMorph()
+      return
+    }
+    this.transitionRafId = requestAnimationFrame(ts => this.morphStep(ts))
+  }
+
+  // Restore the real new mask, repaint cleanly, and resume the logic loop.
+  private finishLevelMorph() {
+    if (this.transitionRafId !== null) {
+      cancelAnimationFrame(this.transitionRafId)
+      this.transitionRafId = null
+    }
+    this.boardMask = this.morphTargetReal
+    this.morphWork = null
+    this.morphTargetDisplay = null
+    this.morphTargetReal = null
+    this.morphChanged = []
+    this.morphRevealed = 0
+    this.morphLastReveal = 0
+    this.isTransitioning = false
+    this.transitionStartTime = 0
+
+    this.draw()
+
+    if (this.gameLoop) clearInterval(this.gameLoop)
+    this.gameLoop = window.setInterval(() => this.update(), this.gameSpeed)
+  }
+
+  // Abandon an in-flight morph without restoring the old board (used when the game
+  // is torn down / restarted, which sets up its own board immediately after).
+  private cancelLevelMorph() {
+    if (this.transitionRafId !== null) {
+      cancelAnimationFrame(this.transitionRafId)
+      this.transitionRafId = null
+    }
+    this.isTransitioning = false
+    this.morphWork = null
+    this.morphTargetDisplay = null
+    this.morphTargetReal = null
+    this.morphChanged = []
+    this.morphRevealed = 0
+    this.morphLastReveal = 0
+    this.transitionStartTime = 0
   }
 
   // === Food ===
