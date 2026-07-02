@@ -2,23 +2,6 @@
 	"version": 1,
 	"entries": [
 		{
-			"commitHash": "b0cf976572670c1490b0c2fd604942e8b7243105",
-			"recap": "When a snake dies, the game board now stays visible and frozen rather than immediately switching away. The fatal collision is highlighted on the board in an amber block, and a pulsing banner names exactly how the snake lost — hitting a wall, running into itself, crashing into the opponent, or starving. In two-player mode, the banner describes each snake's fate individually, and head-on collisions get their own message.\n\nThe freeze persists until the player presses any key, at which point the normal Game Over screen appears with scores, high-score entry, and leaderboard options all intact. During the freeze, the camera controls remain fully active: players can rotate the board, toggle overhead view, and adjust perspective to inspect the collision from any angle before moving on.",
-			"topics": [
-				{
-					"title": "Freeze game on death showing loss reason until key pressed",
-					"decisions": "- **Deferred callback over rewriting end-game functions**: Rather than splitting or duplicating the end-game logic, the freeze inserts itself as a step in front of the existing functions by storing them as callbacks. This kept all the winner/leaderboard/high-score code untouched and made the change low-risk — the freeze is purely additive, and the finalize step is identical to what ran before.\n- **Camera keys fall through during freeze**: The initial implementation dismissed the freeze on any key press. After review, rotate, overhead, and perspective keys were whitelisted to fall through, turning the frozen board into an inspectable \"death cam.\" This required distinguishing between \"view\" keys and \"intent to continue\" keys, but the whitelist is small and the UX benefit — being able to spin the board to see exactly how you died — was considered worth the added complexity.\n- **DOM overlay banner over canvas text**: The loss reason is shown as a DOM element overlaid on the canvas rather than drawn with canvas text. This mirrors the existing starvation-warning pattern already in the codebase, keeps the canvas rendering code free of text layout concerns, and means the banner inherits CSS animation and accessibility attributes without extra work.",
-					"category": "feature",
-					"importance": "major",
-					"filesAffected": [
-						"src/main.ts",
-						"index.html",
-						"src/style.css"
-					]
-				}
-			]
-		},
-		{
 			"commitHash": "6aeabc387455a2e195e08ecce50f26d3eea1c19c",
 			"recap": "Iron Snake Mode now gives players a clear visual countdown for the final three fruits of every level. The fruit shifts from its normal red to violet with three remaining, then magenta with two, then near-white on the very last fruit before the level completes. After eating the final fruit and advancing to the next level, the fruit returns to red immediately. The effect applies in both single-player and two-player Iron Snake sessions, where the countdown tracks the combined score of both players against the shared level goal.",
 			"topics": [
@@ -324,6 +307,23 @@
 						"src/bots/loop-guard.ts",
 						"src/main.ts",
 						"src/menu-demo.ts"
+					]
+				}
+			]
+		},
+		{
+			"commitHash": "b0cf976572670c1490b0c2fd604942e8b7243105",
+			"recap": "When a snake dies, the game board now stays visible and frozen rather than immediately switching away. The fatal collision is highlighted on the board in an amber block, and a pulsing banner names exactly how the snake lost — hitting a wall, running into itself, crashing into the opponent, or starving. In two-player mode, the banner describes each snake's fate individually, and head-on collisions get their own message.\n\nThe freeze persists until the player presses any key, at which point the normal Game Over screen appears with scores, high-score entry, and leaderboard options all intact. During the freeze, the camera controls remain fully active: players can rotate the board, toggle overhead view, and adjust perspective to inspect the collision from any angle before moving on.",
+			"topics": [
+				{
+					"title": "Freeze game on death showing loss reason until key pressed",
+					"decisions": "- **Deferred callback over rewriting end-game functions**: Rather than splitting or duplicating the end-game logic, the freeze inserts itself as a step in front of the existing functions by storing them as callbacks. This kept all the winner/leaderboard/high-score code untouched and made the change low-risk — the freeze is purely additive, and the finalize step is identical to what ran before.\n- **Camera keys fall through during freeze**: The initial implementation dismissed the freeze on any key press. After review, rotate, overhead, and perspective keys were whitelisted to fall through, turning the frozen board into an inspectable \"death cam.\" This required distinguishing between \"view\" keys and \"intent to continue\" keys, but the whitelist is small and the UX benefit — being able to spin the board to see exactly how you died — was considered worth the added complexity.\n- **DOM overlay banner over canvas text**: The loss reason is shown as a DOM element overlaid on the canvas rather than drawn with canvas text. This mirrors the existing starvation-warning pattern already in the codebase, keeps the canvas rendering code free of text layout concerns, and means the banner inherits CSS animation and accessibility attributes without extra work.",
+					"category": "feature",
+					"importance": "major",
+					"filesAffected": [
+						"src/main.ts",
+						"index.html",
+						"src/style.css"
 					]
 				}
 			]
