@@ -89,5 +89,66 @@
 	],
 	"transcripts": [
 		"ecb5afda-1c96-4f3a-ac5b-0aceef721625"
+	],
+	"e2eTestGuide": [
+		{
+			"title": "Interior holes appear on a new Iron Snake board",
+			"preconditions": "Have the game open and ready to start a new session.",
+			"steps": [
+				"Open the game and select Iron Snake mode.",
+				"Start a new game at level 1.",
+				"Look at the board that appears before the snake starts moving.",
+				"Check whether there are any small gaps or empty patches sitting in the middle of the playable area — not along the outer edge, but fully surrounded by playable cells on all sides.",
+				"Start a new game several more times (at least 5) and inspect the board each time."
+			],
+			"expectedResults": [
+				"At least some of the boards should show one or more small interior holes — empty cells completely surrounded by playable space, not touching the outer boundary.",
+				"The holes should never appear directly under the snake's starting position.",
+				"The overall board shape should still look like a single connected region with no isolated pockets of playable cells cut off from the rest."
+			]
+		},
+		{
+			"title": "Holes grow larger and more numerous at higher Iron Snake levels",
+			"preconditions": "Have the game open in Iron Snake mode.",
+			"steps": [
+				"Start an Iron Snake game and note the number and size of any interior holes on the level 1 board.",
+				"Play through several level transitions (or use any available level-select option) until you reach level 5 or higher.",
+				"After each level transition, pause and look at the new board before moving the snake.",
+				"Compare the holes on the higher-level board to what you saw at level 1."
+			],
+			"expectedResults": [
+				"Higher-level boards should have noticeably more interior holes than level 1 boards.",
+				"The holes on higher-level boards should also appear larger (covering more cells) compared to the small single-cell gaps seen early on.",
+				"No hole should ever appear directly on top of the snake or immediately in the cell the snake's head is about to enter when the new level begins."
+			]
+		},
+		{
+			"title": "Snake dies with \"Fell into a hole!\" message when it enters an interior hole",
+			"preconditions": "Have the game open in Iron Snake mode with a board that has at least one visible interior hole.",
+			"steps": [
+				"Start an Iron Snake game and identify a board that has an interior hole (an empty gap surrounded by playable cells).",
+				"Steer the snake so that its head moves directly into one of those interior holes.",
+				"Watch what happens the moment the head enters the hole."
+			],
+			"expectedResults": [
+				"The snake should immediately die, just as it would when hitting the outer wall.",
+				"The death message displayed on screen should read \"Fell into a hole!\" — not \"Hit the wall!\" or \"Ran into itself!\".",
+				"The game should then proceed to its normal end-of-game state (score display, restart option, etc.)."
+			]
+		},
+		{
+			"title": "Two-player Iron Snake: correct death message when a snake falls into a hole",
+			"preconditions": "Have the game open with two-player Iron Snake mode available.",
+			"steps": [
+				"Start a two-player Iron Snake game and wait for a board with at least one visible interior hole.",
+				"Steer one of the two snakes into an interior hole while keeping the other snake alive.",
+				"Observe the death banner that appears."
+			],
+			"expectedResults": [
+				"The death banner should identify which player died and display a message such as \"P1 fell into a hole\" or \"P2 fell into a hole\" (matching whichever player entered the hole).",
+				"The message should not say \"hit the wall\" for a hole death.",
+				"If both snakes die simultaneously by other means (wall, self, head-on), those deaths should still show their own correct messages unchanged."
+			]
+		}
 	]
 }
