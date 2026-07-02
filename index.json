@@ -80,6 +80,22 @@
 				"insertions": 347,
 				"deletions": 10
 			}
+		},
+		{
+			"commitHash": "b0cf976572670c1490b0c2fd604942e8b7243105",
+			"parentCommitHash": null,
+			"treeHash": "49549d29c3d2fb06150567e36cf81bb6ce0af69c",
+			"commitType": "commit",
+			"commitMessage": "Freeze on death showing the loss reason until a key is pressed",
+			"commitDate": "2026-07-02T03:20:13.000Z",
+			"branch": "feature/lossreason",
+			"generatedAt": "2026-07-02T03:21:07.489Z",
+			"topicCount": 1,
+			"diffStats": {
+				"filesChanged": 3,
+				"insertions": 158,
+				"deletions": 4
+			}
 		}
 	],
 	"commitAliases": {

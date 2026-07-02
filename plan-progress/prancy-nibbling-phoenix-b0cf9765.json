@@ -1,0 +1,55 @@
+{
+	"version": 1,
+	"commitHash": "b0cf976572670c1490b0c2fd604942e8b7243105",
+	"commitMessage": "Freeze on death showing the loss reason until a key is pressed",
+	"commitDate": "2026-07-02T03:20:13.000Z",
+	"planSlug": "prancy-nibbling-phoenix-b0cf9765",
+	"originalSlug": "prancy-nibbling-phoenix",
+	"summary": "The developer implemented a full 'freeze-on-death' feature for a Snake game, where the board stays visible with the fatal collision highlighted and a loss-reason banner displayed until any key is pressed, then added camera key fall-through so players can inspect the death from any angle before dismissing.",
+	"steps": [
+		{
+			"id": "1",
+			"description": "New instance fields (deathReason, deathCells, awaitingDeathAck, pendingFinalize) beside deathCause at ~line 154, reset in startNewGame and hideDeathBanner called beside pause-hide",
+			"status": "completed",
+			"note": "The diff adds four new fields (deathMessage instead of deathReason — a deliberate simplification where the composed banner text is stored directly rather than a union type, since the death site has full per-snake context), all reset in startNewGame alongside deathCause. The plan called for a typed 'deathReason' union but the implementation stored the composed string directly as 'deathMessage', trading type-safety for simplicity since the message is always composed at the death site where all context is available."
+		},
+		{
+			"id": "2",
+			"description": "New method beginDeathFreeze(finalize) that sets isGameOver/awaitingDeathAck/pendingFinalize, stops the loop, hides starvation-warning, calls draw(), and calls showDeathBanner()",
+			"status": "completed",
+			"note": "Implemented as specified, with one notable deviation from the plan: auto-rotate is intentionally NOT stopped in beginDeathFreeze (the comment in the diff explicitly states 'Leave auto-rotate running — it spins the frozen board into a death cam in bot/bvb modes'). This was later confirmed as the right call when the human asked to allow rotate/auto-rotate during the freeze, and the deferred endGame/endGameTwoPlayer still stops it at finalize time."
+		},
+		{
+			"id": "3",
+			"description": "Wire the four death sites (single collision, single starvation, two-player collision, two-player starvation) to beginDeathFreeze instead of finalizing directly",
+			"status": "completed",
+			"note": "All four sites are wired: single collision sets deathMessage based on inBounds check, single starvation sets 'Starved!', two-player collision composes per-snake reasons with a '·' separator (or 'Head-on collision!' for headToHead), and two-player starvation distinguishes both-starved vs single. The plan's structured deathReason field was replaced by direct message composition at each site, which the conversation notes was chosen because the death site has full per-snake context unavailable elsewhere."
+		},
+		{
+			"id": "4",
+			"description": "Render death cells in draw() after the object-draw loop, with off-grid fallback for wall deaths and on-canvas drawing for self/opponent/head-to-head",
+			"status": "completed",
+			"note": "Implemented with the amber/gold palette (#facc15, #eab308, #a16207) as specified, drawn only when awaitingDeathAck. The off-grid branch draws both at the clamped last-valid head (snake[0]/snake2[0]) AND at the true OOB coord for the 'sliver past the border' cue. The plan's note that death cells re-read on every draw() call means the highlight persists across camera redraws — critical for the camera-key fall-through feature added in the follow-up."
+		},
+		{
+			"id": "5",
+			"description": "Banner DOM + CSS: add #death-banner in index.html inside .canvas-wrap, add .death-banner CSS mirroring starvation-warning, add showDeathBanner/hideDeathBanner methods",
+			"status": "completed",
+			"note": "The DOM overlay approach was chosen over canvas text (ctx.fillText) specifically because it mirrors the existing starvation-warning pattern, keeps canvas rendering code free of text layout concerns, and gets CSS animation and accessibility attributes for free. The CSS is centered (top:50%, transform:translate(-50%,-50%)) with a distinct death-pulse keyframe, alarm-red border, and pointer-events:none as planned."
+		},
+		{
+			"id": "6",
+			"description": "Acknowledgement branch in handleKeyPress at the top (after INPUT guard, before Enter branch) that dismisses freeze on any key except repeat/modifiers, with camera keys falling through",
+			"status": "completed",
+			"note": "The initial implementation dismissed on any non-modifier key, but the human explicitly requested camera keys (q/e/o/t/[/]) be allowed during the freeze for a 'death cam' inspection experience. The final whitelist ['q','Q','e','E','t','T','o','O','[',']'] was added, with camera keys falling through to their normal handlers while all other keys dismiss. The conversation topic notes this was a deliberate trade-off: the whitelist is small and the UX benefit of being able to spin the board to see exactly how you died was considered worth the added complexity."
+		}
+	],
+	"llm": {
+		"model": "claude-haiku-4-5-20251001",
+		"inputTokens": 17751,
+		"outputTokens": 1242,
+		"apiLatencyMs": 30155,
+		"stopReason": null,
+		"source": "jolli-proxy"
+	}
+}
