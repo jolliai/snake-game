@@ -148,6 +148,22 @@
 				"insertions": 17,
 				"deletions": 0
 			}
+		},
+		{
+			"commitHash": "5247d42bbd4122ab09cb0eea51a8573c84a7f626",
+			"parentCommitHash": null,
+			"treeHash": "db6bc856f4de4d663f454c813fc1b9662cc56916",
+			"commitType": "commit",
+			"commitMessage": "Smooth Iron Snake progression; add head/tail graphics; fix death overlay",
+			"commitDate": "2026-07-02T04:55:03.000Z",
+			"branch": "feature/progression",
+			"generatedAt": "2026-07-02T04:56:23.685Z",
+			"topicCount": 4,
+			"diffStats": {
+				"filesChanged": 3,
+				"insertions": 421,
+				"deletions": 43
+			}
 		}
 	],
 	"commitAliases": {

@@ -1,0 +1,49 @@
+{
+	"version": 1,
+	"commitHash": "5247d42bbd4122ab09cb0eea51a8573c84a7f626",
+	"commitMessage": "Smooth Iron Snake progression; add head/tail graphics; fix death overlay",
+	"commitDate": "2026-07-02T04:55:03.000Z",
+	"planSlug": "i-want-to-smooth-purrfect-pretzel-5247d42b",
+	"originalSlug": "i-want-to-smooth-purrfect-pretzel",
+	"summary": "The developer implemented smooth Iron Snake progression (keeping snake length/shape across levels with proportional board growth), plus several visual improvements: a prominent snake head with direction-facing eyes, a tapered tail, depth-correct death block rendering, and a repositioned death banner.",
+	"steps": [
+		{
+			"id": "1",
+			"description": "Board area scales with level: new exported helper ironSnakeGridSizeForArea in iron-snake.ts, new method ironSnakeGridSizeForLevel in main.ts, new const IRON_SNAKE_GOAL_FILL = 0.4",
+			"status": "completed",
+			"note": "All three additions are present in the diff: `ironSnakeGridSizeForArea` exported from iron-snake.ts using `TARGET_FILL_MID` (the midpoint of LO/HI band), `IRON_SNAKE_GOAL_FILL = 0.4` constant in main.ts, and `ironSnakeGridSizeForLevel` method. The 40% fill target was chosen as 'tighter/harder' — the board feels roomy at level start and tightens as the snake grows toward the goal, with the floor ensuring level-1 behavior is byte-identical to before."
+		},
+		{
+			"id": "2",
+			"description": "Grow the board using the existing gridSize-change plumbing: set new gridSize before regenerating mask, then updateCanvasSize",
+			"status": "completed",
+			"note": "The reworked `advanceLevel` sets `this.gridSize = baseGrid + extra` before calling `regenerateIronSnakeBoard()`, then calls `updateCanvasSize()` at the end — reusing the exact same plumbing as classic `expandGrid`. The retry loop (extra 0..3) was added to give the shape generator more room when a generated shape can't seat the snakes."
+		},
+		{
+			"id": "3",
+			"description": "Preserve the snake's shape on advance: capture relative offsets, placeRigidSnake helper with identity-first then rotation orientations, fallback chain",
+			"status": "completed",
+			"note": "The full fallback chain is implemented: `placeRigid` (rigid placement with 4 orientations), `layoutBody` (Warnsdorff-guided self-avoiding walk — chosen over greedy straight-first after the greedy approach painted itself into corners on irregular boards with long snakes), `reseatKeepingShape` orchestrating both, and the rectangle/length-1 backstops. The Warnsdorff heuristic was a key decision: it reliably seats long snakes without expensive backtracking. `sortedCandidates` was factored out of `findStartCell` to be shared with `placeRigid` as planned."
+		},
+		{
+			"id": "4",
+			"description": "Wire the new gridSize into level start and advance: advanceLevel uses ironSnakeGridSizeForLevel, startNewGame and +/- handler use ironSnakeGridSizeForLevel(1)",
+			"status": "completed",
+			"note": "Both `startNewGame` (line ~1227) and the `+/-` handler (line ~982) now call `this.ironSnakeGridSizeForLevel(1)` instead of `Math.max(this.initialGridSize, IRON_SNAKE_MIN_SIZE)`, and `advanceLevel` uses `ironSnakeGridSizeForLevel(this.level)` as the base grid size before the retry loop."
+		},
+		{
+			"id": "5",
+			"description": "Cleanups: fix maxLength1/2 no-op ordering, update stale comment about board staying same size",
+			"status": "completed",
+			"note": "The stale comment 'since the board stays the same size each level' is updated to 'the board grows with the level'. The `maxLength1/2` lines are kept in place — with shape preservation the snake retains its real length, so they now correctly capture the pre-advance max rather than being no-ops as they were when length was reset to 1 before them."
+		}
+	],
+	"llm": {
+		"model": "claude-haiku-4-5-20251001",
+		"inputTokens": 28565,
+		"outputTokens": 997,
+		"apiLatencyMs": 28176,
+		"stopReason": null,
+		"source": "jolli-proxy"
+	}
+}
