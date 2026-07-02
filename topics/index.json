@@ -173,6 +173,60 @@
 				}
 			],
 			"lastUpdatedAt": "2026-07-02T21:12:13.686Z"
+		},
+		{
+			"stableSlug": "daily-git-summaries",
+			"title": "Daily Git and Management Summary Reports",
+			"summary": "Format, content, and recurring patterns for daily git activity and management summary reports on jolliai/jolli and jolliai/jolliai.",
+			"relatedBranches": [],
+			"sourceRefs": [
+				{
+					"type": "userfile",
+					"id": "daily-git-summary-2026-06-18.md@e9dbed6b79adbeec87cf48d534f2133eb053094b41500d8a4160e7ed899720ed",
+					"timestamp": "2026-07-02T15:51:48.150Z"
+				},
+				{
+					"type": "userfile",
+					"id": "daily-git-summary.md@ab883949963205673ec0d98b6fd34eeabe7105e49e895aa1c735c9a0b6d2c41f",
+					"timestamp": "2026-07-02T15:51:48.150Z"
+				},
+				{
+					"type": "userfile",
+					"id": "daily-standup-2026-07-16.md@ab0019a899e343a1caafd3075221b19e6f3eaca04c753533a88c78751f79bffa",
+					"timestamp": "2026-07-02T15:51:48.150Z"
+				},
+				{
+					"type": "userfile",
+					"id": "git-activity-summary-2026-06-16.md@5fe73d0dff1c6102673da731d7d452f33e5cf68b0199f4da1a64b30104379ec2",
+					"timestamp": "2026-07-02T15:51:48.150Z"
+				},
+				{
+					"type": "userfile",
+					"id": "git-daily-summary.md@2f0601084090d59cd75c81afb346c424b1912f987ff296a1f86cacc2546ca53b",
+					"timestamp": "2026-07-02T15:51:48.152Z"
+				},
+				{
+					"type": "userfile",
+					"id": "management-summary-2026-06-15.md@b73e9ea60c6d3d0a07dc09837f8d378e0e7586bb4f13d11c91b5416f10e5e069",
+					"timestamp": "2026-07-02T15:51:48.152Z"
+				},
+				{
+					"type": "userfile",
+					"id": "management-summary-2026-06-16.md@e4ef26961d008be8852e3757114b3cdaf4c6956332954de3a3db5985ec63180d",
+					"timestamp": "2026-07-02T15:51:48.152Z"
+				},
+				{
+					"type": "userfile",
+					"id": "standup-summary-2026-06-29.md@1542ac31cfb5796a2e3467e7e094c9f556343fe5a6ff8ac31dd4f3277ab7a2b2",
+					"timestamp": "2026-07-02T15:51:48.154Z"
+				},
+				{
+					"type": "userfile",
+					"id": "untitled.md@971547dcca9cbe685971d3fc8737b8f4ed7cf34b64cad38b3c6c7a57191f6ee3",
+					"timestamp": "2026-07-02T15:51:48.154Z"
+				}
+			],
+			"lastUpdatedAt": "2026-07-02T21:12:13.686Z"
 		}
 	]
 }
