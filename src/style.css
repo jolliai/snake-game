@@ -205,6 +205,33 @@ button:active {
   50% { opacity: 0.55; box-shadow: 0 0 24px rgba(239, 68, 68, 0.95); }
 }
 
+/* Frozen-death banner: overlays the still-visible board (which shows the
+   highlighted fatal cell) naming how the snake lost, until any key is pressed. */
+.death-banner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 0.9rem 1.6rem;
+  border-radius: 12px;
+  background-color: rgba(20, 10, 10, 0.92);
+  border: 2px solid #f87171;
+  color: #fecaca;
+  font-size: 1.6em;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-align: center;
+  white-space: nowrap;
+  box-shadow: 0 0 28px rgba(239, 68, 68, 0.7);
+  pointer-events: none;
+  animation: death-pulse 1s ease-in-out infinite;
+}
+
+@keyframes death-pulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 20px rgba(239, 68, 68, 0.6); }
+  50% { opacity: 0.7; box-shadow: 0 0 36px rgba(239, 68, 68, 0.95); }
+}
+
 .game-info {
   display: flex;
   gap: 2rem;
