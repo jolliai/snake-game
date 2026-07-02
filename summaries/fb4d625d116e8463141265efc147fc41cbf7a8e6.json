@@ -1,0 +1,47 @@
+{
+	"version": 5,
+	"commitHash": "fb4d625d116e8463141265efc147fc41cbf7a8e6",
+	"commitMessage": "docs: add CLAUDE.md note to use Jolli Memory when planning/coding",
+	"commitAuthor": "Joe Hart",
+	"commitDate": "2026-07-02T03:44:36.000Z",
+	"branch": "docs/claude-md-jolli-memory",
+	"generatedAt": "2026-07-02T03:44:47.024Z",
+	"commitType": "commit",
+	"commitSource": "cli",
+	"transcriptEntries": 11,
+	"conversationTurns": 5,
+	"llm": {
+		"model": "claude-sonnet-4-6",
+		"inputTokens": 6506,
+		"outputTokens": 322,
+		"apiLatencyMs": 10364,
+		"stopReason": null,
+		"source": "jolli-proxy"
+	},
+	"stats": {
+		"filesChanged": 1,
+		"insertions": 17,
+		"deletions": 0
+	},
+	"topics": [
+		{
+			"title": "Add project guidance to use Jolli Memory when planning or coding",
+			"trigger": "The developer wanted future sessions in this project to consistently use Jolli Memory for context recall, design questions, and PR descriptions, rather than relying on re-deriving context from scratch each time.",
+			"response": "Created `CLAUDE.md` at the repo root with a \"Use Jolli Memory\" section. The note instructs Claude to recall prior branch context before planning, search across branches when design questions arise, and use the Jolli PR skill when opening pull requests.",
+			"decisions": "- **Separate branch over bundling with the active feature branch**: The guidance file is unrelated to the progression feature in progress, so mixing it into that branch would add noise to the PR diff and tie a trivial doc change to a longer-running feature. Branching off the upstream default branch instead keeps the diff minimal and lets this land independently in minutes.\n- **Project-level guidance file over a memory entry or hook**: A project-level guidance file is loaded into context every session and applies to anyone working in the repo, making it the right home for judgment-based instructions like \"when appropriate.\" A hook would be too rigid for a \"when relevant\" guideline and would misfire on unrelated tasks.",
+			"filesAffected": [
+				"CLAUDE.md"
+			],
+			"category": "docs",
+			"importance": "minor"
+		}
+	],
+	"diffStats": {
+		"filesChanged": 1,
+		"insertions": 17,
+		"deletions": 0
+	},
+	"transcripts": [
+		"c065f147-c763-4818-8b10-2dd73d7071d5"
+	]
+}

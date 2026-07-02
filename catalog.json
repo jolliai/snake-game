@@ -143,6 +143,20 @@
 					]
 				}
 			]
+		},
+		{
+			"commitHash": "fb4d625d116e8463141265efc147fc41cbf7a8e6",
+			"topics": [
+				{
+					"title": "Add project guidance to use Jolli Memory when planning or coding",
+					"decisions": "- **Separate branch over bundling with the active feature branch**: The guidance file is unrelated to the progression feature in progress, so mixing it into that branch would add noise to the PR diff and tie a trivial doc change to a longer-running feature. Branching off the upstream default branch instead keeps the diff minimal and lets this land independently in minutes.\n- **Project-level guidance file over a memory entry or hook**: A project-level guidance file is loaded into context every session and applies to anyone working in the repo, making it the right home for judgment-based instructions like \"when appropriate.\" A hook would be too rigid for a \"when relevant\" guideline and would misfire on unrelated tasks.",
+					"category": "docs",
+					"importance": "minor",
+					"filesAffected": [
+						"CLAUDE.md"
+					]
+				}
+			]
 		}
 	]
 }
