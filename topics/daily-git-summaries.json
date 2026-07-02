@@ -1,0 +1,55 @@
+{
+	"schemaVersion": 1,
+	"stableSlug": "daily-git-summaries",
+	"title": "Daily Git and Management Summary Reports",
+	"content": "# Daily Git and Management Summary Reports\n\n## Purpose and Scope\n\nThe project maintains two complementary daily report formats generated from `jolliai/jolli@main` and `jolliai/jolliai@main`:\n\n- **Git Activity Summary** — a technical audience report covering commits, contributors, files touched, net lines, tickets closed, and detailed per-commit breakdowns.\n- **Management Summary** — an executive-audience report translating the same engineering activity into business impact, deployment notes, and risk flags.\n\nBoth report types are generated from `git log` over a rolling 24-hour window (or a stated multi-day period for standup summaries).\n\n---\n\n## Git Activity Summary Format\n\n### Standard Sections\n\n| Section | Content |\n|---|---|\n| **TL;DR** | 3–5 bullet narrative of the day's biggest themes |\n| **By the Numbers** | Commits, contributors, files touched, net lines added/removed, tickets closed |\n| **What Shipped / Merged** | One row per closed/fixed commit: hash, author, message, what changed |\n| **In Progress** | Tickets with \"Part of\" commits — not yet closed |\n| **Worth a Closer Look** | Flagged items: large diffs, new services, CI changes, security-sensitive changes, feature flags |\n| **Detailed Breakdown** | Per-contributor tables with file-level detail |\n\n### Metrics Captured Per Report\n\n- Commit count (24 h window)\n- Contributor count and names\n- Files touched (with overlap note when commits share files)\n- Net insertions / deletions\n- Ticket references (closed vs. in-progress)\n- Timezone spread of contributors\n\n### Risk / Review Flags Used\n\n| Flag | Meaning |\n|---|---|\n| 🔴 | Massive diff or production-critical change |\n| 🟡 | Feature flag gating, DB migration, security/access-control change, bot commit |\n| 🟠 | Large deletion of previously load-bearing files |\n| ⚠️ | Large diff, low-level infrastructure change, operational risk |\n| ℹ️ | Informational (timezone spread, paired commits to review together) |\n\n---\n\n## Management Summary Format\n\n### Standard Sections\n\n| Section | Content |\n|---|---|\n| **Executive Summary** | 1–2 paragraph narrative of the day's themes in business language |\n| **Ticket Highlights** | Per-ticket entries with priority, plain-English description of what was fixed/built, and business impact |\n| **Team Activity** | Table of engineer → tickets contributed |\n| **Deployment Notes** | Numbered action items: migrations required, feature flags to confirm, IAM/infra changes, breaking-change status |\n\n### Ticket Priority Coding\n\n| Icon | Priority |\n|---|---|\n| 🔴 | High — production fix or blocking issue |\n| 🟡 | Medium — user-facing or internal improvement |\n| 🟢 | Low — polish, permission tweak, or minor bug fix |\n\n### Deployment Notes Pattern\n\nEach deployment note entry carries a severity (🔴/🟡/🟢) and specifies:\n- Whether a DB migration is included and what it does\n- Whether new IAM/cloud permissions are required\n- Whether a feature flag must be confirmed per environment\n- Whether any breaking changes exist for end users\n\n---\n\n## Standup / Multi-Day Summary Format\n\nFor periods covering more than one day (e.g., two-week sprint summaries), reports use a standup format with:\n\n- **By Contributor** — chronological list of each engineer's commits with dates\n- **By Theme / Area** — grouped narrative sections (e.g., Force-Push Safety, IntelliJ UI Overhaul, Knowledge Graph, MCP Tools, Telemetry)\n- **Dependency Bumps** — table of automated Dependabot upgrades separated from application changes\n\n---\n\n## Recurring Structural Patterns\n\n### Commit Message Convention\nCommits follow `<Closes|Fixes|Part of> JOLLI-NNNN: <imperative description>`. \"Part of\" signals in-progress work; \"Closes\" or \"Fixes\" signals fully merged work.\n\n### Contributor Timezone Spread\nReports note UTC offset for each contributor. The core team spans UTC+8 (Flyer Li, Sam.Li, finn.zhong, foster.han) and UTC−7 (douglas.schroeder), producing a ~15-hour spread with narrow overlap windows. Reports flag this when shared files (e.g., `WorkflowRouter`, `SiteRouter`) are touched by both timezone groups in the same window.\n\n### Bot Commits\n`jolli-bot` authors automated commits (e.g., marketing-site redirects). Reports flag bot commits for intentionality confirmation.\n\n### Large-Diff Threshold\nCommits touching 40+ files or adding 3,000+ lines are flagged for dedicated review passes regardless of ticket priority.\n\n### Feature Flag Discipline\nNew infrastructure paths (e.g., `PER_PROVIDER_POOL_ENABLED` for per-provider DB connection pooling) are gated behind named flags. Reports call out flag state verification per environment as a deployment action item.\n\n---\n\n## Repositories Covered\n\n| Repo | Content |\n|---|---|\n| `jolliai/jolli` | Backend, frontend, CLI (`space-cli`), infrastructure, DB migrations, CI pipelines |\n| `jolliai/jolliai` | IDE clients (VS Code, IntelliJ), CLI client tooling, knowledge graph, MCP server |\n\nReports are generated separately per repo and cross-referenced when changes in one affect the other (e.g., CLI releases in `jolliai/jolliai` consuming backend APIs from `jolliai/jolli`).\n\n---\n\n## Known Active Work Tracks (as of latest reports)\n\nThe following tickets appear across multiple report windows as long-running tracks:\n\n| Ticket | Description | Last Status |\n|---|---|---|\n| JOLLI-1777 | Unified git-backed spaces (jolli-git + GitHub-backed merged) | Closed |\n| JOLLI-1830/1831 | Per-provider PostgreSQL connection pooling | Closed |\n| JOLLI-1843 | Workflow job cancellation | Closed |\n| JOLLI-1785 | Anonymous opt-out telemetry (CLI, VS Code, IntelliJ) | Closed |\n| JOLLI-1618 | AI-powered auto-merge with hunk-based conflict resolution | In progress |\n| JOLLI-1571 | Production EFS vault mount reliability | In progress (fixes landed) |\n| JOLLI-1734 | Path-addressed structural ops for git-backed spaces | In progress |\n| JOLLI-1731 | AWS Lambda relay + Claude Code Action automation | In progress |\n| Knowledge Base compilation | Topic-centric KB architecture, `jolli compile` command, multi-repo ingest | In progress (SP3–SP6) |\n| MCP server / full-text search | Orama index over KB + commit catalog, 4 MCP tools via stdio | Shipped |\n\n---",
+	"relatedBranches": [],
+	"sourceRefs": [
+		{
+			"type": "userfile",
+			"id": "daily-git-summary-2026-06-18.md@e9dbed6b79adbeec87cf48d534f2133eb053094b41500d8a4160e7ed899720ed",
+			"timestamp": "2026-07-02T15:51:48.150Z"
+		},
+		{
+			"type": "userfile",
+			"id": "daily-git-summary.md@ab883949963205673ec0d98b6fd34eeabe7105e49e895aa1c735c9a0b6d2c41f",
+			"timestamp": "2026-07-02T15:51:48.150Z"
+		},
+		{
+			"type": "userfile",
+			"id": "daily-standup-2026-07-16.md@ab0019a899e343a1caafd3075221b19e6f3eaca04c753533a88c78751f79bffa",
+			"timestamp": "2026-07-02T15:51:48.150Z"
+		},
+		{
+			"type": "userfile",
+			"id": "git-activity-summary-2026-06-16.md@5fe73d0dff1c6102673da731d7d452f33e5cf68b0199f4da1a64b30104379ec2",
+			"timestamp": "2026-07-02T15:51:48.150Z"
+		},
+		{
+			"type": "userfile",
+			"id": "git-daily-summary.md@2f0601084090d59cd75c81afb346c424b1912f987ff296a1f86cacc2546ca53b",
+			"timestamp": "2026-07-02T15:51:48.152Z"
+		},
+		{
+			"type": "userfile",
+			"id": "management-summary-2026-06-15.md@b73e9ea60c6d3d0a07dc09837f8d378e0e7586bb4f13d11c91b5416f10e5e069",
+			"timestamp": "2026-07-02T15:51:48.152Z"
+		},
+		{
+			"type": "userfile",
+			"id": "management-summary-2026-06-16.md@e4ef26961d008be8852e3757114b3cdaf4c6956332954de3a3db5985ec63180d",
+			"timestamp": "2026-07-02T15:51:48.152Z"
+		},
+		{
+			"type": "userfile",
+			"id": "standup-summary-2026-06-29.md@1542ac31cfb5796a2e3467e7e094c9f556343fe5a6ff8ac31dd4f3277ab7a2b2",
+			"timestamp": "2026-07-02T15:51:48.154Z"
+		},
+		{
+			"type": "userfile",
+			"id": "untitled.md@971547dcca9cbe685971d3fc8737b8f4ed7cf34b64cad38b3c6c7a57191f6ee3",
+			"timestamp": "2026-07-02T15:51:48.154Z"
+		}
+	],
+	"lastUpdatedAt": "2026-07-02T21:12:13.686Z"
+}
