@@ -74,6 +74,29 @@
 				}
 			],
 			"lastUpdatedAt": "2026-07-02T01:08:38.234Z"
+		},
+		{
+			"stableSlug": "bot-pathfinding-fixes",
+			"title": "Bot Pathfinding Fixes: Infinite Loop Prevention and Starvation Timer",
+			"summary": "Loop guard breaks bot oscillation cycles via revisit detection + confinement ratio; starvation timer ends games when bots wander without eating.",
+			"relatedBranches": [
+				"bug/botupdate"
+			],
+			"sourceRefs": [
+				{
+					"type": "summary",
+					"id": "4e91f64cb71e1e858e3b492d8900d863fe447675",
+					"timestamp": "2026-07-02T02:03:27.000Z",
+					"branch": "bug/botupdate"
+				},
+				{
+					"type": "plan",
+					"id": "i-noticed-that-there-fluttering-frog-4e91f64c",
+					"timestamp": "2026-07-02T02:04:16.898Z",
+					"branch": "bug/botupdate"
+				}
+			],
+			"lastUpdatedAt": "2026-07-02T02:04:42.080Z"
 		}
 	]
 }
