@@ -97,6 +97,29 @@
 				}
 			],
 			"lastUpdatedAt": "2026-07-02T02:04:42.080Z"
+		},
+		{
+			"stableSlug": "freeze-on-death-loss-reason",
+			"title": "Freeze on Death with Loss Reason Display",
+			"summary": "When a snake dies, the board freezes, the fatal cell is highlighted, a banner names the cause, and any key advances to Game Over.",
+			"relatedBranches": [
+				"feature/lossreason"
+			],
+			"sourceRefs": [
+				{
+					"type": "summary",
+					"id": "b0cf976572670c1490b0c2fd604942e8b7243105",
+					"timestamp": "2026-07-02T03:20:13.000Z",
+					"branch": "feature/lossreason"
+				},
+				{
+					"type": "plan",
+					"id": "prancy-nibbling-phoenix-b0cf9765",
+					"timestamp": "2026-07-02T03:20:37.332Z",
+					"branch": "feature/lossreason"
+				}
+			],
+			"lastUpdatedAt": "2026-07-02T03:21:07.651Z"
 		}
 	]
 }
