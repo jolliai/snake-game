@@ -781,6 +781,22 @@
 					]
 				}
 			]
+		},
+		{
+			"commitHash": "ae5a1443a819914445ebe146df903227604dbb60",
+			"recap": "A new bot called Chaser was added to the snake game and is now available alongside the existing roster of bot personalities. Where other bots prioritize survival or open-space exploration, Chaser aggressively pursues food along the shortest available path. When the direct route to food would leave the snake with no safe escape, Chaser shifts into a tail-following mode, drifting toward its own tail to keep space open until a safe food path becomes available again. Players can now select Chaser from the bot menu for a noticeably more aggressive playstyle.",
+			"topics": [
+				{
+					"title": "New aggressive food-chasing bot added to snake game",
+					"decisions": "- **Trap detection via tail reachability**: The bot checks whether the snake can still reach its own tail after each candidate move. When the tail becomes unreachable, the move is treated as a potential trap and scored very negatively, with open space and tail proximity used as tiebreakers. This avoids the classic failure mode of aggressive food-chasers that corner themselves, at the cost of occasionally taking a longer route to food.\n- **Weighted scoring over pure pathfinding**: Rather than following a single BFS path blindly, the bot combines path length, Manhattan distance, reachable area, and a small momentum bonus into a single score per direction. This allows nuanced trade-offs — for example, preferring a slightly longer path that keeps more open space — without requiring a full lookahead tree, keeping the approach simple and fast.",
+					"category": "feature",
+					"importance": "major",
+					"filesAffected": [
+						"src/bots/chaser-bot.ts",
+						"src/bots/index.ts"
+					]
+				}
+			]
 		}
 	]
 }
