@@ -594,9 +594,10 @@
 		{
 			"stableSlug": "leaderboards",
 			"title": "Per-Mode Leaderboards with Stats",
-			"summary": "Persistent per-mode leaderboards with name entry, stat tracking, and bot-assisted run exclusion across single-player, two-player, and bot-vs-bot modes.",
+			"summary": "Persistent per-mode leaderboards (single-player, two-player, bot-vs-bot, hidden rainbow) with stat summaries, name prompts, and bot-exclusion logic.",
 			"relatedBranches": [
-				"backfilled"
+				"backfilled",
+				"josephhart/joe-7-add-rainbow-colored-snake-suprise"
 			],
 			"sourceRefs": [
 				{
@@ -622,9 +623,15 @@
 					"id": "533589d72ae5461b23779d49e05fb7dc0e4e1a31",
 					"timestamp": "2026-05-12T16:57:36-07:00",
 					"branch": "backfilled"
+				},
+				{
+					"type": "summary",
+					"id": "cf7df218edc27d13844e1e9688608ef6c8561d19",
+					"timestamp": "2026-07-07T16:18:17.000Z",
+					"branch": "josephhart/joe-7-add-rainbow-colored-snake-suprise"
 				}
 			],
-			"lastUpdatedAt": "2026-07-07T15:25:41.149Z"
+			"lastUpdatedAt": "2026-07-07T16:18:39.088Z"
 		},
 		{
 			"stableSlug": "dependency-maintenance",
