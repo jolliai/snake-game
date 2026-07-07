@@ -276,6 +276,22 @@
 				"insertions": 253,
 				"deletions": 209
 			}
+		},
+		{
+			"commitHash": "cd6ac54603270151807381a9d1f7173ed25091c0",
+			"parentCommitHash": null,
+			"treeHash": "0131911ec8e0c8ff6a59badde39fdbf2dcfaa0c3",
+			"commitType": "commit",
+			"commitMessage": "chore: update npm dependencies",
+			"commitDate": "2026-05-15T14:55:51-07:00",
+			"branch": "backfilled",
+			"generatedAt": "2026-07-07T15:07:51.082Z",
+			"topicCount": 0,
+			"diffStats": {
+				"filesChanged": 1,
+				"insertions": 253,
+				"deletions": 209
+			}
 		}
 	],
 	"commitAliases": {
