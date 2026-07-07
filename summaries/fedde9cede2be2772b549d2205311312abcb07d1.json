@@ -1,0 +1,50 @@
+{
+	"version": 5,
+	"commitHash": "fedde9cede2be2772b549d2205311312abcb07d1",
+	"commitMessage": "Add perspective projection to 2.5D rendering",
+	"commitAuthor": "Joe Hart",
+	"commitDate": "2026-02-22T12:36:34-08:00",
+	"branch": "backfilled",
+	"generatedAt": "2026-07-07T15:19:20.680Z",
+	"commitType": "commit",
+	"commitSource": "cli",
+	"transcriptEntries": 0,
+	"conversationTurns": 0,
+	"llm": {
+		"model": "claude-sonnet-4-6",
+		"inputTokens": 8818,
+		"outputTokens": 789,
+		"cachedTokens": 0,
+		"apiLatencyMs": 21602,
+		"stopReason": null,
+		"source": "jolli-proxy"
+	},
+	"stats": {
+		"filesChanged": 3,
+		"insertions": 122,
+		"deletions": 48
+	},
+	"diffStats": {
+		"filesChanged": 3,
+		"insertions": 122,
+		"deletions": 48
+	},
+	"topics": [
+		{
+			"title": "Perspective projection added to isometric 2.5D game view",
+			"trigger": "The isometric rendering gave every tile the same apparent size regardless of its position in the grid, making the view feel flat. The developer wanted a perspective effect where tiles farther from the viewer appear smaller, giving the scene more visual depth.",
+			"response": "- Perspective projection was introduced in `src/main.ts` via a focal-length calculation derived from the grid's depth range and a tunable strength value. The `toIso()` function now applies a per-point scale factor based on each point's distance from the viewer, converging toward a vanishing point at the far edge of the grid. A new `getBlockHeight()` method applies the same per-tile scale to block extrusion height so tall blocks also shrink with distance.\n- The block face rendering in `drawBlock()` was generalized to handle arbitrary rotation angles. Rather than hard-coding left and right faces, the code now classifies all four side faces dynamically as front-facing or back-facing based on their screen-space edge direction, draws back faces first, then front faces on top with shading chosen by the face's outward normal. This makes the perspective effect visually correct at any rotation angle.\n- Canvas sizing was reworked to be viewport-responsive. A `getIsoWidth()` helper clamps the canvas width between a minimum and the available window width, a resize listener redraws on window resize, and the grid center is anchored to the canvas center so rotation pivots smoothly without the grid drifting off-screen.",
+			"decisions": "- **Focal length derived from depth range, not a fixed value**: Tying the focal length to the actual pixel depth of the grid at the current scale means the perspective effect stays visually consistent as the grid size or zoom changes. A fixed focal-length constant would have produced wildly different-looking distortion at different scales, requiring manual re-tuning whenever layout parameters changed.\n- **Perspective strength as a runtime-adjustable parameter**: Exposing perspective strength as a value the player can nudge with keyboard shortcuts (rather than baking in a single value) lets the effect be evaluated and tuned interactively without recompiling. The strength is clamped to a safe range so the projection never degenerates into an unusable extreme. This also doubles as a debug affordance during development.\n- **Rotation-invariant block height using a fixed formula**: Block height was previously computed from the angle-dependent basis vectors, which caused blocks to visually change height as the grid rotated. Switching to a formula based only on the scale factor and aspect ratio keeps block height stable across all rotation angles, avoiding a jarring size jump when the player spins the view.",
+			"filesAffected": [
+				"src/main.ts",
+				"src/style.css"
+			],
+			"category": "feature",
+			"importance": "major"
+		}
+	],
+	"backfilled": true,
+	"backfillMethod": "diff-only",
+	"treeHash": "7d4c7ff22b07682ba3ed01deee820548c36e673c",
+	"recap": "The isometric snake game gained a perspective projection system that makes tiles and blocks closer to the viewer appear larger than those farther away, giving the flat grid a genuine sense of depth. Players can now adjust the strength of this effect in real time using keyboard shortcuts, with the projection smoothly scaling from completely flat all the way to a pronounced vanishing-point perspective. Block heights shrink with distance alongside the tile footprints, keeping the 3D appearance consistent across the whole grid. The canvas also became responsive to window size, so the game fills the available screen width and redraws correctly when the browser is resized."
+}
