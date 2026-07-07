@@ -62,6 +62,22 @@ const IRON_SNAKE_FINAL_FRUIT_COLORS: Record<number, [string, string, string]> = 
   1: ['#f8fafc', '#e2e8f0', '#cbd5e1'], // white flash (final fruit)
 }
 
+// Rainbow Snake surprise (JOE-7): on a rare game the P1 snake renders as an
+// animated rainbow and a Mortal Kombat "FRIENDSHIP!"-style banner flashes.
+const RAINBOW_CHANCE = 0.01 // ~1 in 100 games
+const RAINBOW_HUE_SWEEP_DEG_PER_SEC = 60 // how fast the body's rainbow scrolls
+const RAINBOW_BANNER_MS = 3000 // banner hold before it fades out
+const RAINBOW_BANNER_FADE_MS = 600 // opacity fade duration (matches the CSS transition)
+
+// ?rainbow=1 forces the surprise on, ?rainbow=0 forces it off (deterministic
+// testing / manual verification); anything else leaves it to the random roll.
+function parseRainbowOverride(): boolean | null {
+  const p = new URLSearchParams(window.location.search).get('rainbow')
+  if (p === '1' || p === 'true') return true
+  if (p === '0' || p === 'false') return false
+  return null
+}
+
 function formatDuration(seconds: number): string {
   const total = Math.max(0, Math.floor(seconds))
   const m = Math.floor(total / 60)
@@ -215,6 +231,13 @@ class SnakeGame {
 
   // Menu demo (small rotating snake on the start screen)
   private menuDemo: MenuDemo | null = null
+
+  // Rainbow Snake surprise (JOE-7). Rolled once per game in startNewGame and held
+  // for the whole run; rainbowOverride (from ?rainbow=1|0) forces it for testing.
+  // rainbowBannerTimer drives the friendship banner's flash-then-fade auto-dismiss.
+  private rainbowSnake: boolean = false
+  private rainbowOverride: boolean | null = parseRainbowOverride()
+  private rainbowBannerTimer: number | null = null
 
   constructor() {
     this.canvas = document.getElementById('canvas') as HTMLCanvasElement
@@ -700,6 +723,15 @@ class SnakeGame {
 
   // === Main draw ===
 
+  // Three isometric face shades (top / right / left) for one Rainbow Snake
+  // segment. Hue = the segment's fraction along the body (index/len) plus a
+  // time-based phase so the rainbow scrolls; lightness steps down per face to
+  // match the existing 3D block shading (top lightest, left darkest).
+  private rainbowFaces(index: number, len: number, phaseDeg: number): [string, string, string] {
+    const h = (((index / Math.max(1, len)) * 360) + phaseDeg) % 360
+    return [`hsl(${h}, 90%, 62%)`, `hsl(${h}, 90%, 50%)`, `hsl(${h}, 90%, 40%)`]
+  }
+
   private draw() {
     const ctx = this.ctx
     ctx.fillStyle = '#1a1a1a'
@@ -711,13 +743,15 @@ class SnakeGame {
 
     // Collect all objects to render
     type DrawType = 'head' | 'body' | 'tail' | 'food' | 'head2' | 'body2' | 'tail2' | 'death'
-    const objects: { x: number; y: number; type: DrawType }[] = []
+    // seg/segLen carry the P1 segment's position along its body so the Rainbow
+    // Snake surprise can colour each segment by a hue derived from its index.
+    const objects: { x: number; y: number; type: DrawType; seg?: number; segLen?: number }[] = []
 
     const segType = (index: number, len: number): DrawType =>
       index === 0 ? 'head' : index === len - 1 ? 'tail' : 'body'
 
     this.snake.forEach((segment, index) => {
-      objects.push({ x: segment.x, y: segment.y, type: segType(index, this.snake.length) })
+      objects.push({ x: segment.x, y: segment.y, type: segType(index, this.snake.length), seg: index, segLen: this.snake.length })
     })
 
     if (this.isTwoSnakeMode()) {
@@ -768,6 +802,13 @@ class SnakeGame {
 
     const head1 = tint(['#4ade80', '#22c55e', '#16a34a'], HUNGER_HEAD_COLORS, f1)
     const body1 = tint(['#22c55e', '#16a34a', '#15803d'], HUNGER_BODY_COLORS, f1)
+
+    // Rainbow Snake surprise: colour each P1 segment by a hue that runs along the
+    // body and scrolls over time (animated by the existing per-frame redraw).
+    // Supersedes the P1 hunger tint; the starvation text banner still warns.
+    const rainbowPhase = this.rainbowSnake ? (performance.now() / 1000) * RAINBOW_HUE_SWEEP_DEG_PER_SEC : 0
+    const p1Faces = (obj: { seg?: number; segLen?: number }): [string, string, string] =>
+      this.rainbowFaces(obj.seg ?? 0, obj.segLen ?? 1, rainbowPhase)
     const head2 = tint(['#60a5fa', '#3b82f6', '#2563eb'], HUNGER_HEAD_COLORS, f2)
     const body2 = tint(['#3b82f6', '#2563eb', '#1d4ed8'], HUNGER_BODY_COLORS, f2)
 
@@ -780,13 +821,15 @@ class SnakeGame {
     for (const obj of objects) {
       switch (obj.type) {
         case 'head':
-          this.drawSnakeHead(obj.x, obj.y, head1, this.direction)
+          this.drawSnakeHead(obj.x, obj.y, this.rainbowSnake ? p1Faces(obj) : head1, this.direction)
           break
-        case 'body':
-          this.drawBlock(obj.x, obj.y, body1[0], body1[1], body1[2])
+        case 'body': {
+          const c = this.rainbowSnake ? p1Faces(obj) : body1
+          this.drawBlock(obj.x, obj.y, c[0], c[1], c[2])
           break
+        }
         case 'tail':
-          this.drawSnakeTail(obj.x, obj.y, body1, this.tailDirection(this.snake))
+          this.drawSnakeTail(obj.x, obj.y, this.rainbowSnake ? p1Faces(obj) : body1, this.tailDirection(this.snake))
           break
         case 'head2':
           this.drawSnakeHead(obj.x, obj.y, head2, this.direction2)
@@ -1232,6 +1275,10 @@ class SnakeGame {
     }
     this.botEverActive = this.botEnabled
 
+    // Roll the rare Rainbow Snake surprise (JOE-7) once per game; it holds for
+    // the whole run. rainbowOverride (from ?rainbow=…) wins so tests are stable.
+    this.rainbowSnake = this.rainbowOverride ?? (Math.random() < RAINBOW_CHANCE)
+
     // Iron Snake Mode uses a larger bounding box (so shapes have room) and carves
     // an irregular mask; classic mode keeps the full rectangle (mask = null).
     this.gridSize = this.ironSnakeMode
@@ -1306,6 +1353,8 @@ class SnakeGame {
     this.showScreen('game')
     document.getElementById('pause')!.classList.add('hidden')
     this.hideDeathBanner()
+    if (this.rainbowSnake) this.showRainbowBanner()
+    else this.hideRainbowBanner()
 
     if (this.gameLoop) clearInterval(this.gameLoop)
     this.gameLoop = null
@@ -2254,6 +2303,34 @@ class SnakeGame {
     document.getElementById('death-banner')!.classList.add('hidden')
   }
 
+  // Rainbow Snake surprise (JOE-7): flash the Mortal Kombat "FRIENDSHIP!"-style
+  // banner announcing the rare rainbow game, hold it, then fade it out. Called
+  // when a rainbow game starts; auto-dismisses so it never covers the board.
+  private showRainbowBanner() {
+    const el = document.getElementById('rainbow-banner')!
+    this.clearRainbowBannerTimer()
+    el.classList.remove('hidden', 'fading')
+    void el.offsetWidth // reflow so the pop-in animation restarts on a fresh game
+    this.rainbowBannerTimer = window.setTimeout(() => {
+      el.classList.add('fading') // CSS transitions opacity to 0
+      this.rainbowBannerTimer = window.setTimeout(() => this.hideRainbowBanner(), RAINBOW_BANNER_FADE_MS)
+    }, RAINBOW_BANNER_MS)
+  }
+
+  private hideRainbowBanner() {
+    this.clearRainbowBannerTimer()
+    const el = document.getElementById('rainbow-banner')!
+    el.classList.add('hidden')
+    el.classList.remove('fading')
+  }
+
+  private clearRainbowBannerTimer() {
+    if (this.rainbowBannerTimer !== null) {
+      clearTimeout(this.rainbowBannerTimer)
+      this.rainbowBannerTimer = null
+    }
+  }
+
   private updateModeUI() {
     const isTwoPlayer = this.isTwoSnakeMode()
 
@@ -2571,6 +2648,8 @@ class SnakeGame {
       else this.menuDemo.stop()
     }
     if (screenId !== 'menu') this.closeAllExpandPanels()
+    // Never let the rainbow banner linger past the game view (e.g. quick deaths).
+    if (screenId !== 'game') this.hideRainbowBanner()
   }
 
   private getHighScore(): number {
