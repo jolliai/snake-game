@@ -583,6 +583,41 @@
 				}
 			],
 			"lastUpdatedAt": "2026-07-07T15:25:41.149Z"
+		},
+		{
+			"stableSlug": "leaderboards",
+			"title": "Per-Mode Leaderboards with Stats",
+			"summary": "Persistent per-mode leaderboards with name entry, stat tracking, and bot-assisted run exclusion across single-player, two-player, and bot-vs-bot modes.",
+			"relatedBranches": [
+				"backfilled"
+			],
+			"sourceRefs": [
+				{
+					"type": "summary",
+					"id": "e6746a45948e34a5562e0f79b61ff7593573433f",
+					"timestamp": "2026-05-12T12:05:19-07:00",
+					"branch": "backfilled"
+				},
+				{
+					"type": "summary",
+					"id": "93a06b13e6ca82df430151e3dfd807fdac3f75bd",
+					"timestamp": "2026-05-12T12:07:03-07:00",
+					"branch": "backfilled"
+				},
+				{
+					"type": "summary",
+					"id": "b227c9ee2a5d1df574a7ca81d9bdfde215dae09c",
+					"timestamp": "2026-05-12T16:56:55-07:00",
+					"branch": "backfilled"
+				},
+				{
+					"type": "summary",
+					"id": "533589d72ae5461b23779d49e05fb7dc0e4e1a31",
+					"timestamp": "2026-05-12T16:57:36-07:00",
+					"branch": "backfilled"
+				}
+			],
+			"lastUpdatedAt": "2026-07-07T15:25:41.149Z"
 		}
 	]
 }
