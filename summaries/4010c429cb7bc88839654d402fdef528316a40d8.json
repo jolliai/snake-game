@@ -1,0 +1,50 @@
+{
+	"version": 5,
+	"commitHash": "4010c429cb7bc88839654d402fdef528316a40d8",
+	"commitMessage": "Revert \"Reapply \"Add R key to reset game from any state\"\"",
+	"commitAuthor": "Joe Hart",
+	"commitDate": "2026-02-12T20:00:37-08:00",
+	"branch": "backfilled",
+	"generatedAt": "2026-07-07T15:23:13.036Z",
+	"commitType": "commit",
+	"commitSource": "cli",
+	"transcriptEntries": 0,
+	"conversationTurns": 0,
+	"llm": {
+		"model": "claude-sonnet-4-6",
+		"inputTokens": 5237,
+		"outputTokens": 349,
+		"cachedTokens": 0,
+		"apiLatencyMs": 11607,
+		"stopReason": null,
+		"source": "jolli-proxy"
+	},
+	"stats": {
+		"filesChanged": 2,
+		"insertions": 1,
+		"deletions": 7
+	},
+	"diffStats": {
+		"filesChanged": 2,
+		"insertions": 1,
+		"deletions": 7
+	},
+	"topics": [
+		{
+			"title": "Remove keyboard reset shortcut and revert related UI changes",
+			"trigger": "A previously added feature allowing players to reset the snake game at any time by pressing the R key was reverted, along with its associated on-screen instructions and a related UI fix.",
+			"response": "- The R key handler was removed from `src/main.ts`, eliminating the ability to reset the game from any state via keyboard shortcut.\n- The on-screen control hint in `index.html` was updated to remove the \"Press R to Reset\" instruction, restoring the original controls text.\n- A line in `src/main.ts` that hid the pause screen overlay when starting a new game was also removed as part of the revert.",
+			"decisions": "The entire feature was reverted rather than patched. This suggests the reset-from-any-state behavior introduced a problem significant enough to warrant a clean rollback rather than a targeted fix, preserving the prior stable state while the issue is reconsidered.",
+			"filesAffected": [
+				"src/main.ts",
+				"index.html"
+			],
+			"category": "bugfix",
+			"importance": "major"
+		}
+	],
+	"backfilled": true,
+	"backfillMethod": "diff-only",
+	"treeHash": "4d88bccdb8065a7588b9b8b3380a80368fb9e42a",
+	"recap": "The ability to reset the snake game at any time by pressing the R key was removed. This reverts a recently added feature, restoring the game to its prior behavior where no keyboard shortcut existed for resetting mid-game. The on-screen control instructions no longer mention a reset key, and the game's new-game flow returns to its previous state."
+}
