@@ -878,9 +878,6 @@
 			]
 		},
 		{
-			"commitHash": "a438a7bb2831cd2ae81767014116e26f4528b75e"
-		},
-		{
 			"commitHash": "33d73c531daf7232a4dfcd80eb14a2f75bf90f3b",
 			"recap": "The game gained a full autoplay system with three distinct bot personalities: Survival, Hunter, and Explorer. Each bot evaluates every possible move using a scoring formula tuned to a different risk appetite -- Survival maximizes open space, Hunter chases food aggressively, and Explorer favors wide lanes away from walls. Players can switch profiles at any time from a dropdown on both the menu and the in-game overlay, toggle the bot on and off with a button or keyboard shortcut, and launch straight into a bot demo from the main menu. Manual direction input is disabled while the bot is active to prevent conflicting control.\n\nWhile the bot plays, the camera slowly rotates around the board, giving the demo mode a more dynamic feel. If the player manually adjusts the camera angle, the auto-rotation pauses for a few seconds before resuming, so a manual reposition is respected without requiring any extra action to restore the animation.\n\n---",
 			"topics": [
@@ -1410,6 +1407,9 @@
 					]
 				}
 			]
+		},
+		{
+			"commitHash": "a438a7bb2831cd2ae81767014116e26f4528b75e"
 		}
 	]
 }
