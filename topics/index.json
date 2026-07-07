@@ -103,6 +103,37 @@
 				}
 			],
 			"lastUpdatedAt": "2026-07-07T02:20:01.705Z"
+		},
+		{
+			"stableSlug": "project-docs",
+			"title": "Project Documentation & README",
+			"summary": "README.md is the single source of truth for the project; CLAUDE.md provides session guidance for AI agents working in the repo.",
+			"relatedBranches": [
+				"docs/cleanup",
+				"docs/claude-md-jolli-memory",
+				"josephhart/joe-7-add-rainbow-colored-snake-suprise"
+			],
+			"sourceRefs": [
+				{
+					"type": "summary",
+					"id": "4b0f9fd779a7e8cbdc3dd702d41ad4f55eb2836a",
+					"timestamp": "2026-07-01T18:53:35.000Z",
+					"branch": "docs/cleanup"
+				},
+				{
+					"type": "summary",
+					"id": "7fdbb7aefeb1311c20012868220c2b11de0597fd",
+					"timestamp": "2026-07-01T20:46:17-07:00",
+					"branch": "docs/claude-md-jolli-memory"
+				},
+				{
+					"type": "summary",
+					"id": "ea18bf87e66146aebefae37044f63b51e497e07a",
+					"timestamp": "2026-07-07T02:19:54.000Z",
+					"branch": "josephhart/joe-7-add-rainbow-colored-snake-suprise"
+				}
+			],
+			"lastUpdatedAt": "2026-07-07T02:20:01.705Z"
 		}
 	]
 }
