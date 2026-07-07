@@ -1,0 +1,36 @@
+{
+	"version": 5,
+	"commitHash": "1a475b3c48552e11049de3f1aa7f17e007eb314c",
+	"commitMessage": "Add color blind mode to future plans",
+	"commitAuthor": "Joe Hart",
+	"commitDate": "2026-02-13T10:04:11-08:00",
+	"branch": "backfilled",
+	"generatedAt": "2026-07-07T15:20:04.570Z",
+	"commitType": "commit",
+	"commitSource": "cli",
+	"transcriptEntries": 0,
+	"conversationTurns": 0,
+	"llm": {
+		"model": "claude-sonnet-4-6",
+		"inputTokens": 4847,
+		"outputTokens": 8,
+		"cachedTokens": 0,
+		"apiLatencyMs": 1866,
+		"stopReason": null,
+		"source": "jolli-proxy"
+	},
+	"stats": {
+		"filesChanged": 1,
+		"insertions": 1,
+		"deletions": 0
+	},
+	"diffStats": {
+		"filesChanged": 1,
+		"insertions": 1,
+		"deletions": 0
+	},
+	"topics": [],
+	"backfilled": true,
+	"backfillMethod": "diff-only",
+	"treeHash": "c706c3edefe40a3d7a5a654fc3a9fce876af2db5"
+}
