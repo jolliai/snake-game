@@ -980,6 +980,22 @@
 				"insertions": 44,
 				"deletions": 0
 			}
+		},
+		{
+			"commitHash": "518efbd94bbd030dd10fc2007a2f26a80b2cc5c0",
+			"parentCommitHash": null,
+			"treeHash": "21f34e1aeeba6f5c8c53b0c8d25b019077e3ba6c",
+			"commitType": "commit",
+			"commitMessage": "Add Claude Code local settings to .gitignore",
+			"commitDate": "2026-02-13T00:57:47-08:00",
+			"branch": "backfilled",
+			"generatedAt": "2026-07-07T15:20:24.884Z",
+			"topicCount": 0,
+			"diffStats": {
+				"filesChanged": 1,
+				"insertions": 3,
+				"deletions": 0
+			}
 		}
 	],
 	"commitAliases": {
