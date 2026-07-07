@@ -513,24 +513,6 @@
 			]
 		},
 		{
-			"commitHash": "e6746a45948e34a5562e0f79b61ff7593573433f",
-			"recap": "The game now tracks and persists scores across sessions through a full leaderboard system. Three separate rankings — one each for single-player, two-player, and bot-versus-bot — are accessible from the main menu and from the game-over screen. Each leaderboard holds the top ten entries, sorted by score and broken ties by longest snake length and survival time.\n\nAt the end of every game, players see a stat summary showing their longest snake and how long they survived. When a score is good enough to crack the top ten, a name-entry prompt appears so the player can claim their rank; the game remembers the last name used to make repeat entries faster. Bot-versus-bot results are recorded automatically under each bot's name with no prompt needed. After saving, a confirmation line tells the player exactly where they landed on the board.",
-			"topics": [
-				{
-					"title": "Per-mode leaderboards with name entry and stat tracking",
-					"decisions": "- **Separate leaderboards per mode rather than one unified table**: Mixing single-player scores with two-player or bot scores would make the rankings meaningless — a bot-versus-bot run produces scores under completely different conditions than a solo game. Keeping three independent boards lets each mode's rankings reflect comparable play.\n- **Qualify-before-prompting rather than always asking for a name**: Interrupting every player with a name prompt regardless of their score would feel annoying and devalue the leaderboard. Checking eligibility first means only genuinely competitive runs trigger the prompt, which keeps the interaction feel rewarding rather than routine.\n- **Auto-record bot-versus-bot results with no prompt**: Bot runs are deterministic and unattended — there is no human present to type a name. Recording both bots automatically (using their display names) keeps the bot leaderboard populated without requiring any interaction, while still letting players browse those results for comparison.",
-					"category": "feature",
-					"importance": "major",
-					"filesAffected": [
-						"src/leaderboard.ts",
-						"src/main.ts",
-						"index.html",
-						"src/style.css"
-					]
-				}
-			]
-		},
-		{
 			"commitHash": "a2b18e9c96f0f741483ddb27329c1952b1023f1d",
 			"recap": "A new bot called Sweeper was added to the game's roster of AI opponents. It navigates the grid in a back-and-forth lawnmower pattern, sweeping each row horizontally and stepping down to the next row at the end, aiming for full grid coverage rather than purely chasing food or reacting to other snakes. The bot balances this pattern against survival: it continuously checks whether it can still reach its own tail and how much open space remains, and will abandon the sweep path when following it would put it in danger. Players can now select Sweeper alongside the existing ten bots.",
 			"topics": [
@@ -1406,6 +1388,24 @@
 					"filesAffected": [
 						"index.html",
 						"src/main.ts",
+						"src/style.css"
+					]
+				}
+			]
+		},
+		{
+			"commitHash": "e6746a45948e34a5562e0f79b61ff7593573433f",
+			"recap": "The game now tracks and persists scores across sessions through a full leaderboard system. Three separate rankings — one each for single-player, two-player, and bot-versus-bot — are accessible from the main menu and from the game-over screen. Each leaderboard holds the top ten entries, sorted by score and broken ties by longest snake length and survival time.\n\nAt the end of every game, players see a stat summary showing their longest snake and how long they survived. When a score is good enough to crack the top ten, a name-entry prompt appears so the player can claim their rank; the game remembers the last name used to make repeat entries faster. Bot-versus-bot results are recorded automatically under each bot's name with no prompt needed. After saving, a confirmation line tells the player exactly where they landed on the board.",
+			"topics": [
+				{
+					"title": "Per-mode leaderboards with name entry and stat tracking",
+					"decisions": "- **Separate leaderboards per mode rather than one unified table**: Mixing single-player scores with two-player or bot scores would make the rankings meaningless — a bot-versus-bot run produces scores under completely different conditions than a solo game. Keeping three independent boards lets each mode's rankings reflect comparable play.\n- **Qualify-before-prompting rather than always asking for a name**: Interrupting every player with a name prompt regardless of their score would feel annoying and devalue the leaderboard. Checking eligibility first means only genuinely competitive runs trigger the prompt, which keeps the interaction feel rewarding rather than routine.\n- **Auto-record bot-versus-bot results with no prompt**: Bot runs are deterministic and unattended — there is no human present to type a name. Recording both bots automatically (using their display names) keeps the bot leaderboard populated without requiring any interaction, while still letting players browse those results for comparison.",
+					"category": "feature",
+					"importance": "major",
+					"filesAffected": [
+						"src/leaderboard.ts",
+						"src/main.ts",
+						"index.html",
 						"src/style.css"
 					]
 				}
