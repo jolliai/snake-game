@@ -1,0 +1,96 @@
+{
+	"schemaVersion": 1,
+	"stableSlug": "bot-strategies",
+	"title": "Bot Strategies: Coiler, Edge Runner, Chaser, Ambusher, Nomad, Spiral",
+	"content": "# Bot Strategies: Coiler, Edge Runner, Chaser, Ambusher, Nomad, Spiral\n\nSix bot personalities have been added to the snake game beyond the original survival/hunter/explorer roster. Each is implemented as a separate file in `src/bots/` and registered in `src/bots/index.ts` via the `AVAILABLE_BOTS` array.\n\nAll six bots share a common survival floor: moves that leave the snake unable to reach its own tail are scored at a large negative value (with only a small partial credit for reachable open area), ensuring no positional or food-seeking bonus can override self-preservation.\n\n---\n\n## Coiler (`src/bots/coiler-bot.ts`)\n\n**Behavior:** Hugs its own body to stay compact and methodical. Rather than chasing food aggressively or maximizing open space, it rewards moves where the head ends up adjacent to its own body segments.\n\n**Scoring weights:**\n- Body-adjacency bonus: **+3,000 per adjacent body segment**\n- Tail reachability: **+80,000** (dominant survival signal; −100,000 if unreachable)\n- Food proximity and path-to-food: intermediate weights\n- The body-adjacency bonus is high enough to meaningfully influence direction but well below the tail-reachability penalty, so coiling never overrides survival.\n\n**Trade-off:** The snake may take longer paths to food, but the high tail-reachability weight prevents self-entrapment.\n\n---\n\n## Edge Runner (`src/bots/edge-runner-bot.ts`)\n\n**Behavior:** Patrols the perimeter of the board, only venturing inward to collect food near the walls.\n\n**Wall-hugging logic:** The wall-proximity bonus is conditionally applied only when food is within the \"edge zone.\" The edge zone is **not a fixed distance** — it is dynamically computed as **20% of the current grid size** (floored), so the bot's spatial awareness scales consistently across different board sizes.\n\n**Scoring priorities (in order):**\n1. Tail reachability (dominant constraint)\n2. Wall-hugging bonus (only when food is within the edge zone)\n3. Food proximity\n\n**Trade-off:** When food spawns centrally, the wall bonus is suppressed and the bot pursues food normally, preventing it from dying by ignoring centrally-placed food.\n\n---\n\n## Chaser (`src/bots/chaser-bot.ts`)\n\n**Behavior:** Aggressively pursues food along the shortest available path. Falls back to tail-chasing when the direct food path would be unsafe.\n\n**Scoring system:**\n- Primary food reward: **BFS path length** to food (not Manhattan distance — this correctly avoids geometrically close but navigationally blocked moves)\n- Manhattan distance: kept as a tie-breaker only\n- Reachable open area: factored in\n- Small forward-momentum bonus\n\n**Trap detection (hard branch, not blended):** If the snake's tail becomes unreachable after a simulated move, the entire scoring regime switches to survival mode — maximizing open space and closing distance to the tail. This avoids the failure mode where a weighted blend still nudges the snake into a dead end.\n\n**Fallback:** Tail-chasing (drifting toward the snake's own tail) keeps the snake in a loop-friendly posture that preserves future options.\n\n---\n\n## Ambusher (`src/bots/ambusher-bot.ts`)\n\n**Behavior:** Holds position near the center of the board and only commits to aggressive food pursuit when food spawns within a configurable strike radius.\n\n**Two-phase strategy:**\n- **Within strike range:** Pursues food via shortest path length scoring.\n- **Outside strike range:** Drifts toward food while penalizing distance from the grid center, keeping the snake mobile without abandoning its ambush position.\n\n**Strike threshold:** Scales dynamically with grid size — **30% of the grid dimension, floored at a minimum of 3 tiles**. A fixed tile count would make the bot too passive on large grids or recklessly aggressive on small ones.\n\n**Survival gate:** Any move that cuts off tail reachability is scored at **−200,000** (with a small reachable-area bonus to break ties), effectively eliminating it from consideration before any positional scoring applies.\n\n---\n\n## Nomad (`src/bots/nomad-bot.ts`)\n\n**Behavior:** Actively steers away from its own body trail to seek out fresh, uncrowded territory. Wanders and explores rather than clustering or circling.\n\n**Core mechanic — trail avoidance:** Moves near the snake's own body segments are penalized using a **proximity-weighted penalty** — closer segments incur a heavier cost. This creates a gradient that nudges the snake outward into unexplored space without requiring explicit path history tracking.\n\n**Scoring balance:**\n- Trail-avoidance penalty: dominant directional signal\n- Reachable open area: rewarded\n- Food pursuit: included but weighted **lower** than in hunter-style bots — the bot won't ignore food but won't abandon its wandering character to chase it aggressively\n- Small forward-momentum bonus: discourages unnecessary turning\n\n**Safety floor:** Moves that break tail reachability are scored at a large negative value (with a small reachable-area offset). Unlike some bots, this is a heavy penalty rather than an absolute cutoff, allowing the nomad to take calculated risks in open space — a stricter hard cutoff would conflict with the exploratory playstyle.\n\n---\n\n## Spiral (`src/bots/spiral-bot.ts`)\n\n**Behavior:** Sweeps the grid in clockwise spiral patterns, extending each leg as far as possible before turning inward.\n\n**Scoring priorities:**\n- **Straight movement: +1,200** (highest directional bonus — extends each spiral leg)\n- **Clockwise turn: +800** (second priority — initiates the inward spiral)\n- **Counter-clockwise turn: no bonus** (naturally deprioritized)\n- **Wall-proximity bonus:** When the head is within one cell of a wall, an additional bonus is applied to the clockwise turn to reinforce inward spiraling.\n\n**Straight-first rationale:** Scoring straight higher than clockwise produces wide, grid-sweeping loops. A pure clockwise-always rule would produce tight, inefficient circles.\n\n**Food pursuit:** Included but weighted modestly — the bot will eat opportunistically without abandoning the spiral pattern to chase food aggressively. This keeps it distinguishable from the explorer and hunter bots.\n\n**Safety:** Tail-reachability is enforced as a hard gate (large negative score for unsafe moves), preventing the spiral from painting itself into a corner.\n\n---\n\n## Registration\n\nAll six bots are imported and registered in `src/bots/index.ts` in the `AVAILABLE_BOTS` array. The current order (after all merges) is: existing bots → Coiler → Edge Runner → Ambusher → Chaser → Nomad → Spiral.",
+	"relatedBranches": [
+		"backfilled"
+	],
+	"sourceRefs": [
+		{
+			"type": "summary",
+			"id": "be331716af40275ebae0cbc79c3e7eea33ebc5ed",
+			"timestamp": "2026-04-06T16:59:09-07:00",
+			"branch": "backfilled"
+		},
+		{
+			"type": "summary",
+			"id": "127c160181386eb69dc714c174265e825cc1843e",
+			"timestamp": "2026-04-06T17:08:21-07:00",
+			"branch": "backfilled"
+		},
+		{
+			"type": "summary",
+			"id": "484b35cd8f271cb38ce42c09807a75e7bb977b34",
+			"timestamp": "2026-04-06T17:18:21-07:00",
+			"branch": "backfilled"
+		},
+		{
+			"type": "summary",
+			"id": "a529ccd969f51fe293f5307a5aef58ee30118e63",
+			"timestamp": "2026-04-06T17:24:27-07:00",
+			"branch": "backfilled"
+		},
+		{
+			"type": "summary",
+			"id": "21f4344d6c4d9f4fa625e821c5a120afd77bf897",
+			"timestamp": "2026-04-06T17:28:28-07:00",
+			"branch": "backfilled"
+		},
+		{
+			"type": "summary",
+			"id": "ae5a1443a819914445ebe146df903227604dbb60",
+			"timestamp": "2026-04-06T17:29:18-07:00",
+			"branch": "backfilled"
+		},
+		{
+			"type": "summary",
+			"id": "03b468b2985ea09b7a6dc6900e8233cba8bb39f9",
+			"timestamp": "2026-04-06T17:30:57-07:00",
+			"branch": "backfilled"
+		},
+		{
+			"type": "summary",
+			"id": "acc4d1e667f55c342b67c207bf993505f8900eec",
+			"timestamp": "2026-04-06T17:34:32-07:00",
+			"branch": "backfilled"
+		},
+		{
+			"type": "summary",
+			"id": "9b6aec4fa8a2f879402cbbb2db8b72db7ad123bf",
+			"timestamp": "2026-04-06T18:08:49-07:00",
+			"branch": "backfilled"
+		},
+		{
+			"type": "summary",
+			"id": "3d4d62aa1db87a2f15dc26f5d3747d757a79471b",
+			"timestamp": "2026-04-06T18:10:31-07:00",
+			"branch": "backfilled"
+		},
+		{
+			"type": "summary",
+			"id": "0e9e869a0350b28403a23c31c20eccba71133b03",
+			"timestamp": "2026-04-06T18:18:35-07:00",
+			"branch": "backfilled"
+		},
+		{
+			"type": "summary",
+			"id": "572e53700a554fa72b31a06688e05e0f8da928bc",
+			"timestamp": "2026-04-06T18:30:37-07:00",
+			"branch": "backfilled"
+		},
+		{
+			"type": "summary",
+			"id": "c1b50456bf124504751fdff785f55b6bca5d50b7",
+			"timestamp": "2026-04-06T18:32:12-07:00",
+			"branch": "backfilled"
+		},
+		{
+			"type": "summary",
+			"id": "4585346b57a553b0e7c9046f375b0bb9dbc4be06",
+			"timestamp": "2026-04-06T18:32:23-07:00",
+			"branch": "backfilled"
+		}
+	],
+	"lastUpdatedAt": "2026-07-07T15:24:20.601Z"
+}
