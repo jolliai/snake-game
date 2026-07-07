@@ -1049,6 +1049,22 @@
 					]
 				}
 			]
+		},
+		{
+			"commitHash": "8915b6cd5a7682d1007fb7e760be1f53131947be",
+			"recap": "The snake game's visual presentation was completely rebuilt with an isometric 2.5D perspective. The flat grid of colored squares is gone; every snake segment and food item now appears as a shaded three-dimensional block sitting on a diamond-shaped board, with distinct top and side faces that give the impression of depth and lighting. Shadows are painted beneath each block before the blocks themselves are drawn, and objects are layered back-to-front so pieces closer to the viewer always appear on top.\n\nThe board itself scales dynamically to fit the screen at any grid size, and players can rotate the viewing angle live using the Q and E keys, spinning the diamond in 5° steps. The canvas automatically resizes to frame the projected board correctly at whatever angle is chosen.",
+			"topics": [
+				{
+					"title": "Snake game upgraded to isometric 2.5D perspective rendering",
+					"decisions": "- **Dynamic canvas sizing over fixed dimensions**: The canvas is now sized to exactly fit the projected isometric diamond rather than using a fixed pixel constant. This keeps the layout correct at any grid size or rotation angle without manual tuning, at the cost of the canvas dimensions changing whenever the grid or angle changes.\n- **Painter's algorithm for depth sorting**: Objects are sorted by the sum of their grid coordinates before drawing, which approximates correct occlusion in isometric views without a full depth buffer. This is simple and fast for the small object counts in a snake game, though it would break down for overlapping objects at the same depth — an acceptable trade-off here.\n- **Configurable rotation angle with live keyboard controls**: Rather than locking the isometric angle, Q and E keys let the player rotate the view in 5° increments at any time. This adds interactivity and lets the angle be tuned visually at runtime, deferring the need to pick a single \"correct\" value up front.",
+					"category": "feature",
+					"importance": "major",
+					"filesAffected": [
+						"src/main.ts",
+						"src/style.css"
+					]
+				}
+			]
 		}
 	]
 }

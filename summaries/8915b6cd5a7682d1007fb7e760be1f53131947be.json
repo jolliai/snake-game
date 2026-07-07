@@ -1,0 +1,50 @@
+{
+	"version": 5,
+	"commitHash": "8915b6cd5a7682d1007fb7e760be1f53131947be",
+	"commitMessage": "Merge pull request #5 from jeverest/isometric-2.5d-rendering",
+	"commitAuthor": "Joe Hart",
+	"commitDate": "2026-02-22T09:28:07-08:00",
+	"branch": "backfilled",
+	"generatedAt": "2026-07-07T15:19:41.355Z",
+	"commitType": "commit",
+	"commitSource": "cli",
+	"transcriptEntries": 0,
+	"conversationTurns": 0,
+	"llm": {
+		"model": "claude-sonnet-4-6",
+		"inputTokens": 9514,
+		"outputTokens": 754,
+		"cachedTokens": 0,
+		"apiLatencyMs": 20444,
+		"stopReason": null,
+		"source": "jolli-proxy"
+	},
+	"stats": {
+		"filesChanged": 2,
+		"insertions": 254,
+		"deletions": 45
+	},
+	"diffStats": {
+		"filesChanged": 2,
+		"insertions": 254,
+		"deletions": 45
+	},
+	"topics": [
+		{
+			"title": "Snake game upgraded to isometric 2.5D perspective rendering",
+			"trigger": "The flat top-down grid view of the snake game needed a visual overhaul to give it depth and a more engaging appearance, replacing the plain 2D squares with a three-dimensional isometric look.",
+			"response": "- The entire rendering pipeline in `src/main.ts` was replaced. The old flat `draw()` method, which painted simple filled rectangles on a fixed 300×300 canvas, was removed and replaced with an isometric projection system. New methods `drawGroundPlane()`, `drawGridLines()`, `drawGroundBorder()`, `drawBlockShadow()`, and `drawBlock()` compose the scene layer by layer, with a painter's-algorithm sort ensuring back-to-front draw order for correct depth appearance.\n- A coordinate transformation system was introduced via `toIso()` and a precomputed `isoCache` grid. Basis vectors derived from a configurable angle and perspective ratio convert every grid position into canvas screen coordinates. Canvas dimensions are computed dynamically from the projected diamond extents plus padding, replacing the hardcoded `CANVAS_SIZE` constant.\n- Each snake segment and food item is now rendered as a 3D block with a top face and two visible side faces, each shaded a distinct color to simulate lighting. Shadows are drawn beneath every block in a separate pass before the blocks themselves are painted.",
+			"decisions": "- **Dynamic canvas sizing over fixed dimensions**: The canvas is now sized to exactly fit the projected isometric diamond rather than using a fixed pixel constant. This keeps the layout correct at any grid size or rotation angle without manual tuning, at the cost of the canvas dimensions changing whenever the grid or angle changes.\n- **Painter's algorithm for depth sorting**: Objects are sorted by the sum of their grid coordinates before drawing, which approximates correct occlusion in isometric views without a full depth buffer. This is simple and fast for the small object counts in a snake game, though it would break down for overlapping objects at the same depth — an acceptable trade-off here.\n- **Configurable rotation angle with live keyboard controls**: Rather than locking the isometric angle, Q and E keys let the player rotate the view in 5° increments at any time. This adds interactivity and lets the angle be tuned visually at runtime, deferring the need to pick a single \"correct\" value up front.",
+			"filesAffected": [
+				"src/main.ts",
+				"src/style.css"
+			],
+			"category": "feature",
+			"importance": "major"
+		}
+	],
+	"backfilled": true,
+	"backfillMethod": "diff-only",
+	"treeHash": "4ef728b37be1e16eda7ff7b02fd7d43b70691e3b",
+	"recap": "The snake game's visual presentation was completely rebuilt with an isometric 2.5D perspective. The flat grid of colored squares is gone; every snake segment and food item now appears as a shaded three-dimensional block sitting on a diamond-shaped board, with distinct top and side faces that give the impression of depth and lighting. Shadows are painted beneath each block before the blocks themselves are drawn, and objects are layered back-to-front so pieces closer to the viewer always appear on top.\n\nThe board itself scales dynamically to fit the screen at any grid size, and players can rotate the viewing angle live using the Q and E keys, spinning the diamond in 5° steps. The canvas automatically resizes to frame the projected board correctly at whatever angle is chosen."
+}
