@@ -1,0 +1,50 @@
+{
+	"version": 5,
+	"commitHash": "0e9e869a0350b28403a23c31c20eccba71133b03",
+	"commitMessage": "Merge pull request #10 from jeverest/add-nomad-bot",
+	"commitAuthor": "Joe Hart",
+	"commitDate": "2026-04-06T18:18:35-07:00",
+	"branch": "backfilled",
+	"generatedAt": "2026-07-07T15:13:55.466Z",
+	"commitType": "commit",
+	"commitSource": "cli",
+	"transcriptEntries": 0,
+	"conversationTurns": 0,
+	"llm": {
+		"model": "claude-sonnet-4-6",
+		"inputTokens": 5990,
+		"outputTokens": 569,
+		"cachedTokens": 0,
+		"apiLatencyMs": 15035,
+		"stopReason": null,
+		"source": "jolli-proxy"
+	},
+	"stats": {
+		"filesChanged": 2,
+		"insertions": 76,
+		"deletions": 1
+	},
+	"diffStats": {
+		"filesChanged": 2,
+		"insertions": 76,
+		"deletions": 1
+	},
+	"topics": [
+		{
+			"title": "New Nomad bot added that avoids its own trail to explore open space",
+			"trigger": "The game needed a new snake bot with a distinct movement personality — one that actively steers away from its own body to seek out fresh, open territory rather than circling or clustering near itself.",
+			"response": "- Created `src/bots/nomad-bot.ts` implementing the `SnakeBot` interface. The core scoring function penalizes moves toward nearby body segments (weighted by proximity) and rewards reachable open area, while still pursuing food via pathfinding. A small forward-momentum bonus discourages unnecessary turning.\n- Registered the new bot in `src/bots/index.ts` by importing it and appending it to the `AVAILABLE_BOTS` array, making it selectable alongside the existing seven bots.",
+			"decisions": "- **Trail-avoidance as the defining behavior**: The bot's personality is built around penalizing proximity to its own body segments rather than, say, maximizing territory control or aggressive food pursuit. Closer segments carry a heavier penalty, creating a gradient that nudges the snake outward into unexplored space. This produces emergent wandering behavior without requiring explicit path planning to \"new\" areas.\n- **Food pursuit kept moderate**: Unlike the hunter bot, the nomad scores food paths positively but with lower weight, and applies a smaller distance-to-food penalty. This keeps the bot functional (it won't ignore food) while ensuring the trail-avoidance and open-space rewards dominate its movement decisions in normal play.\n- **Safety floor preserved**: Moves that break the tail-reachability constraint are scored at a large negative value (with a small reachable-area offset), ensuring the nomad still avoids self-trapping even while wandering. This reuses the existing position-analysis helpers rather than implementing a separate safety check.",
+			"filesAffected": [
+				"src/bots/nomad-bot.ts",
+				"src/bots/index.ts"
+			],
+			"category": "feature",
+			"importance": "major"
+		}
+	],
+	"backfilled": true,
+	"backfillMethod": "diff-only",
+	"treeHash": "ea2f333315bfa9357a03b3be56541aaa2f6c7b7c",
+	"recap": "A new playable snake bot called Nomad was added to the game. Unlike the existing bots, the Nomad actively steers away from its own body trail, favoring open, unexplored areas of the board. It still picks up food along the way, but exploration takes priority over aggressive food-chasing. The Nomad is now available for selection alongside the seven previously existing bots."
+}
