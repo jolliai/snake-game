@@ -1,10 +1,11 @@
 {
 	"schemaVersion": 1,
 	"stableSlug": "dev-tooling-config",
-	"title": "Developer Tooling & Config (gitignore, Jolli)",
-	"content": "## Overview\n\nThe project's `.gitignore` is configured to exclude the `.jolli` directory. This ensures that any files generated or cached by the Jolli tooling locally are not tracked in version control.\n\n## `.jolli` Directory\n\nThe `.jolli` directory is a local artifact produced by the Jolli tool. It is intentionally excluded from the repository via `.gitignore` to avoid committing machine-specific or generated state.\n\n### Rationale\n\n- Keeps the repository clean of tool-generated noise.\n- Prevents accidental commits of local Jolli state that would not be meaningful or portable across developer environments.",
+	"title": "Developer Tooling & Config (gitignore, Jolli, Claude)",
+	"content": "## Overview\n\nThe project's `.gitignore` is configured to exclude several tool-specific local directories from version control: `.jolli/` (Jolli tool artifacts) and `.claude/` (Claude Code local settings).\n\n## `.jolli` Directory\n\nThe `.jolli` directory is a local artifact produced by the Jolli tool. It is intentionally excluded from the repository via `.gitignore` to avoid committing machine-specific or generated state.\n\n### Rationale\n\n- Keeps the repository clean of tool-generated noise.\n- Prevents accidental commits of local Jolli state that would not be meaningful or portable across developer environments.\n\n## `.claude` Directory\n\nThe entire `.claude/` directory is excluded from the repository via `.gitignore`. This directory contains Claude Code local settings, which are machine-specific and not intended to be shared or tracked in version control.\n\n### Rationale\n\n- Claude Code local settings are developer-environment-specific and not portable.\n- Excluding the full directory (rather than individual files within it) ensures all current and future Claude Code local artifacts remain untracked.",
 	"relatedBranches": [
-		"chore/gitignore-jolli"
+		"chore/gitignore-jolli",
+		"backfilled"
 	],
 	"sourceRefs": [
 		{
@@ -12,7 +13,19 @@
 			"id": "31d93c3f670b49f2eb5583d128ce61bdc2a98299",
 			"timestamp": "2026-07-01T18:45:04.000Z",
 			"branch": "chore/gitignore-jolli"
+		},
+		{
+			"type": "summary",
+			"id": "518efbd94bbd030dd10fc2007a2f26a80b2cc5c0",
+			"timestamp": "2026-02-13T00:57:47-08:00",
+			"branch": "backfilled"
+		},
+		{
+			"type": "summary",
+			"id": "a438a7bb2831cd2ae81767014116e26f4528b75e",
+			"timestamp": "2026-03-18T08:06:51-07:00",
+			"branch": "backfilled"
 		}
 	],
-	"lastUpdatedAt": "2026-07-07T02:20:01.705Z"
+	"lastUpdatedAt": "2026-07-07T15:24:20.601Z"
 }
