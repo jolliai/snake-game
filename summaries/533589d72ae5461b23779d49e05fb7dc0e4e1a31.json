@@ -1,0 +1,50 @@
+{
+	"version": 5,
+	"commitHash": "533589d72ae5461b23779d49e05fb7dc0e4e1a31",
+	"commitMessage": "Merge pull request #16 from jeverest/fix-leaderboard-name-prompt",
+	"commitAuthor": "Joe Hart",
+	"commitDate": "2026-05-12T16:57:36-07:00",
+	"branch": "backfilled",
+	"generatedAt": "2026-07-07T15:09:25.038Z",
+	"commitType": "commit",
+	"commitSource": "cli",
+	"transcriptEntries": 0,
+	"conversationTurns": 0,
+	"llm": {
+		"model": "claude-sonnet-4-6",
+		"inputTokens": 5435,
+		"outputTokens": 529,
+		"cachedTokens": 0,
+		"apiLatencyMs": 15166,
+		"stopReason": null,
+		"source": "jolli-proxy"
+	},
+	"stats": {
+		"filesChanged": 2,
+		"insertions": 11,
+		"deletions": 2
+	},
+	"diffStats": {
+		"filesChanged": 2,
+		"insertions": 11,
+		"deletions": 2
+	},
+	"topics": [
+		{
+			"title": "Bot involvement now fully disqualifies a run from the leaderboard name prompt",
+			"trigger": "Players discovered they could enable the bot during a run, then disable it before the game ended, and still be prompted to enter their name on the leaderboard — as if they had played the entire run themselves.",
+			"response": "- Added a `botEverActive` boolean flag in `src/main.ts` that is set to `true` the moment the bot is switched on during a run, and is never reset back to `false` mid-run. At game start, the flag is initialized to match whether the bot is already enabled, covering cases where the bot is on from the very beginning.\n- Changed the end-of-game leaderboard check in `src/main.ts` to evaluate `botEverActive` instead of the current `botEnabled` state, so any bot involvement at any point in the run suppresses the name prompt.\n- Added a `.leaderboard-prompt.hidden` CSS rule in `src/style.css` to support hiding the prompt element via a class toggle.",
+			"decisions": "- **Lifetime flag over snapshot check**: Checking only whether the bot was active at the moment the game ended allowed players to game the system by toggling the bot off before dying. Tracking whether the bot was ever active during the run closes this loophole with minimal complexity — a single boolean that is set once and never cleared until the next game starts.\n- **Reset on new game, not on toggle-off**: The flag resets only when a new run begins, not when the bot is disabled mid-run. This keeps the disqualification permanent for the lifetime of a single run while still allowing a fresh run to be fully human-played and eligible for the leaderboard.",
+			"filesAffected": [
+				"src/main.ts",
+				"src/style.css"
+			],
+			"category": "bugfix",
+			"importance": "major"
+		}
+	],
+	"backfilled": true,
+	"backfillMethod": "diff-only",
+	"treeHash": "4814f9104b10769258d4862993532ad9f2454d07",
+	"recap": "Players can no longer earn a leaderboard entry by briefly enabling the bot during a run and then switching it off before the game ends. The game now tracks whether the bot was active at any point during a run, and any bot involvement — even momentary — permanently disqualifies that run from the name prompt. A new run started without the bot remains fully eligible for the leaderboard as normal."
+}
