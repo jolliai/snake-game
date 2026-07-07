@@ -1,0 +1,18 @@
+{
+	"schemaVersion": 1,
+	"stableSlug": "dev-tooling-config",
+	"title": "Developer Tooling & Config (gitignore, Jolli)",
+	"content": "## Overview\n\nThe project's `.gitignore` is configured to exclude the `.jolli` directory. This ensures that any files generated or cached by the Jolli tooling locally are not tracked in version control.\n\n## `.jolli` Directory\n\nThe `.jolli` directory is a local artifact produced by the Jolli tool. It is intentionally excluded from the repository via `.gitignore` to avoid committing machine-specific or generated state.\n\n### Rationale\n\n- Keeps the repository clean of tool-generated noise.\n- Prevents accidental commits of local Jolli state that would not be meaningful or portable across developer environments.",
+	"relatedBranches": [
+		"chore/gitignore-jolli"
+	],
+	"sourceRefs": [
+		{
+			"type": "summary",
+			"id": "31d93c3f670b49f2eb5583d128ce61bdc2a98299",
+			"timestamp": "2026-07-01T18:45:04.000Z",
+			"branch": "chore/gitignore-jolli"
+		}
+	],
+	"lastUpdatedAt": "2026-07-07T02:20:01.705Z"
+}
