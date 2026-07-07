@@ -513,21 +513,6 @@
 			]
 		},
 		{
-			"commitHash": "484b35cd8f271cb38ce42c09807a75e7bb977b34",
-			"recap": "The Edge Runner bot's sense of how close food is to a wall now adjusts automatically to the size of the playing grid. Previously, the boundary was a fixed two-cell margin, which produced inconsistent behavior as grid dimensions changed. The bot now treats the outer 20% of the grid as the edge zone, keeping its avoidance strategy proportionally consistent whether the arena is small or large.",
-			"topics": [
-				{
-					"title": "Bot wall-proximity detection scales with grid size",
-					"decisions": "Tying the wall threshold to a percentage of the grid size keeps the bot's spatial awareness consistent regardless of the arena it plays in. A fixed value would make the bot behave very differently on a 10-cell grid versus a 50-cell grid, while a proportional value preserves the same strategic intent at any scale. The 20% figure was chosen as a reasonable approximation of a meaningful \"edge zone\" without over-tuning to a specific grid dimension.",
-					"category": "bugfix",
-					"importance": "major",
-					"filesAffected": [
-						"src/bots/edge-runner-bot.ts"
-					]
-				}
-			]
-		},
-		{
 			"commitHash": "33d73c531daf7232a4dfcd80eb14a2f75bf90f3b",
 			"recap": "The game gained a full autoplay system with three distinct bot personalities: Survival, Hunter, and Explorer. Each bot evaluates every possible move using a scoring formula tuned to a different risk appetite -- Survival maximizes open space, Hunter chases food aggressively, and Explorer favors wide lanes away from walls. Players can switch profiles at any time from a dropdown on both the menu and the in-game overlay, toggle the bot on and off with a button or keyboard shortcut, and launch straight into a bot demo from the main menu. Manual direction input is disabled while the bot is active to prevent conflicting control.\n\nWhile the bot plays, the camera slowly rotates around the board, giving the demo mode a more dynamic feel. If the player manually adjusts the camera angle, the auto-rotation pauses for a few seconds before resuming, so a manual reposition is respected without requiring any extra action to restore the animation.\n\n---",
 			"topics": [
@@ -1407,6 +1392,21 @@
 					"filesAffected": [
 						"src/bots/chaser-bot.ts",
 						"src/bots/index.ts"
+					]
+				}
+			]
+		},
+		{
+			"commitHash": "484b35cd8f271cb38ce42c09807a75e7bb977b34",
+			"recap": "The Edge Runner bot's sense of how close food is to a wall now adjusts automatically to the size of the playing grid. Previously, the boundary was a fixed two-cell margin, which produced inconsistent behavior as grid dimensions changed. The bot now treats the outer 20% of the grid as the edge zone, keeping its avoidance strategy proportionally consistent whether the arena is small or large.",
+			"topics": [
+				{
+					"title": "Bot wall-proximity detection scales with grid size",
+					"decisions": "Tying the wall threshold to a percentage of the grid size keeps the bot's spatial awareness consistent regardless of the arena it plays in. A fixed value would make the bot behave very differently on a 10-cell grid versus a 50-cell grid, while a proportional value preserves the same strategic intent at any scale. The 20% figure was chosen as a reasonable approximation of a meaningful \"edge zone\" without over-tuning to a specific grid dimension.",
+					"category": "bugfix",
+					"importance": "major",
+					"filesAffected": [
+						"src/bots/edge-runner-bot.ts"
 					]
 				}
 			]

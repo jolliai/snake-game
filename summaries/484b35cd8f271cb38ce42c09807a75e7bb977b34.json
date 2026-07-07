@@ -45,5 +45,7 @@
 	"backfilled": true,
 	"backfillMethod": "diff-only",
 	"treeHash": "30dcdd22f3bbd8981a9d0cc98c9495262e16b839",
-	"recap": "The Edge Runner bot's sense of how close food is to a wall now adjusts automatically to the size of the playing grid. Previously, the boundary was a fixed two-cell margin, which produced inconsistent behavior as grid dimensions changed. The bot now treats the outer 20% of the grid as the edge zone, keeping its avoidance strategy proportionally consistent whether the arena is small or large."
+	"recap": "The Edge Runner bot's sense of how close food is to a wall now adjusts automatically to the size of the playing grid. Previously, the boundary was a fixed two-cell margin, which produced inconsistent behavior as grid dimensions changed. The bot now treats the outer 20% of the grid as the edge zone, keeping its avoidance strategy proportionally consistent whether the arena is small or large.",
+	"jolliDocUrl": "https://jolli.ai/brckbmk4/articles?doc=2668",
+	"jolliDocId": 2668
 }
