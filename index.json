@@ -948,6 +948,22 @@
 				"insertions": 1,
 				"deletions": 0
 			}
+		},
+		{
+			"commitHash": "e7777fa7355805627306e678e326170b1b4ce41f",
+			"parentCommitHash": null,
+			"treeHash": "9e04bd82f747e8dbde9cc8e10abf66a75d407f61",
+			"commitType": "commit",
+			"commitMessage": "Add coming soon section with 2.5D mode to README",
+			"commitDate": "2026-02-13T08:25:26-08:00",
+			"branch": "backfilled",
+			"generatedAt": "2026-07-07T15:20:16.449Z",
+			"topicCount": 0,
+			"diffStats": {
+				"filesChanged": 1,
+				"insertions": 3,
+				"deletions": 0
+			}
 		}
 	],
 	"commitAliases": {

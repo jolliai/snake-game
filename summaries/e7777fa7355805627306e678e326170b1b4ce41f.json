@@ -1,0 +1,36 @@
+{
+	"version": 5,
+	"commitHash": "e7777fa7355805627306e678e326170b1b4ce41f",
+	"commitMessage": "Add coming soon section with 2.5D mode to README",
+	"commitAuthor": "Joe Hart",
+	"commitDate": "2026-02-13T08:25:26-08:00",
+	"branch": "backfilled",
+	"generatedAt": "2026-07-07T15:20:16.449Z",
+	"commitType": "commit",
+	"commitSource": "cli",
+	"transcriptEntries": 0,
+	"conversationTurns": 0,
+	"llm": {
+		"model": "claude-sonnet-4-6",
+		"inputTokens": 4915,
+		"outputTokens": 8,
+		"cachedTokens": 0,
+		"apiLatencyMs": 1153,
+		"stopReason": null,
+		"source": "jolli-proxy"
+	},
+	"stats": {
+		"filesChanged": 1,
+		"insertions": 3,
+		"deletions": 0
+	},
+	"diffStats": {
+		"filesChanged": 1,
+		"insertions": 3,
+		"deletions": 0
+	},
+	"topics": [],
+	"backfilled": true,
+	"backfillMethod": "diff-only",
+	"treeHash": "9e04bd82f747e8dbde9cc8e10abf66a75d407f61"
+}
