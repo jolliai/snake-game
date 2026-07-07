@@ -344,21 +344,6 @@
 			]
 		},
 		{
-			"commitHash": "925a3772869a6ff7a3f1761af5cb3703d48c4802",
-			"recap": "Players can now press T during a game to freeze the board's automatic spinning in place, then press T again to resume it. The pause holds indefinitely until toggled off, giving players full control over their viewing angle without interrupting gameplay. Both the two-player and bot-vs-bot modes display the new shortcut in the on-screen controls bar so players can discover it without consulting documentation.",
-			"topics": [
-				{
-					"title": "Add keyboard shortcut to pause and resume board auto-rotation",
-					"decisions": "The pause toggle was implemented as a separate boolean flag rather than reusing the existing timed-override mechanism (which temporarily suppresses rotation after a manual Q/E rotation). Keeping them separate means the T key pause persists indefinitely until the player presses T again, while the timed override continues to work independently for its own purpose. Merging the two would have required tracking intent and complicated the expiry logic.",
-					"category": "feature",
-					"importance": "major",
-					"filesAffected": [
-						"src/main.ts"
-					]
-				}
-			]
-		},
-		{
 			"commitHash": "d2f765bd7ee9665192df87ef50f379ff9906b079"
 		},
 		{
@@ -1406,6 +1391,21 @@
 					"importance": "minor",
 					"filesAffected": [
 						"src/game-types.ts",
+						"src/main.ts"
+					]
+				}
+			]
+		},
+		{
+			"commitHash": "925a3772869a6ff7a3f1761af5cb3703d48c4802",
+			"recap": "Players can now press T during a game to freeze the board's automatic spinning in place, then press T again to resume it. The pause holds indefinitely until toggled off, giving players full control over their viewing angle without interrupting gameplay. Both the two-player and bot-vs-bot modes display the new shortcut in the on-screen controls bar so players can discover it without consulting documentation.",
+			"topics": [
+				{
+					"title": "Add keyboard shortcut to pause and resume board auto-rotation",
+					"decisions": "The pause toggle was implemented as a separate boolean flag rather than reusing the existing timed-override mechanism (which temporarily suppresses rotation after a manual Q/E rotation). Keeping them separate means the T key pause persists indefinitely until the player presses T again, while the timed override continues to work independently for its own purpose. Merging the two would have required tracking intent and complicated the expiry logic.",
+					"category": "feature",
+					"importance": "major",
+					"filesAffected": [
 						"src/main.ts"
 					]
 				}

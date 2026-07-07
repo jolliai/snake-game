@@ -45,5 +45,7 @@
 	"backfilled": true,
 	"backfillMethod": "diff-only",
 	"treeHash": "87f2d13c3874d893cda5dc8aced412792f48263a",
-	"recap": "Players can now press T during a game to freeze the board's automatic spinning in place, then press T again to resume it. The pause holds indefinitely until toggled off, giving players full control over their viewing angle without interrupting gameplay. Both the two-player and bot-vs-bot modes display the new shortcut in the on-screen controls bar so players can discover it without consulting documentation."
+	"recap": "Players can now press T during a game to freeze the board's automatic spinning in place, then press T again to resume it. The pause holds indefinitely until toggled off, giving players full control over their viewing angle without interrupting gameplay. Both the two-player and bot-vs-bot modes display the new shortcut in the on-screen controls bar so players can discover it without consulting documentation.",
+	"jolliDocUrl": "https://jolli.ai/brckbmk4/articles?doc=2672",
+	"jolliDocId": 2672
 }
