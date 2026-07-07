@@ -735,22 +735,6 @@
 			]
 		},
 		{
-			"commitHash": "9b6aec4fa8a2f879402cbbb2db8b72db7ad123bf",
-			"recap": "A new Nomad bot is now available in the snake game alongside the existing roster of bot personalities. Where other bots focus on hunting food or hugging edges, the Nomad actively steers away from its own body trail, preferring open, unvisited areas of the board. It still collects food along the way, but exploration takes priority over efficiency. Players can now select the Nomad as their bot of choice and observe a noticeably different movement style — one that wanders and spreads across the board rather than coiling or charging.",
-			"topics": [
-				{
-					"title": "New Nomad bot that steers away from its own trail to explore open space",
-					"decisions": "- **Trail avoidance as the core mechanic**: The bot's defining behavior is a strong penalty for moving near its own body, rather than simply chasing food or maximizing open space. This creates a wandering, exploratory character that feels meaningfully different from existing bots. The trade-off is that the snake may take suboptimal paths to food, but that inefficiency is intentional — it produces the nomadic personality.\n- **Moderate food pursuit rather than aggressive or passive**: Food scoring is included but weighted lower than in a hunter-style bot. Completely ignoring food would make the bot uncompetitive; over-weighting it would collapse the nomad behavior into something indistinguishable from existing bots. The chosen balance keeps the bot viable while preserving its distinct identity.\n- **Tail-reachability as a safety floor**: Moves that leave the snake unable to reach its own tail are heavily penalized rather than outright forbidden, with a partial credit for reachable area. This avoids the bot painting itself into a corner while still allowing it to take calculated risks in open space — a stricter hard cutoff would conflict with the exploratory playstyle.",
-					"category": "feature",
-					"importance": "major",
-					"filesAffected": [
-						"src/bots/nomad-bot.ts",
-						"src/bots/index.ts"
-					]
-				}
-			]
-		},
-		{
 			"commitHash": "03b468b2985ea09b7a6dc6900e8233cba8bb39f9",
 			"recap": "A new bot called Chaser is now available in the snake game. It pursues food along the shortest calculated path and plays aggressively by default, closing the gap to food faster than the existing bots. When the direct path to food would leave the snake with no safe escape route, Chaser automatically shifts into a holding pattern — drifting toward its own tail to keep options open until a safe path to food reopens. Players can now select Chaser alongside the existing roster of bot personalities.",
 			"topics": [
@@ -1406,6 +1390,22 @@
 					"importance": "major",
 					"filesAffected": [
 						"src/bots/ambusher-bot.ts",
+						"src/bots/index.ts"
+					]
+				}
+			]
+		},
+		{
+			"commitHash": "9b6aec4fa8a2f879402cbbb2db8b72db7ad123bf",
+			"recap": "A new Nomad bot is now available in the snake game alongside the existing roster of bot personalities. Where other bots focus on hunting food or hugging edges, the Nomad actively steers away from its own body trail, preferring open, unvisited areas of the board. It still collects food along the way, but exploration takes priority over efficiency. Players can now select the Nomad as their bot of choice and observe a noticeably different movement style — one that wanders and spreads across the board rather than coiling or charging.",
+			"topics": [
+				{
+					"title": "New Nomad bot that steers away from its own trail to explore open space",
+					"decisions": "- **Trail avoidance as the core mechanic**: The bot's defining behavior is a strong penalty for moving near its own body, rather than simply chasing food or maximizing open space. This creates a wandering, exploratory character that feels meaningfully different from existing bots. The trade-off is that the snake may take suboptimal paths to food, but that inefficiency is intentional — it produces the nomadic personality.\n- **Moderate food pursuit rather than aggressive or passive**: Food scoring is included but weighted lower than in a hunter-style bot. Completely ignoring food would make the bot uncompetitive; over-weighting it would collapse the nomad behavior into something indistinguishable from existing bots. The chosen balance keeps the bot viable while preserving its distinct identity.\n- **Tail-reachability as a safety floor**: Moves that leave the snake unable to reach its own tail are heavily penalized rather than outright forbidden, with a partial credit for reachable area. This avoids the bot painting itself into a corner while still allowing it to take calculated risks in open space — a stricter hard cutoff would conflict with the exploratory playstyle.",
+					"category": "feature",
+					"importance": "major",
+					"filesAffected": [
+						"src/bots/nomad-bot.ts",
 						"src/bots/index.ts"
 					]
 				}

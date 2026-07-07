@@ -46,5 +46,7 @@
 	"backfilled": true,
 	"backfillMethod": "diff-only",
 	"treeHash": "9da28dae2c282cb8a71b575b04624cf89c7b2026",
-	"recap": "A new Nomad bot is now available in the snake game alongside the existing roster of bot personalities. Where other bots focus on hunting food or hugging edges, the Nomad actively steers away from its own body trail, preferring open, unvisited areas of the board. It still collects food along the way, but exploration takes priority over efficiency. Players can now select the Nomad as their bot of choice and observe a noticeably different movement style — one that wanders and spreads across the board rather than coiling or charging."
+	"recap": "A new Nomad bot is now available in the snake game alongside the existing roster of bot personalities. Where other bots focus on hunting food or hugging edges, the Nomad actively steers away from its own body trail, preferring open, unvisited areas of the board. It still collects food along the way, but exploration takes priority over efficiency. Players can now select the Nomad as their bot of choice and observe a noticeably different movement style — one that wanders and spreads across the board rather than coiling or charging.",
+	"jolliDocUrl": "https://jolli.ai/brckbmk4/articles?doc=2640",
+	"jolliDocId": 2640
 }
