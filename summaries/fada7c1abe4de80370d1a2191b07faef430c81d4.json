@@ -46,5 +46,7 @@
 	"backfilled": true,
 	"backfillMethod": "diff-only",
 	"treeHash": "849749f64bfe789fe1322f7375eeffbe8bfd76bc",
-	"recap": "A new snake bot called Zigzag joined the roster of available opponents. It moves in a sawtooth weaving pattern, alternating left and right turns as it advances toward food, giving it a visually distinct style compared to the existing bots. The bot also applies a wall-avoidance penalty near the edges of the grid, where weaving movement is most likely to cause self-entrapment, and falls back gracefully when all available moves are risky rather than failing outright."
+	"recap": "A new snake bot called Zigzag joined the roster of available opponents. It moves in a sawtooth weaving pattern, alternating left and right turns as it advances toward food, giving it a visually distinct style compared to the existing bots. The bot also applies a wall-avoidance penalty near the edges of the grid, where weaving movement is most likely to cause self-entrapment, and falls back gracefully when all available moves are risky rather than failing outright.",
+	"jolliDocUrl": "https://jolli.ai/brckbmk4/articles?doc=2652",
+	"jolliDocId": 2652
 }
