@@ -987,6 +987,21 @@
 					]
 				}
 			]
+		},
+		{
+			"commitHash": "6f96e53c6166f7955f1971409a820c1345398513",
+			"recap": "Players can now press Enter to start a new game from the main menu or after a game ends. The shortcut is active only when the game is not in progress, so there is no risk of accidentally triggering a restart during play.",
+			"topics": [
+				{
+					"title": "Enter key starts a new game from menu or game-over screen",
+					"decisions": "Enter was chosen as the trigger key for starting or restarting from menu and game-over screens rather than applying it universally, keeping the behavior contextual. Pressing Enter during active gameplay does nothing, which avoids accidental restarts mid-session.",
+					"category": "feature",
+					"importance": "major",
+					"filesAffected": [
+						"src/main.ts"
+					]
+				}
+			]
 		}
 	]
 }

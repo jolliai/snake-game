@@ -1,0 +1,49 @@
+{
+	"version": 5,
+	"commitHash": "6f96e53c6166f7955f1971409a820c1345398513",
+	"commitMessage": "Add Enter key to start new game from menu or game-over screen",
+	"commitAuthor": "Joe Hart",
+	"commitDate": "2026-02-23T19:09:02-08:00",
+	"branch": "backfilled",
+	"generatedAt": "2026-07-07T15:18:29.070Z",
+	"commitType": "commit",
+	"commitSource": "cli",
+	"transcriptEntries": 0,
+	"conversationTurns": 0,
+	"llm": {
+		"model": "claude-sonnet-4-6",
+		"inputTokens": 4935,
+		"outputTokens": 285,
+		"cachedTokens": 0,
+		"apiLatencyMs": 7959,
+		"stopReason": null,
+		"source": "jolli-proxy"
+	},
+	"stats": {
+		"filesChanged": 1,
+		"insertions": 7,
+		"deletions": 0
+	},
+	"diffStats": {
+		"filesChanged": 1,
+		"insertions": 7,
+		"deletions": 0
+	},
+	"topics": [
+		{
+			"title": "Enter key starts a new game from menu or game-over screen",
+			"trigger": "Players had no way to start a new game using the keyboard from the main menu or after a game ended, requiring them to use a different key or input method.",
+			"response": "Added a check in `handleKeyPress` in `src/main.ts` that intercepts the Enter key and calls `startNewGame()` when the game has not yet started or when the game-over state is active. The existing `R` key shortcut for restarting mid-session is unaffected.",
+			"decisions": "Enter was chosen as the trigger key for starting or restarting from menu and game-over screens rather than applying it universally, keeping the behavior contextual. Pressing Enter during active gameplay does nothing, which avoids accidental restarts mid-session.",
+			"filesAffected": [
+				"src/main.ts"
+			],
+			"category": "feature",
+			"importance": "major"
+		}
+	],
+	"backfilled": true,
+	"backfillMethod": "diff-only",
+	"treeHash": "83bbd241c73223ea30506b84ee6627b7024c40b8",
+	"recap": "Players can now press Enter to start a new game from the main menu or after a game ends. The shortcut is active only when the game is not in progress, so there is no risk of accidentally triggering a restart during play."
+}

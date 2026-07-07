@@ -788,6 +788,22 @@
 				"insertions": 1,
 				"deletions": 0
 			}
+		},
+		{
+			"commitHash": "6f96e53c6166f7955f1971409a820c1345398513",
+			"parentCommitHash": null,
+			"treeHash": "83bbd241c73223ea30506b84ee6627b7024c40b8",
+			"commitType": "commit",
+			"commitMessage": "Add Enter key to start new game from menu or game-over screen",
+			"commitDate": "2026-02-23T19:09:02-08:00",
+			"branch": "backfilled",
+			"generatedAt": "2026-07-07T15:18:29.070Z",
+			"topicCount": 1,
+			"diffStats": {
+				"filesChanged": 1,
+				"insertions": 7,
+				"deletions": 0
+			}
 		}
 	],
 	"commitAliases": {
