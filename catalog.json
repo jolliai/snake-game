@@ -668,24 +668,6 @@
 			]
 		},
 		{
-			"commitHash": "c1b50456bf124504751fdff785f55b6bca5d50b7",
-			"recap": "Three new bot opponents were added to the snake game, each with a distinct play style. The Ambusher stakes out the center of the board and only chases food when it spawns nearby, making it a patient, positional opponent. The Chaser relentlessly pursues the shortest route to food and switches to a defensive tail-following mode when the direct path becomes dangerous. The Nomad actively steers away from its own body trail, spreading across fresh territory and picking up food along the way rather than hunting it directly. All three bots are now selectable alongside the existing roster.",
-			"topics": [
-				{
-					"title": "Three new snake bot personalities added to the game",
-					"decisions": "- **Distinct behavioral identities over parameter tuning**: Each bot was given a fundamentally different scoring philosophy rather than being a re-tuned version of an existing bot. The Ambusher anchors to a spatial position, the Chaser maximizes food-path efficiency, and the Nomad penalizes body proximity. This makes each bot feel meaningfully different to play against and avoids a situation where bots are indistinguishable in practice.\n- **Shared survival floor across all bots**: All three bots use the same tail-reachability check as a hard constraint — moves that would leave the snake unable to reach its own tail are scored far below any safe move. This keeps the new bots from dying trivially while still allowing their distinct personalities to express themselves in safe situations.\n- **Body-proximity penalty as the Nomad's core mechanic**: Rather than rewarding exploration abstractly, the Nomad directly counts nearby body segments and applies a steep per-segment penalty. This produces emergent trail-avoidance behavior without requiring explicit path history tracking, keeping the implementation simple while achieving the intended wandering effect.",
-					"category": "feature",
-					"importance": "major",
-					"filesAffected": [
-						"src/bots/ambusher-bot.ts",
-						"src/bots/chaser-bot.ts",
-						"src/bots/nomad-bot.ts",
-						"src/bots/index.ts"
-					]
-				}
-			]
-		},
-		{
 			"commitHash": "572e53700a554fa72b31a06688e05e0f8da928bc",
 			"recap": "A new Spiral bot was added to the game's roster of playable bots. Unlike the existing bots that react primarily to food or threats, the Spiral bot attempts to sweep the grid in wide clockwise arcs, turning inward whenever it approaches a wall. Players can now select it alongside the existing options and observe a distinctly different movement personality — one that prioritizes grid coverage over direct food pursuit. The bot still avoids collisions and self-trapping, so it plays safely while maintaining its spiral character.",
 			"topics": [
@@ -1405,6 +1387,24 @@
 					"category": "feature",
 					"importance": "major",
 					"filesAffected": [
+						"src/bots/nomad-bot.ts",
+						"src/bots/index.ts"
+					]
+				}
+			]
+		},
+		{
+			"commitHash": "c1b50456bf124504751fdff785f55b6bca5d50b7",
+			"recap": "Three new bot opponents were added to the snake game, each with a distinct play style. The Ambusher stakes out the center of the board and only chases food when it spawns nearby, making it a patient, positional opponent. The Chaser relentlessly pursues the shortest route to food and switches to a defensive tail-following mode when the direct path becomes dangerous. The Nomad actively steers away from its own body trail, spreading across fresh territory and picking up food along the way rather than hunting it directly. All three bots are now selectable alongside the existing roster.",
+			"topics": [
+				{
+					"title": "Three new snake bot personalities added to the game",
+					"decisions": "- **Distinct behavioral identities over parameter tuning**: Each bot was given a fundamentally different scoring philosophy rather than being a re-tuned version of an existing bot. The Ambusher anchors to a spatial position, the Chaser maximizes food-path efficiency, and the Nomad penalizes body proximity. This makes each bot feel meaningfully different to play against and avoids a situation where bots are indistinguishable in practice.\n- **Shared survival floor across all bots**: All three bots use the same tail-reachability check as a hard constraint — moves that would leave the snake unable to reach its own tail are scored far below any safe move. This keeps the new bots from dying trivially while still allowing their distinct personalities to express themselves in safe situations.\n- **Body-proximity penalty as the Nomad's core mechanic**: Rather than rewarding exploration abstractly, the Nomad directly counts nearby body segments and applies a steep per-segment penalty. This produces emergent trail-avoidance behavior without requiring explicit path history tracking, keeping the implementation simple while achieving the intended wandering effect.",
+					"category": "feature",
+					"importance": "major",
+					"filesAffected": [
+						"src/bots/ambusher-bot.ts",
+						"src/bots/chaser-bot.ts",
 						"src/bots/nomad-bot.ts",
 						"src/bots/index.ts"
 					]

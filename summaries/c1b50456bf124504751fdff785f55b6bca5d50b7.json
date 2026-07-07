@@ -48,5 +48,7 @@
 	"backfilled": true,
 	"backfillMethod": "diff-only",
 	"treeHash": "822c5f83df0de67981d7dd90673fe04507e24732",
-	"recap": "Three new bot opponents were added to the snake game, each with a distinct play style. The Ambusher stakes out the center of the board and only chases food when it spawns nearby, making it a patient, positional opponent. The Chaser relentlessly pursues the shortest route to food and switches to a defensive tail-following mode when the direct path becomes dangerous. The Nomad actively steers away from its own body trail, spreading across fresh territory and picking up food along the way rather than hunting it directly. All three bots are now selectable alongside the existing roster."
+	"recap": "Three new bot opponents were added to the snake game, each with a distinct play style. The Ambusher stakes out the center of the board and only chases food when it spawns nearby, making it a patient, positional opponent. The Chaser relentlessly pursues the shortest route to food and switches to a defensive tail-following mode when the direct path becomes dangerous. The Nomad actively steers away from its own body trail, spreading across fresh territory and picking up food along the way rather than hunting it directly. All three bots are now selectable alongside the existing roster.",
+	"jolliDocUrl": "https://jolli.ai/brckbmk4/articles?doc=2646",
+	"jolliDocId": 2646
 }
