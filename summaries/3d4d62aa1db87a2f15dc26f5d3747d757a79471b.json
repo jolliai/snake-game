@@ -47,5 +47,7 @@
 	"backfilled": true,
 	"backfillMethod": "diff-only",
 	"treeHash": "ea2f333315bfa9357a03b3be56541aaa2f6c7b7c",
-	"recap": "Two new bot personalities joined the snake game's roster. The Ambusher stakes out the center of the board and holds position, only breaking into a chase when food spawns close enough to strike — giving it a patient, territorial feel that looks noticeably different from existing bots. The Chaser takes the opposite approach, always hunting the shortest route to food and only pulling back when the direct path would leave it cornered, at which point it shadows its own tail to stay alive until a safe opening appears. Both bots are now available for players to select alongside the existing lineup."
+	"recap": "Two new bot personalities joined the snake game's roster. The Ambusher stakes out the center of the board and holds position, only breaking into a chase when food spawns close enough to strike — giving it a patient, territorial feel that looks noticeably different from existing bots. The Chaser takes the opposite approach, always hunting the shortest route to food and only pulling back when the direct path would leave it cornered, at which point it shadows its own tail to stay alive until a safe opening appears. Both bots are now available for players to select alongside the existing lineup.",
+	"jolliDocUrl": "https://jolli.ai/brckbmk4/articles?doc=2642",
+	"jolliDocId": 2642
 }
