@@ -513,22 +513,6 @@
 			]
 		},
 		{
-			"commitHash": "03b468b2985ea09b7a6dc6900e8233cba8bb39f9",
-			"recap": "A new bot called Chaser is now available in the snake game. It pursues food along the shortest calculated path and plays aggressively by default, closing the gap to food faster than the existing bots. When the direct path to food would leave the snake with no safe escape route, Chaser automatically shifts into a holding pattern — drifting toward its own tail to keep options open until a safe path to food reopens. Players can now select Chaser alongside the existing roster of bot personalities.",
-			"topics": [
-				{
-					"title": "New aggressive food-chasing bot added to snake game",
-					"decisions": "- **Tail-reachability as a safety gate**: The bot uses tail reachability as a hard filter before committing to any food-chasing move. Moves where the tail becomes unreachable are scored far below any safe move, preventing the snake from trapping itself in a dead end while still aggressively pursuing food when a safe path exists. This trades some food-collection speed for a meaningful reduction in self-trapping deaths.\n- **Weighted scoring over pure BFS**: Rather than following the shortest BFS path to food unconditionally, the bot blends BFS path length, manhattan distance, open area, and a tail-drift bonus into a single score. This allows the bot to gracefully degrade when no BFS path to food exists — drifting toward the tail to buy time — without needing a separate decision tree or mode-switching logic.",
-					"category": "feature",
-					"importance": "major",
-					"filesAffected": [
-						"src/bots/chaser-bot.ts",
-						"src/bots/index.ts"
-					]
-				}
-			]
-		},
-		{
 			"commitHash": "484b35cd8f271cb38ce42c09807a75e7bb977b34",
 			"recap": "The Edge Runner bot's sense of how close food is to a wall now adjusts automatically to the size of the playing grid. Previously, the boundary was a fixed two-cell margin, which produced inconsistent behavior as grid dimensions changed. The bot now treats the outer 20% of the grid as the edge zone, keeping its avoidance strategy proportionally consistent whether the arena is small or large.",
 			"topics": [
@@ -1406,6 +1390,22 @@
 					"importance": "major",
 					"filesAffected": [
 						"src/bots/spiral-bot.ts",
+						"src/bots/index.ts"
+					]
+				}
+			]
+		},
+		{
+			"commitHash": "03b468b2985ea09b7a6dc6900e8233cba8bb39f9",
+			"recap": "A new bot called Chaser is now available in the snake game. It pursues food along the shortest calculated path and plays aggressively by default, closing the gap to food faster than the existing bots. When the direct path to food would leave the snake with no safe escape route, Chaser automatically shifts into a holding pattern — drifting toward its own tail to keep options open until a safe path to food reopens. Players can now select Chaser alongside the existing roster of bot personalities.",
+			"topics": [
+				{
+					"title": "New aggressive food-chasing bot added to snake game",
+					"decisions": "- **Tail-reachability as a safety gate**: The bot uses tail reachability as a hard filter before committing to any food-chasing move. Moves where the tail becomes unreachable are scored far below any safe move, preventing the snake from trapping itself in a dead end while still aggressively pursuing food when a safe path exists. This trades some food-collection speed for a meaningful reduction in self-trapping deaths.\n- **Weighted scoring over pure BFS**: Rather than following the shortest BFS path to food unconditionally, the bot blends BFS path length, manhattan distance, open area, and a tail-drift bonus into a single score. This allows the bot to gracefully degrade when no BFS path to food exists — drifting toward the tail to buy time — without needing a separate decision tree or mode-switching logic.",
+					"category": "feature",
+					"importance": "major",
+					"filesAffected": [
+						"src/bots/chaser-bot.ts",
 						"src/bots/index.ts"
 					]
 				}

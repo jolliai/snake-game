@@ -46,5 +46,7 @@
 	"backfilled": true,
 	"backfillMethod": "diff-only",
 	"treeHash": "f065045da55c7b345f6c7add470d9d15117a8340",
-	"recap": "A new bot called Chaser is now available in the snake game. It pursues food along the shortest calculated path and plays aggressively by default, closing the gap to food faster than the existing bots. When the direct path to food would leave the snake with no safe escape route, Chaser automatically shifts into a holding pattern — drifting toward its own tail to keep options open until a safe path to food reopens. Players can now select Chaser alongside the existing roster of bot personalities."
+	"recap": "A new bot called Chaser is now available in the snake game. It pursues food along the shortest calculated path and plays aggressively by default, closing the gap to food faster than the existing bots. When the direct path to food would leave the snake with no safe escape route, Chaser automatically shifts into a holding pattern — drifting toward its own tail to keep options open until a safe path to food reopens. Players can now select Chaser alongside the existing roster of bot personalities.",
+	"jolliDocUrl": "https://jolli.ai/brckbmk4/articles?doc=2666",
+	"jolliDocId": 2666
 }
