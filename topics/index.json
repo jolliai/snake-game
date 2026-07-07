@@ -560,6 +560,29 @@
 				}
 			],
 			"lastUpdatedAt": "2026-07-07T15:25:41.149Z"
+		},
+		{
+			"stableSlug": "multiplayer-modes",
+			"title": "Two-Player and Bot-vs-Bot Multiplayer Modes",
+			"summary": "Local two-player (PvP) and bot-versus-bot spectator modes added to Snake, with simultaneous collision resolution and independent bot instances.",
+			"relatedBranches": [
+				"backfilled"
+			],
+			"sourceRefs": [
+				{
+					"type": "summary",
+					"id": "2f6de8b760cf6bbef2fb8d9e77440d8a169ae8ee",
+					"timestamp": "2026-05-12T11:35:31-07:00",
+					"branch": "backfilled"
+				},
+				{
+					"type": "summary",
+					"id": "5e095b21fad625332fb89c0feba50d8e100019d2",
+					"timestamp": "2026-05-12T11:36:09-07:00",
+					"branch": "backfilled"
+				}
+			],
+			"lastUpdatedAt": "2026-07-07T15:25:41.149Z"
 		}
 	]
 }
