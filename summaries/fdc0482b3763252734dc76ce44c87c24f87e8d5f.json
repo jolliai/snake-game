@@ -1,0 +1,49 @@
+{
+	"version": 5,
+	"commitHash": "fdc0482b3763252734dc76ce44c87c24f87e8d5f",
+	"commitMessage": "Revert \"Reapply \"Reapply \"Reapply \"Reapply \"Add R key to reset game from any state\"\"\"\"\"",
+	"commitAuthor": "Joe Hart",
+	"commitDate": "2026-02-12T23:59:29-08:00",
+	"branch": "backfilled",
+	"generatedAt": "2026-07-07T15:21:56.313Z",
+	"commitType": "commit",
+	"commitSource": "cli",
+	"transcriptEntries": 0,
+	"conversationTurns": 0,
+	"llm": {
+		"model": "claude-sonnet-4-6",
+		"inputTokens": 5256,
+		"outputTokens": 270,
+		"cachedTokens": 0,
+		"apiLatencyMs": 7410,
+		"stopReason": null,
+		"source": "jolli-proxy"
+	},
+	"stats": {
+		"filesChanged": 2,
+		"insertions": 1,
+		"deletions": 7
+	},
+	"diffStats": {
+		"filesChanged": 2,
+		"insertions": 1,
+		"deletions": 7
+	},
+	"topics": [
+		{
+			"title": "Remove reset key shortcut and revert related UI changes",
+			"trigger": "A previously added feature allowing players to press a key to reset the game from any state was reverted, undoing the keyboard shortcut and its associated interface text.",
+			"response": "- The keyboard handler in `src/main.ts` had the reset shortcut block removed, eliminating the ability to trigger a new game via a key press during any game state.\n- The pause screen hide call that was added alongside the reset feature was also removed from the new-game startup logic in `src/main.ts`.\n- The controls hint text in `index.html` was updated to remove the mention of the reset key, keeping the on-screen instructions accurate.",
+			"decisions": "The reset shortcut was reverted rather than kept or reworked. No conversation context is available to explain the reasoning, but the commit message indicates this is a revert of a revert chain, suggesting the feature introduced a problem significant enough to warrant repeated rollback attempts.",
+			"filesAffected": [
+				"src/main.ts",
+				"index.html"
+			],
+			"category": "bugfix",
+			"importance": "minor"
+		}
+	],
+	"backfilled": true,
+	"backfillMethod": "diff-only",
+	"treeHash": "4d88bccdb8065a7588b9b8b3380a80368fb9e42a"
+}

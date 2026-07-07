@@ -1219,6 +1219,21 @@
 					]
 				}
 			]
+		},
+		{
+			"commitHash": "fdc0482b3763252734dc76ce44c87c24f87e8d5f",
+			"topics": [
+				{
+					"title": "Remove reset key shortcut and revert related UI changes",
+					"decisions": "The reset shortcut was reverted rather than kept or reworked. No conversation context is available to explain the reasoning, but the commit message indicates this is a revert of a revert chain, suggesting the feature introduced a problem significant enough to warrant repeated rollback attempts.",
+					"category": "bugfix",
+					"importance": "minor",
+					"filesAffected": [
+						"src/main.ts",
+						"index.html"
+					]
+				}
+			]
 		}
 	]
 }
