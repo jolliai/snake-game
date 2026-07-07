@@ -473,6 +473,44 @@
 					]
 				}
 			]
+		},
+		{
+			"commitHash": "93a06b13e6ca82df430151e3dfd807fdac3f75bd",
+			"recap": "The game now supports persistent leaderboards across all three play modes — single player, two-player, and bot vs bot. After finishing a game, players who achieve a top-10 score are shown an inline prompt to enter their name, with their projected rank displayed before they commit. The entry is saved immediately and a confirmation shows the final rank. Players can browse all three leaderboards from the main menu, switching between modes with tabs, and can clear any board individually. Bot-vs-bot results are recorded automatically using each bot's name, keeping that leaderboard populated without any manual input.\n\nAlongside the leaderboard feature, the game-over screen now surfaces two additional stats for every run: the longest snake length reached and the total survival time. In two-player games both players' peak lengths are shown side by side. These same stats feed directly into the leaderboard ranking, so ties on score are broken first by longest snake and then by how long the player survived.",
+			"topics": [
+				{
+					"title": "Persistent leaderboards with name entry and per-mode rankings",
+					"decisions": "- **Qualification check before prompting**: Players are only shown the name-entry form when their result would actually appear in the top 10. Prompting everyone regardless of rank would feel hollow for low scores and train players to dismiss the prompt. The check runs against the current board state before any entry is saved, so the displayed rank estimate is accurate.\n- **Bot-vs-bot auto-records without prompting**: Bot games have no human player to name, so both bots' results are written silently using the bot's display name. Prompting for a name in a fully automated game mode would be disruptive and meaningless. This keeps the bot leaderboard populated automatically while reserving the name-entry flow for human players.\n- **Last-used name pre-filled in the input**: The name entered most recently is stored separately and pre-populated the next time the prompt appears. This reduces friction for returning players who want to keep the same identity across sessions, while still allowing them to change it each time.",
+					"category": "feature",
+					"importance": "major",
+					"filesAffected": [
+						"src/leaderboard.ts",
+						"src/main.ts",
+						"index.html",
+						"src/style.css"
+					]
+				},
+				{
+					"title": "Game-over screen shows survival time and longest snake stats",
+					"decisions": "- **Stats displayed on game-over rather than during play**: Showing running stats mid-game would add visual noise to the play area. Surfacing them only at the end keeps the in-game UI clean while still giving players a meaningful post-run summary to reflect on.",
+					"category": "feature",
+					"importance": "major",
+					"filesAffected": [
+						"src/main.ts",
+						"index.html",
+						"src/style.css"
+					]
+				},
+				{
+					"title": "Keyboard input blocked from triggering game actions while typing a name",
+					"decisions": "Intercepting at the top of the key handler rather than disabling individual bindings keeps the fix in one place and covers all current and future shortcuts uniformly. Disabling specific keys per-field would require updating multiple code paths whenever new shortcuts are added.",
+					"category": "bugfix",
+					"importance": "minor",
+					"filesAffected": [
+						"src/main.ts"
+					]
+				}
+			]
 		}
 	]
 }

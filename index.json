@@ -356,6 +356,22 @@
 				"insertions": 11,
 				"deletions": 2
 			}
+		},
+		{
+			"commitHash": "93a06b13e6ca82df430151e3dfd807fdac3f75bd",
+			"parentCommitHash": null,
+			"treeHash": "52c4467390d00acb18bd477189fb6bb03b83cdc6",
+			"commitType": "commit",
+			"commitMessage": "Merge pull request #15 from jeverest/add-leaderboards",
+			"commitDate": "2026-05-12T12:07:03-07:00",
+			"branch": "backfilled",
+			"generatedAt": "2026-07-07T15:10:12.238Z",
+			"topicCount": 3,
+			"diffStats": {
+				"filesChanged": 4,
+				"insertions": 543,
+				"deletions": 0
+			}
 		}
 	],
 	"commitAliases": {

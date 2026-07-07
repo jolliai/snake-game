@@ -1,0 +1,76 @@
+{
+	"version": 5,
+	"commitHash": "93a06b13e6ca82df430151e3dfd807fdac3f75bd",
+	"commitMessage": "Merge pull request #15 from jeverest/add-leaderboards",
+	"commitAuthor": "Joe Hart",
+	"commitDate": "2026-05-12T12:07:03-07:00",
+	"branch": "backfilled",
+	"generatedAt": "2026-07-07T15:10:12.238Z",
+	"commitType": "commit",
+	"commitSource": "cli",
+	"transcriptEntries": 0,
+	"conversationTurns": 0,
+	"llm": {
+		"model": "claude-sonnet-4-6",
+		"inputTokens": 12504,
+		"outputTokens": 1296,
+		"cachedTokens": 0,
+		"apiLatencyMs": 31494,
+		"stopReason": null,
+		"source": "jolli-proxy"
+	},
+	"stats": {
+		"filesChanged": 4,
+		"insertions": 543,
+		"deletions": 0
+	},
+	"diffStats": {
+		"filesChanged": 4,
+		"insertions": 543,
+		"deletions": 0
+	},
+	"topics": [
+		{
+			"title": "Persistent leaderboards with name entry and per-mode rankings",
+			"trigger": "Players had no way to record or compare their best performances across sessions. High scores were tracked locally but there was no ranked board, no name entry, and no way to browse past results by game mode.",
+			"response": "- A new leaderboard data layer was introduced in `src/leaderboard.ts`. It stores up to 10 entries per mode (single player, two-player, bot vs bot) in browser local storage, with entries ranked by score, then longest snake, then survival time. The module exposes functions to read, add, and clear entries, plus a qualification check to avoid prompting players who wouldn't make the board.\n- The game-over screen in `src/main.ts` was extended to detect qualifying scores and show an inline name-entry form. On submission the entry is saved and a confirmation message displays the achieved rank. Bot-vs-bot results are recorded automatically without prompting; two-player games prompt for the winner's name only. Single-player bot demos are excluded from the human leaderboard.\n- A dedicated Leaderboards screen was added to `index.html` and wired up in `src/main.ts`. It shows a tabbed table for each mode with columns for rank, name, score, longest snake, survival time, and (for multiplayer modes) result and opponent. A \"Clear This Board\" button lets players reset any individual mode's entries.",
+			"decisions": "- **Qualification check before prompting**: Players are only shown the name-entry form when their result would actually appear in the top 10. Prompting everyone regardless of rank would feel hollow for low scores and train players to dismiss the prompt. The check runs against the current board state before any entry is saved, so the displayed rank estimate is accurate.\n- **Bot-vs-bot auto-records without prompting**: Bot games have no human player to name, so both bots' results are written silently using the bot's display name. Prompting for a name in a fully automated game mode would be disruptive and meaningless. This keeps the bot leaderboard populated automatically while reserving the name-entry flow for human players.\n- **Last-used name pre-filled in the input**: The name entered most recently is stored separately and pre-populated the next time the prompt appears. This reduces friction for returning players who want to keep the same identity across sessions, while still allowing them to change it each time.",
+			"filesAffected": [
+				"src/leaderboard.ts",
+				"src/main.ts",
+				"index.html",
+				"src/style.css"
+			],
+			"category": "feature",
+			"importance": "major"
+		},
+		{
+			"title": "Game-over screen shows survival time and longest snake stats",
+			"trigger": "The game-over screen only showed the final score and high score. Players had no visibility into how long they survived or how large their snake grew during a run.",
+			"response": "- `src/main.ts` now tracks game start time and the maximum snake length reached by each player during a run. These are reset at the start of every new game and updated on each move.\n- A stats row is rendered on the game-over screen showing longest snake and formatted survival time (e.g. \"2m 05s\"). Two-player games show stats for both players. A `formatDuration` helper was added to produce the human-readable time string.",
+			"decisions": "- **Stats displayed on game-over rather than during play**: Showing running stats mid-game would add visual noise to the play area. Surfacing them only at the end keeps the in-game UI clean while still giving players a meaningful post-run summary to reflect on.",
+			"filesAffected": [
+				"src/main.ts",
+				"index.html",
+				"src/style.css"
+			],
+			"category": "feature",
+			"importance": "major"
+		},
+		{
+			"title": "Keyboard input blocked from triggering game actions while typing a name",
+			"trigger": "Pressing Enter or directional keys while the name-entry field was focused would accidentally restart the game or change direction instead of interacting with the form.",
+			"response": "The keyboard handler in `src/main.ts` now checks whether the focused element is a text input, textarea, or select before processing any game key bindings. If the user is typing in a form field, all game shortcuts are suppressed for that keypress.",
+			"decisions": "Intercepting at the top of the key handler rather than disabling individual bindings keeps the fix in one place and covers all current and future shortcuts uniformly. Disabling specific keys per-field would require updating multiple code paths whenever new shortcuts are added.",
+			"filesAffected": [
+				"src/main.ts"
+			],
+			"category": "bugfix",
+			"importance": "minor"
+		}
+	],
+	"backfilled": true,
+	"backfillMethod": "diff-only",
+	"treeHash": "52c4467390d00acb18bd477189fb6bb03b83cdc6",
+	"recap": "The game now supports persistent leaderboards across all three play modes — single player, two-player, and bot vs bot. After finishing a game, players who achieve a top-10 score are shown an inline prompt to enter their name, with their projected rank displayed before they commit. The entry is saved immediately and a confirmation shows the final rank. Players can browse all three leaderboards from the main menu, switching between modes with tabs, and can clear any board individually. Bot-vs-bot results are recorded automatically using each bot's name, keeping that leaderboard populated without any manual input.\n\nAlongside the leaderboard feature, the game-over screen now surfaces two additional stats for every run: the longest snake length reached and the total survival time. In two-player games both players' peak lengths are shown side by side. These same stats feed directly into the leaderboard ranking, so ties on score are broken first by longest snake and then by how long the player survived."
+}
