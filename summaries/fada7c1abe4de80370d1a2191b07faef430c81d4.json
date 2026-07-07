@@ -1,0 +1,50 @@
+{
+	"version": 5,
+	"commitHash": "fada7c1abe4de80370d1a2191b07faef430c81d4",
+	"commitMessage": "Merge pull request #12 from jeverest/add-zigzag-bot",
+	"commitAuthor": "Joe Hart",
+	"commitDate": "2026-04-08T08:58:38-07:00",
+	"branch": "backfilled",
+	"generatedAt": "2026-07-07T15:12:33.971Z",
+	"commitType": "commit",
+	"commitSource": "cli",
+	"transcriptEntries": 0,
+	"conversationTurns": 0,
+	"llm": {
+		"model": "claude-sonnet-4-6",
+		"inputTokens": 6030,
+		"outputTokens": 615,
+		"cachedTokens": 0,
+		"apiLatencyMs": 16050,
+		"stopReason": null,
+		"source": "jolli-proxy"
+	},
+	"stats": {
+		"filesChanged": 2,
+		"insertions": 83,
+		"deletions": 1
+	},
+	"diffStats": {
+		"filesChanged": 2,
+		"insertions": 83,
+		"deletions": 1
+	},
+	"topics": [
+		{
+			"title": "New zigzag snake bot that weaves toward food",
+			"trigger": "The project needed an additional bot personality to expand the roster of available snake opponents. A zigzag-style bot with a distinctive weaving movement pattern was contributed via pull request.",
+			"response": "- `src/bots/zigzag-bot.ts` was created from scratch, implementing a scoring-based direction chooser. The bot evaluates each candidate move by simulating it, then scores it across several dimensions: food proximity via BFS path length, reachable area (used as a safety floor), wall proximity penalty, and a bonus for turning perpendicular to the current heading. The perpendicular-turn bonus is what produces the characteristic sawtooth weave.\n- `src/bots/index.ts` was updated to import `zigzagBot` and append it to the `AVAILABLE_BOTS` array, making it selectable in the game alongside the existing nine bots.",
+			"decisions": "- **Safety-first scoring with a hard floor**: Moves that leave the snake unable to reach its own tail are scored at a large negative value rather than being filtered out entirely. This preserves a fallback path when all moves are dangerous, letting the bot pick the least-bad option rather than returning null and crashing.\n- **Perpendicular-turn bias over strict path-following**: Rather than building a dedicated zigzag planner, the bot adds a flat score bonus whenever the chosen direction is perpendicular to the current heading. This keeps the implementation simple and composable with the food-pursuit and safety logic, at the cost of the weave being opportunistic rather than geometrically precise.\n- **Wall-margin penalty to protect the weave near edges**: Zigzagging close to a wall tends to trap the snake faster than it would a straight-moving bot, so a score penalty is applied when the next head position is within one cell of any border. This trades a small amount of aggressive food pursuit near edges for meaningfully better survival near boundaries.",
+			"filesAffected": [
+				"src/bots/zigzag-bot.ts",
+				"src/bots/index.ts"
+			],
+			"category": "feature",
+			"importance": "major"
+		}
+	],
+	"backfilled": true,
+	"backfillMethod": "diff-only",
+	"treeHash": "849749f64bfe789fe1322f7375eeffbe8bfd76bc",
+	"recap": "A new snake bot called Zigzag joined the roster of available opponents. It moves in a sawtooth weaving pattern, alternating left and right turns as it advances toward food, giving it a visually distinct style compared to the existing bots. The bot also applies a wall-avoidance penalty near the edges of the grid, where weaving movement is most likely to cause self-entrapment, and falls back gracefully when all available moves are risky rather than failing outright."
+}
