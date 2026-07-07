@@ -46,5 +46,7 @@
 	"backfilled": true,
 	"backfillMethod": "diff-only",
 	"treeHash": "f065045da55c7b345f6c7add470d9d15117a8340",
-	"recap": "A new bot called Ambusher joined the snake game's roster of playable opponents. Unlike bots that chase food across the entire board, the Ambusher holds a position near the center of the grid and only commits to an aggressive pursuit when food spawns within a short distance. The strike range adjusts automatically to the size of the board, keeping the bot's behavior consistent across different grid configurations. Survival takes absolute priority: the bot will always choose a safe path over a scoring opportunity if the alternative risks trapping itself."
+	"recap": "A new bot called Ambusher joined the snake game's roster of playable opponents. Unlike bots that chase food across the entire board, the Ambusher holds a position near the center of the grid and only commits to an aggressive pursuit when food spawns within a short distance. The strike range adjusts automatically to the size of the board, keeping the bot's behavior consistent across different grid configurations. Survival takes absolute priority: the bot will always choose a safe path over a scoring opportunity if the alternative risks trapping itself.",
+	"jolliDocUrl": "https://jolli.ai/brckbmk4/articles?doc=2638",
+	"jolliDocId": 2638
 }
