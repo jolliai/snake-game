@@ -1,0 +1,50 @@
+{
+	"version": 5,
+	"commitHash": "5daac7a44ffa8be20e7a790dded179275ae813ad",
+	"commitMessage": "Reapply \"Reapply \"Add R key to reset game from any state\"\"",
+	"commitAuthor": "Joe Hart",
+	"commitDate": "2026-02-12T20:00:43-08:00",
+	"branch": "backfilled",
+	"generatedAt": "2026-07-07T15:23:01.297Z",
+	"commitType": "commit",
+	"commitSource": "cli",
+	"transcriptEntries": 0,
+	"conversationTurns": 0,
+	"llm": {
+		"model": "claude-sonnet-4-6",
+		"inputTokens": 5240,
+		"outputTokens": 497,
+		"cachedTokens": 0,
+		"apiLatencyMs": 13053,
+		"stopReason": null,
+		"source": "jolli-proxy"
+	},
+	"stats": {
+		"filesChanged": 2,
+		"insertions": 7,
+		"deletions": 1
+	},
+	"diffStats": {
+		"filesChanged": 2,
+		"insertions": 7,
+		"deletions": 1
+	},
+	"topics": [
+		{
+			"title": "Add keyboard shortcut to reset the game at any time",
+			"trigger": "Players had no way to restart the game mid-session without navigating away or waiting for a game-over screen. A reset shortcut was needed so players could start fresh at any point.",
+			"response": "- In `src/main.ts`, an early-exit handler was added to `handleKeyPress` so that pressing R (upper or lower case) calls `startNewGame` immediately, before any other key logic runs. This ensures the reset works regardless of whether the game is running, paused, or over.\n- Also in `startNewGame` within `src/main.ts`, the pause overlay is now explicitly hidden when a new game begins, preventing a stale pause screen from persisting if the player resets while paused.\n- The on-screen control hint in `index.html` was updated to include \"Press R to Reset\" so players can discover the shortcut without consulting external documentation.",
+			"decisions": "- **Reset works from every game state**: Handling the R key before the pause and direction checks means it fires unconditionally — whether the game is live, paused, or ended. The alternative of gating reset on specific states would have created edge cases where the shortcut silently did nothing, which is confusing for players.\n- **Hiding the pause screen on reset**: Rather than relying on the game-start flow to implicitly clear UI state, the pause overlay is now explicitly dismissed when a new game is initialized. This prevents a visual bug where a player who resets while paused would see the pause indicator on an already-running new game.",
+			"filesAffected": [
+				"src/main.ts",
+				"index.html"
+			],
+			"category": "feature",
+			"importance": "major"
+		}
+	],
+	"backfilled": true,
+	"backfillMethod": "diff-only",
+	"treeHash": "611d1670b999684ceeed254f74a30064ac0d09d2",
+	"recap": "Players can now press R at any point during a Snake session to immediately restart the game. The shortcut works from all states — mid-game, paused, or after a game over — and the on-screen controls hint was updated so the option is visible without any prior knowledge. A subtle visual bug was also resolved: resetting while paused no longer leaves the pause indicator visible on the freshly started game."
+}
