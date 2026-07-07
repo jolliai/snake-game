@@ -529,6 +529,35 @@
 					]
 				}
 			]
+		},
+		{
+			"commitHash": "5e095b21fad625332fb89c0feba50d8e100019d2",
+			"recap": "The Snake game gained two new competitive modes: a local two-player mode where one player uses WASD and the other uses arrow keys, and a fully automated bot-versus-bot mode where two independently configured bots compete on the same board. Both modes start immediately on launch rather than waiting for a keypress, and the game loop resolves both snakes' moves at the same instant each tick, treating simultaneous head-on collisions as a draw rather than giving either player an advantage.\n\nThe menu, in-game display, and game-over screen were all updated to reflect the active mode. Players can now select a separate bot profile for each snake before starting a bot match. During play, per-player scores appear color-coded to match each snake, and the bot controls are hidden entirely in two-player modes. After a match ends, the game-over screen announces the winner and shows both players' final scores, with a menu button and keyboard shortcut available to return to the main screen at any time.",
+			"topics": [
+				{
+					"title": "Two-player and bot-versus-bot game modes added to Snake",
+					"decisions": "- **Separate key bindings for two-player mode**: In two-player mode, Player 1 is locked to WASD and Player 2 to arrow keys, rather than letting both players share all keys. Sharing keys would cause one player's input to accidentally move the other's snake, making simultaneous play impossible. Single-player mode retains both key sets for convenience.\n- **Simultaneous collision resolution**: Both snakes' new head positions are computed before either move is applied, and a head-to-head collision is treated as a draw rather than giving priority to whichever snake was processed first. Processing them sequentially would introduce an unfair advantage for whichever player happened to be evaluated first in the code.\n- **Opponent snake passed into bot helpers**: Rather than giving bots a global view of the board, the opponent's body is injected only into the path-finding helpers (`simulateMove`, `analyzePosition`) used during that bot's turn. This keeps the existing bot interface stable and avoids rewriting every bot implementation while still letting bots make collision-aware decisions against a second snake.",
+					"category": "feature",
+					"importance": "major",
+					"filesAffected": [
+						"src/main.ts",
+						"index.html",
+						"src/style.css",
+						"src/bots/bot-types.ts"
+					]
+				},
+				{
+					"title": "Menu and in-game UI updated to support multiple game modes",
+					"decisions": "- **Hide bot controls entirely in two-player modes**: Rather than disabling the bot toggle button, it and the bot profile selector are hidden when a two-player mode is active. Leaving them visible but disabled would invite confusion about whether the bot was influencing the game; hiding them makes the control surface match the actual game rules.\n- **Color-coded player scores throughout**: Player 1 scores are styled green (matching the snake color) and Player 2 scores blue throughout the game and game-over screens. Consistent color association reduces the cognitive load of tracking which number belongs to which snake, especially during fast play.",
+					"category": "ux",
+					"importance": "major",
+					"filesAffected": [
+						"index.html",
+						"src/main.ts",
+						"src/style.css"
+					]
+				}
+			]
 		}
 	]
 }
