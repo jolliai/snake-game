@@ -973,6 +973,20 @@
 					]
 				}
 			]
+		},
+		{
+			"commitHash": "aa60e54001ccf9ac4c6d03b41422ba10a39c93ac",
+			"topics": [
+				{
+					"title": "First person snake view added to user feedback list",
+					"decisions": "No design decisions were made in this session; the change is a verbatim transcription of a user's feature request into the feedback log.",
+					"category": "docs",
+					"importance": "minor",
+					"filesAffected": [
+						"README3.md"
+					]
+				}
+			]
 		}
 	]
 }
