@@ -389,6 +389,23 @@
 				}
 			],
 			"lastUpdatedAt": "2026-07-07T15:24:20.601Z"
+		},
+		{
+			"stableSlug": "enter-key-new-game",
+			"title": "Enter Key to Start New Game from Menu or Game Over",
+			"summary": "The Enter key starts a new game from the main menu or game-over screen; it does nothing during active gameplay to prevent accidental restarts.",
+			"relatedBranches": [
+				"backfilled"
+			],
+			"sourceRefs": [
+				{
+					"type": "summary",
+					"id": "6f96e53c6166f7955f1971409a820c1345398513",
+					"timestamp": "2026-02-23T19:09:02-08:00",
+					"branch": "backfilled"
+				}
+			],
+			"lastUpdatedAt": "2026-07-07T15:24:20.601Z"
 		}
 	]
 }
