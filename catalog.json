@@ -1017,6 +1017,22 @@
 					]
 				}
 			]
+		},
+		{
+			"commitHash": "40fd84a19a80ae089d2feb6f4c08f803eb3ca255",
+			"recap": "The snake game's isometric view gained a perspective projection effect, making tiles and blocks near the far edge of the board appear smaller than those close to the viewer. Players can tune the strength of this effect live using keyboard shortcuts, from a completely flat parallel view all the way to a pronounced vanishing-point look. The canvas now also responds to browser window resizing, keeping the board correctly scaled and centered at any viewport width.\n\nThe block rendering was also reworked so that face shading and draw order are computed from the actual projected geometry of each tile rather than fixed assumptions about which side is \"left\" and which is \"right.\" This means blocks look correct at every rotation angle, with the darker and lighter faces always appearing on the geometrically appropriate sides.",
+			"topics": [
+				{
+					"title": "Perspective projection added to isometric snake game view",
+					"decisions": "- **Perspective strength as a tunable ratio rather than a fixed focal length**: The perspective effect is controlled by a single 0–1 strength value that the player can adjust live with keyboard shortcuts. This keeps the feature approachable and lets players dial in the look they prefer, while the underlying focal length is derived automatically from the grid's depth range so the effect scales correctly regardless of grid size or rotation angle.\n- **Rotation-invariant canvas sizing**: The canvas is now sized to the maximum possible grid extent at any rotation angle rather than the actual extent at the current angle. This prevents the canvas from resizing and the page layout from jumping every time the player rotates the board, at the cost of a small amount of unused canvas space at non-45° angles.\n- **Dynamic face classification instead of hardcoded left/right faces**: Rather than always drawing a fixed \"left face\" and \"right face\", the renderer now inspects the projected corner positions at draw time to decide which edges are front-facing. This makes the block rendering correct across all rotation angles and is a prerequisite for perspective projection, where the apparent geometry of each tile changes depending on its position on the board.",
+					"category": "feature",
+					"importance": "major",
+					"filesAffected": [
+						"src/main.ts",
+						"src/style.css"
+					]
+				}
+			]
 		}
 	]
 }

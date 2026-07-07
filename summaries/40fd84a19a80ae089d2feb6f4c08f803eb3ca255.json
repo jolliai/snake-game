@@ -1,0 +1,50 @@
+{
+	"version": 5,
+	"commitHash": "40fd84a19a80ae089d2feb6f4c08f803eb3ca255",
+	"commitMessage": "Merge pull request #6 from jeverest/perspective-projection",
+	"commitAuthor": "Joe Hart",
+	"commitDate": "2026-02-22T12:42:43-08:00",
+	"branch": "backfilled",
+	"generatedAt": "2026-07-07T15:18:58.902Z",
+	"commitType": "commit",
+	"commitSource": "cli",
+	"transcriptEntries": 0,
+	"conversationTurns": 0,
+	"llm": {
+		"model": "claude-sonnet-4-6",
+		"inputTokens": 8825,
+		"outputTokens": 767,
+		"cachedTokens": 0,
+		"apiLatencyMs": 20589,
+		"stopReason": null,
+		"source": "jolli-proxy"
+	},
+	"stats": {
+		"filesChanged": 3,
+		"insertions": 122,
+		"deletions": 48
+	},
+	"diffStats": {
+		"filesChanged": 3,
+		"insertions": 122,
+		"deletions": 48
+	},
+	"topics": [
+		{
+			"title": "Perspective projection added to isometric snake game view",
+			"trigger": "The isometric game board used a flat parallel projection, making all tiles appear the same size regardless of their position. The developer wanted to add a sense of depth by making tiles farther away appear smaller, like a real 3D perspective view.",
+			"response": "- Added perspective projection math to `src/main.ts` via a `focalLength` value derived from a configurable `perspectiveStrength` property. The `toIso()` method now scales each point based on its depth distance from the viewer, and a new `getBlockHeight()` method applies the same per-tile depth scaling to block extrusion height so blocks shrink naturally toward the horizon.\n- Overhauled the block face rendering in `drawBlock()` to dynamically classify each of the four side faces as front-facing or back-facing based on the projected geometry, then draws back faces first and front faces on top. Face shading (light vs. dark) is now determined by the face's outward normal direction rather than hardcoded left/right assumptions, making the rendering correct at any rotation angle.\n- Added keyboard shortcuts (`[` and `]`) to decrease and increase perspective strength at runtime, and wired a `resize` event listener so the canvas and projection recompute whenever the browser window changes size.",
+			"decisions": "- **Perspective strength as a tunable ratio rather than a fixed focal length**: The perspective effect is controlled by a single 0–1 strength value that the player can adjust live with keyboard shortcuts. This keeps the feature approachable and lets players dial in the look they prefer, while the underlying focal length is derived automatically from the grid's depth range so the effect scales correctly regardless of grid size or rotation angle.\n- **Rotation-invariant canvas sizing**: The canvas is now sized to the maximum possible grid extent at any rotation angle rather than the actual extent at the current angle. This prevents the canvas from resizing and the page layout from jumping every time the player rotates the board, at the cost of a small amount of unused canvas space at non-45° angles.\n- **Dynamic face classification instead of hardcoded left/right faces**: Rather than always drawing a fixed \"left face\" and \"right face\", the renderer now inspects the projected corner positions at draw time to decide which edges are front-facing. This makes the block rendering correct across all rotation angles and is a prerequisite for perspective projection, where the apparent geometry of each tile changes depending on its position on the board.",
+			"filesAffected": [
+				"src/main.ts",
+				"src/style.css"
+			],
+			"category": "feature",
+			"importance": "major"
+		}
+	],
+	"backfilled": true,
+	"backfillMethod": "diff-only",
+	"treeHash": "7d4c7ff22b07682ba3ed01deee820548c36e673c",
+	"recap": "The snake game's isometric view gained a perspective projection effect, making tiles and blocks near the far edge of the board appear smaller than those close to the viewer. Players can tune the strength of this effect live using keyboard shortcuts, from a completely flat parallel view all the way to a pronounced vanishing-point look. The canvas now also responds to browser window resizing, keeping the board correctly scaled and centered at any viewport width.\n\nThe block rendering was also reworked so that face shading and draw order are computed from the actual projected geometry of each tile rather than fixed assumptions about which side is \"left\" and which is \"right.\" This means blocks look correct at every rotation angle, with the darker and lighter faces always appearing on the geometrically appropriate sides."
+}
