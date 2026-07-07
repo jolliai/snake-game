@@ -1,0 +1,50 @@
+{
+	"version": 5,
+	"commitHash": "cb024d7c90b635238238d7a9703ae1df519085a2",
+	"commitMessage": "Add Zigzag bot that weaves in sawtooth patterns",
+	"commitAuthor": "Joe Hart",
+	"commitDate": "2026-04-08T08:57:51-07:00",
+	"branch": "backfilled",
+	"generatedAt": "2026-07-07T15:12:48.987Z",
+	"commitType": "commit",
+	"commitSource": "cli",
+	"transcriptEntries": 0,
+	"conversationTurns": 0,
+	"llm": {
+		"model": "claude-sonnet-4-6",
+		"inputTokens": 6022,
+		"outputTokens": 603,
+		"cachedTokens": 0,
+		"apiLatencyMs": 14858,
+		"stopReason": null,
+		"source": "jolli-proxy"
+	},
+	"stats": {
+		"filesChanged": 2,
+		"insertions": 83,
+		"deletions": 1
+	},
+	"diffStats": {
+		"filesChanged": 2,
+		"insertions": 83,
+		"deletions": 1
+	},
+	"topics": [
+		{
+			"title": "New Zigzag bot that weaves in sawtooth patterns toward food",
+			"trigger": "The project needed a new snake bot with a distinctive movement style — one that weaves back and forth rather than moving in straight lines or spirals.",
+			"response": "- Created `src/bots/zigzag-bot.ts` implementing the `SnakeBot` interface. The bot scores candidate directions using a `scoreDirection` function that combines food-seeking heuristics (BFS path length, Manhattan distance) with a perpendicular-turn bonus that produces the characteristic weaving motion. Safety is enforced by requiring tail reachability and penalizing moves that leave insufficient open area.\n- Registered the new bot in `src/bots/index.ts` by importing `zigzagBot` and appending it to the `AVAILABLE_BOTS` array, making it selectable alongside the existing nine bots.",
+			"decisions": "- **Perpendicular-turn bias over straight-line movement**: The bot awards a score bonus for turning perpendicular to the current heading rather than continuing straight. This is a lightweight way to encode the sawtooth weaving behavior without a separate state machine or turn counter — the scoring function naturally alternates directions as long as perpendicular moves are safe and competitive.\n- **Safety gate before style**: Tail reachability is checked first and, if it fails, the direction is scored far below any safe alternative regardless of food proximity or weaving preference. This ensures the aesthetic zigzag pattern never overrides survival, accepting that the bot may temporarily move straight when weaving would be dangerous.\n- **Wall-proximity penalty**: An additional penalty is applied when the next head position is within one cell of any edge. Zigzagging near walls is disproportionately risky because perpendicular turns quickly run out of space, so the penalty discourages the bot from entering those corridors in the first place.",
+			"filesAffected": [
+				"src/bots/zigzag-bot.ts",
+				"src/bots/index.ts"
+			],
+			"category": "feature",
+			"importance": "major"
+		}
+	],
+	"backfilled": true,
+	"backfillMethod": "diff-only",
+	"treeHash": "849749f64bfe789fe1322f7375eeffbe8bfd76bc",
+	"recap": "A new Zigzag bot joined the roster of available snake bots. Unlike the existing bots that move in spirals, along edges, or reactively toward food, the Zigzag bot weaves back and forth in a sawtooth pattern as it advances — turning perpendicular to its current heading whenever it safely can. The bot still pursues food and avoids trapping itself, but its movement has a visually distinctive alternating rhythm. Players can now select Zigzag alongside the nine previously available bots."
+}

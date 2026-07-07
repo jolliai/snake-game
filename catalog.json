@@ -634,6 +634,22 @@
 					]
 				}
 			]
+		},
+		{
+			"commitHash": "cb024d7c90b635238238d7a9703ae1df519085a2",
+			"recap": "A new Zigzag bot joined the roster of available snake bots. Unlike the existing bots that move in spirals, along edges, or reactively toward food, the Zigzag bot weaves back and forth in a sawtooth pattern as it advances — turning perpendicular to its current heading whenever it safely can. The bot still pursues food and avoids trapping itself, but its movement has a visually distinctive alternating rhythm. Players can now select Zigzag alongside the nine previously available bots.",
+			"topics": [
+				{
+					"title": "New Zigzag bot that weaves in sawtooth patterns toward food",
+					"decisions": "- **Perpendicular-turn bias over straight-line movement**: The bot awards a score bonus for turning perpendicular to the current heading rather than continuing straight. This is a lightweight way to encode the sawtooth weaving behavior without a separate state machine or turn counter — the scoring function naturally alternates directions as long as perpendicular moves are safe and competitive.\n- **Safety gate before style**: Tail reachability is checked first and, if it fails, the direction is scored far below any safe alternative regardless of food proximity or weaving preference. This ensures the aesthetic zigzag pattern never overrides survival, accepting that the bot may temporarily move straight when weaving would be dangerous.\n- **Wall-proximity penalty**: An additional penalty is applied when the next head position is within one cell of any edge. Zigzagging near walls is disproportionately risky because perpendicular turns quickly run out of space, so the penalty discourages the bot from entering those corridors in the first place.",
+					"category": "feature",
+					"importance": "major",
+					"filesAffected": [
+						"src/bots/zigzag-bot.ts",
+						"src/bots/index.ts"
+					]
+				}
+			]
 		}
 	]
 }
