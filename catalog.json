@@ -650,6 +650,22 @@
 					]
 				}
 			]
+		},
+		{
+			"commitHash": "4585346b57a553b0e7c9046f375b0bb9dbc4be06",
+			"recap": "A new bot called Spiral joined the snake game's roster of playable opponents. Rather than chasing food directly or patrolling edges, it moves in a clockwise sweeping pattern across the grid, running straight until it nears a wall and then turning inward to continue the spiral. Food collection is still part of its behavior, but the spiral motion takes priority, giving it a visually distinct movement style compared to the existing bots. The bot also checks at every step that it can still reach its own tail, keeping it from trapping itself as the spiral tightens.",
+			"topics": [
+				{
+					"title": "New spiral movement bot added to snake game",
+					"decisions": "- **Straight-first, clockwise-second priority**: The bot awards a higher score to continuing straight than to turning clockwise, with counter-clockwise receiving nothing. This produces a natural spiral: the snake runs along a straight path until a wall forces a clockwise turn, then repeats. A pure clockwise-always rule would cause tight circles; the straight preference creates wider, grid-sweeping loops.\n- **Tail-reachability as a hard gate**: Any move that leaves the snake unable to reach its own tail is scored at a large negative value, with only a small partial credit for reachable open area. This keeps the spiral from painting itself into a corner, trading some spiral purity for survival safety.\n- **Moderate food pursuit layered on top**: Food proximity and path-to-food scores are included but weighted lower than the spiral and safety signals. This means the bot will detour toward food when a clear path exists, but will not abandon the spiral pattern to chase food aggressively — a deliberate balance between score-seeking and pattern consistency.",
+					"category": "feature",
+					"importance": "major",
+					"filesAffected": [
+						"src/bots/spiral-bot.ts",
+						"src/bots/index.ts"
+					]
+				}
+			]
 		}
 	]
 }

@@ -1,0 +1,50 @@
+{
+	"version": 5,
+	"commitHash": "4585346b57a553b0e7c9046f375b0bb9dbc4be06",
+	"commitMessage": "Merge pull request #11 from jeverest/add-spiral-bot",
+	"commitAuthor": "Joe Hart",
+	"commitDate": "2026-04-06T18:32:23-07:00",
+	"branch": "backfilled",
+	"generatedAt": "2026-07-07T15:13:05.417Z",
+	"commitType": "commit",
+	"commitSource": "cli",
+	"transcriptEntries": 0,
+	"conversationTurns": 0,
+	"llm": {
+		"model": "claude-sonnet-4-6",
+		"inputTokens": 6153,
+		"outputTokens": 623,
+		"cachedTokens": 0,
+		"apiLatencyMs": 16284,
+		"stopReason": null,
+		"source": "jolli-proxy"
+	},
+	"stats": {
+		"filesChanged": 2,
+		"insertions": 86,
+		"deletions": 2
+	},
+	"diffStats": {
+		"filesChanged": 2,
+		"insertions": 86,
+		"deletions": 2
+	},
+	"topics": [
+		{
+			"title": "New spiral movement bot added to snake game",
+			"trigger": "The project needed a new bot personality that moves in a clockwise spiral pattern, sweeping the grid inward rather than chasing food directly or hugging edges.",
+			"response": "- `src/bots/spiral-bot.ts` was created from scratch. It implements a scoring function that evaluates each candidate move direction by simulating the move, checking reachability of the snake's own tail, measuring proximity to walls, and applying bonuses that favor moving straight first and turning clockwise second. Counter-clockwise turns receive no bonus and are naturally deprioritized. An additional wall-proximity bonus reinforces the inward spiral turn when the head is adjacent to a wall.\n- `src/bots/index.ts` was updated to import `spiralBot` and append it to the list of available bots, making it selectable in the game alongside the existing eight bots.",
+			"decisions": "- **Straight-first, clockwise-second priority**: The bot awards a higher score to continuing straight than to turning clockwise, with counter-clockwise receiving nothing. This produces a natural spiral: the snake runs along a straight path until a wall forces a clockwise turn, then repeats. A pure clockwise-always rule would cause tight circles; the straight preference creates wider, grid-sweeping loops.\n- **Tail-reachability as a hard gate**: Any move that leaves the snake unable to reach its own tail is scored at a large negative value, with only a small partial credit for reachable open area. This keeps the spiral from painting itself into a corner, trading some spiral purity for survival safety.\n- **Moderate food pursuit layered on top**: Food proximity and path-to-food scores are included but weighted lower than the spiral and safety signals. This means the bot will detour toward food when a clear path exists, but will not abandon the spiral pattern to chase food aggressively — a deliberate balance between score-seeking and pattern consistency.",
+			"filesAffected": [
+				"src/bots/spiral-bot.ts",
+				"src/bots/index.ts"
+			],
+			"category": "feature",
+			"importance": "major"
+		}
+	],
+	"backfilled": true,
+	"backfillMethod": "diff-only",
+	"treeHash": "822c5f83df0de67981d7dd90673fe04507e24732",
+	"recap": "A new bot called Spiral joined the snake game's roster of playable opponents. Rather than chasing food directly or patrolling edges, it moves in a clockwise sweeping pattern across the grid, running straight until it nears a wall and then turning inward to continue the spiral. Food collection is still part of its behavior, but the spiral motion takes priority, giving it a visually distinct movement style compared to the existing bots. The bot also checks at every step that it can still reach its own tail, keeping it from trapping itself as the spiral tightens."
+}
