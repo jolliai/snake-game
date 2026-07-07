@@ -916,7 +916,9 @@ class SnakeGame {
     document.getElementById('clear-leaderboard')!.addEventListener('click', () => {
       if (confirm(`Clear the ${MODE_LABELS[this.leaderboardActiveMode]} leaderboard?`)) {
         clearLeaderboard(this.leaderboardActiveMode)
-        this.renderLeaderboardTable(this.leaderboardActiveMode)
+        // Re-open so the rainbow tab re-hides and we fall back to a visible
+        // board when the one just cleared was the rainbow board.
+        this.openLeaderboards(this.leaderboardActiveMode)
       }
     })
     for (const tab of document.querySelectorAll<HTMLButtonElement>('.lb-tab')) {
@@ -926,7 +928,9 @@ class SnakeGame {
       })
     }
     document.getElementById('view-leaderboard')!.addEventListener('click', () => {
-      this.openLeaderboards(this.gameMode)
+      // After a rainbow game, reveal the secret board the score landed on;
+      // openLeaderboards falls back to the normal mode if nothing qualified.
+      this.openLeaderboards(this.rainbowSnake ? 'rainbow' : this.gameMode)
     })
     document.getElementById('leaderboard-name-form')!.addEventListener('submit', e => {
       e.preventDefault()
@@ -2411,7 +2415,7 @@ class SnakeGame {
       // Any bot involvement disqualifies the run from the human leaderboard.
       this.clearLeaderboardPrompt()
     } else {
-      this.maybePromptForEntry('single', {
+      this.maybePromptForEntry(this.leaderboardTargetMode('single'), {
         name: '',
         score: this.score,
         longestSnake: this.maxLength1,
@@ -2476,7 +2480,8 @@ class SnakeGame {
 
     if (this.gameMode === 'bvb') {
       // Auto-record both bots; no prompt needed.
-      addEntry('bvb', {
+      const bvbTarget = this.leaderboardTargetMode('bvb')
+      addEntry(bvbTarget, {
         name: this.activeBot.name,
         score: this.score,
         longestSnake: this.maxLength1,
@@ -2485,7 +2490,7 @@ class SnakeGame {
         result: p1Result,
         opponent: this.activeBot2.name
       })
-      addEntry('bvb', {
+      addEntry(bvbTarget, {
         name: this.activeBot2.name,
         score: this.score2,
         longestSnake: this.maxLength2,
@@ -2517,7 +2522,7 @@ class SnakeGame {
             timestamp: Date.now(),
             result: p2Result
           }
-      this.maybePromptForEntry('pvp', entry)
+      this.maybePromptForEntry(this.leaderboardTargetMode('pvp'), entry)
     }
 
     this.showScreen('game-over')
@@ -2587,8 +2592,28 @@ class SnakeGame {
 
   // === Leaderboard UI ===
 
+  // Route a run's score to the hidden Rainbow Snake board (JOE-7) when it was a
+  // rainbow game; otherwise to its normal mode board.
+  private leaderboardTargetMode(normal: LeaderboardMode): LeaderboardMode {
+    return this.rainbowSnake ? 'rainbow' : normal
+  }
+
+  // The rainbow board stays secret until a score has been entered there.
+  private rainbowBoardRevealed(): boolean {
+    return getLeaderboard('rainbow').length > 0
+  }
+
+  private updateRainbowTabVisibility() {
+    const tab = document.querySelector<HTMLButtonElement>('.lb-tab[data-mode="rainbow"]')
+    if (tab) tab.hidden = !this.rainbowBoardRevealed()
+  }
+
   private openLeaderboards(mode: LeaderboardMode) {
+    // Never land on the rainbow board while it's still hidden (e.g. a stale
+    // active mode after the board was cleared).
+    if (mode === 'rainbow' && !this.rainbowBoardRevealed()) mode = 'single'
     this.leaderboardActiveMode = mode
+    this.updateRainbowTabVisibility()
     for (const tab of document.querySelectorAll<HTMLButtonElement>('.lb-tab')) {
       tab.classList.toggle('active', tab.dataset.mode === mode)
     }
@@ -2604,8 +2629,10 @@ class SnakeGame {
       return
     }
 
-    const showResult = mode !== 'single'
-    const showOpponent = mode === 'bvb'
+    // The rainbow board aggregates runs from every mode, so its columns depend
+    // on what the entries actually carry rather than a single fixed mode.
+    const showResult = mode === 'rainbow' ? entries.some(e => e.result) : mode !== 'single'
+    const showOpponent = mode === 'rainbow' ? entries.some(e => e.opponent) : mode === 'bvb'
 
     const rows = entries.map((entry, i) => {
       const cells: string[] = []

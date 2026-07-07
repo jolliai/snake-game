@@ -1,4 +1,4 @@
-export type LeaderboardMode = 'single' | 'pvp' | 'bvb'
+export type LeaderboardMode = 'single' | 'pvp' | 'bvb' | 'rainbow'
 
 export type GameResult = 'win' | 'loss' | 'draw'
 
@@ -92,5 +92,8 @@ export function sanitizeName(input: string): string {
 export const MODE_LABELS: Record<LeaderboardMode, string> = {
   single: 'Single Player',
   pvp: 'Two Player',
-  bvb: 'Bot vs Bot'
+  bvb: 'Bot vs Bot',
+  // Hidden Rainbow Snake board (JOE-7): collects every score made during a rare
+  // rainbow game, across all modes. Its tab stays hidden until it has an entry.
+  rainbow: '🌈 Rainbow Snake'
 }
