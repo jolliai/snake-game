@@ -46,5 +46,7 @@
 	"backfilled": true,
 	"backfillMethod": "diff-only",
 	"treeHash": "243e987e440af0609decc3aa1603079f6ccd1ee5",
-	"recap": "A new Sweeper bot joined the roster of available snake strategies. It navigates the grid in a lawnmower pattern, sweeping each row in alternating directions and stepping downward at the end of each pass. Unlike purely reactive bots, the Sweeper treats coverage as its primary goal, with food-seeking and open-space awareness playing a supporting role.\n\nThe bot stays alive by treating the ability to reach its own tail as a near-disqualifying condition for any move, so it will break from the sweep pattern when necessary to avoid trapping itself. Players selecting the Sweeper can expect methodical, grid-wide coverage under normal conditions, with graceful deviation when the pattern would otherwise be fatal."
+	"recap": "A new Sweeper bot joined the roster of available snake strategies. It navigates the grid in a lawnmower pattern, sweeping each row in alternating directions and stepping downward at the end of each pass. Unlike purely reactive bots, the Sweeper treats coverage as its primary goal, with food-seeking and open-space awareness playing a supporting role.\n\nThe bot stays alive by treating the ability to reach its own tail as a near-disqualifying condition for any move, so it will break from the sweep pattern when necessary to avoid trapping itself. Players selecting the Sweeper can expect methodical, grid-wide coverage under normal conditions, with graceful deviation when the pattern would otherwise be fatal.",
+	"jolliDocUrl": "https://jolli.ai/brckbmk4/articles?doc=2654",
+	"jolliDocId": 2654
 }
