@@ -644,6 +644,22 @@
 				"insertions": 76,
 				"deletions": 1
 			}
+		},
+		{
+			"commitHash": "a529ccd969f51fe293f5307a5aef58ee30118e63",
+			"parentCommitHash": null,
+			"treeHash": "060555171ce1b17345837cb58bdcf6cd10c10abe",
+			"commitType": "commit",
+			"commitMessage": "Add Chaser bot that follows shortest path to food with tail-chase fallback",
+			"commitDate": "2026-04-06T17:24:27-07:00",
+			"branch": "backfilled",
+			"generatedAt": "2026-07-07T15:15:56.706Z",
+			"topicCount": 1,
+			"diffStats": {
+				"filesChanged": 2,
+				"insertions": 73,
+				"deletions": 1
+			}
 		}
 	],
 	"commitAliases": {

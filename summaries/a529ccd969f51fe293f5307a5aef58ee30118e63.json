@@ -1,0 +1,50 @@
+{
+	"version": 5,
+	"commitHash": "a529ccd969f51fe293f5307a5aef58ee30118e63",
+	"commitMessage": "Add Chaser bot that follows shortest path to food with tail-chase fallback",
+	"commitAuthor": "Joe Hart",
+	"commitDate": "2026-04-06T17:24:27-07:00",
+	"branch": "backfilled",
+	"generatedAt": "2026-07-07T15:15:56.706Z",
+	"commitType": "commit",
+	"commitSource": "cli",
+	"transcriptEntries": 0,
+	"conversationTurns": 0,
+	"llm": {
+		"model": "claude-sonnet-4-6",
+		"inputTokens": 6006,
+		"outputTokens": 676,
+		"cachedTokens": 0,
+		"apiLatencyMs": 18130,
+		"stopReason": null,
+		"source": "jolli-proxy"
+	},
+	"stats": {
+		"filesChanged": 2,
+		"insertions": 73,
+		"deletions": 1
+	},
+	"diffStats": {
+		"filesChanged": 2,
+		"insertions": 73,
+		"deletions": 1
+	},
+	"topics": [
+		{
+			"title": "New aggressive food-chasing bot with safe fallback behavior",
+			"trigger": "The game needed an additional bot personality that actively pursues food along the shortest available path, while still being able to survive when that path would lead it into a trap.",
+			"response": "- `src/bots/chaser-bot.ts` was created with a `scoreDirection` function that evaluates each candidate move using BFS-derived path length to food, reachable open area, and Manhattan distance. When the bot detects it cannot reach its own tail after a move (a classic trap indicator), it switches to a tail-chasing survival mode that prioritizes open space and proximity to the tail over food pursuit.\n- `src/bots/index.ts` was updated to import `chaserBot` and append it to the `AVAILABLE_BOTS` array, making it selectable in the game alongside the existing bots.",
+			"decisions": "- **Tail-reachability as a trap gate**: Rather than blending food-pursuit and safety scores continuously, the bot uses a hard branch: if the tail is unreachable after a move, the entire scoring regime switches to survival mode. This keeps food-chasing aggressive when the path is genuinely safe, and avoids the common failure mode where a weighted blend still nudges the snake into a dead end.\n- **BFS path length over Manhattan distance for food scoring**: The primary food reward is based on the actual shortest navigable path to food rather than straight-line distance. Manhattan distance is kept only as a tie-breaker. This means the bot correctly avoids \"closer\" moves that are geometrically near but navigationally blocked, at the cost of the extra computation a BFS requires each tick.\n- **Tail-chasing as the fallback strategy**: When the direct food path is unsafe, the bot drifts toward its own tail rather than simply maximizing open space. Following the tail keeps the snake in a loop-friendly posture that tends to preserve future options, trading some short-term space efficiency for longer-term survivability.",
+			"filesAffected": [
+				"src/bots/chaser-bot.ts",
+				"src/bots/index.ts"
+			],
+			"category": "feature",
+			"importance": "major"
+		}
+	],
+	"backfilled": true,
+	"backfillMethod": "diff-only",
+	"treeHash": "060555171ce1b17345837cb58bdcf6cd10c10abe",
+	"recap": "A new bot called Chaser is now available in the game. It pursues food along the shortest navigable route and scores each possible move using real path analysis rather than simple straight-line estimates, making it noticeably more direct and efficient than the existing bots when the board is open. When the shortest path to food would leave the snake unable to reach its own tail — a reliable sign of an impending dead end — Chaser abandons food pursuit entirely and shifts into a survival posture, drifting toward its own tail to keep its options open until a safe food path becomes available again. Players selecting Chaser will see a snake that closes on food quickly in open conditions and retreats into cautious looping behavior when the board tightens."
+}
