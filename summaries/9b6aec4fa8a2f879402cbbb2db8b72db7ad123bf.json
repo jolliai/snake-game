@@ -1,0 +1,50 @@
+{
+	"version": 5,
+	"commitHash": "9b6aec4fa8a2f879402cbbb2db8b72db7ad123bf",
+	"commitMessage": "Add Nomad bot that avoids its own trail to explore fresh territory",
+	"commitAuthor": "Joe Hart",
+	"commitDate": "2026-04-06T18:08:49-07:00",
+	"branch": "backfilled",
+	"generatedAt": "2026-07-07T15:14:28.142Z",
+	"commitType": "commit",
+	"commitSource": "cli",
+	"transcriptEntries": 0,
+	"conversationTurns": 0,
+	"llm": {
+		"model": "claude-sonnet-4-6",
+		"inputTokens": 5967,
+		"outputTokens": 657,
+		"cachedTokens": 0,
+		"apiLatencyMs": 16077,
+		"stopReason": null,
+		"source": "jolli-proxy"
+	},
+	"stats": {
+		"filesChanged": 2,
+		"insertions": 75,
+		"deletions": 1
+	},
+	"diffStats": {
+		"filesChanged": 2,
+		"insertions": 75,
+		"deletions": 1
+	},
+	"topics": [
+		{
+			"title": "New Nomad bot that steers away from its own trail to explore open space",
+			"trigger": "The game needed a new bot personality with a distinct exploration-focused playstyle — one that actively avoids retracing its own path and seeks out fresh, uncrowded areas of the board rather than aggressively chasing food.",
+			"response": "- Created `src/bots/nomad-bot.ts` implementing the full bot logic. The scoring function penalizes moves near the snake's own body segments using a proximity-weighted penalty (closer segments incur a heavier cost), while rewarding reachable open area and maintaining a moderate interest in food via path-length scoring. A small forward-momentum bonus nudges the snake to keep moving into new territory.\n- Registered the new bot in `src/bots/index.ts` by importing it and appending it to the `AVAILABLE_BOTS` array, making it selectable alongside the existing bots.",
+			"decisions": "- **Trail avoidance as the core mechanic**: The bot's defining behavior is a strong penalty for moving near its own body, rather than simply chasing food or maximizing open space. This creates a wandering, exploratory character that feels meaningfully different from existing bots. The trade-off is that the snake may take suboptimal paths to food, but that inefficiency is intentional — it produces the nomadic personality.\n- **Moderate food pursuit rather than aggressive or passive**: Food scoring is included but weighted lower than in a hunter-style bot. Completely ignoring food would make the bot uncompetitive; over-weighting it would collapse the nomad behavior into something indistinguishable from existing bots. The chosen balance keeps the bot viable while preserving its distinct identity.\n- **Tail-reachability as a safety floor**: Moves that leave the snake unable to reach its own tail are heavily penalized rather than outright forbidden, with a partial credit for reachable area. This avoids the bot painting itself into a corner while still allowing it to take calculated risks in open space — a stricter hard cutoff would conflict with the exploratory playstyle.",
+			"filesAffected": [
+				"src/bots/nomad-bot.ts",
+				"src/bots/index.ts"
+			],
+			"category": "feature",
+			"importance": "major"
+		}
+	],
+	"backfilled": true,
+	"backfillMethod": "diff-only",
+	"treeHash": "9da28dae2c282cb8a71b575b04624cf89c7b2026",
+	"recap": "A new Nomad bot is now available in the snake game alongside the existing roster of bot personalities. Where other bots focus on hunting food or hugging edges, the Nomad actively steers away from its own body trail, preferring open, unvisited areas of the board. It still collects food along the way, but exploration takes priority over efficiency. Players can now select the Nomad as their bot of choice and observe a noticeably different movement style — one that wanders and spreads across the board rather than coiling or charging."
+}
