@@ -1393,6 +1393,23 @@
 					]
 				}
 			]
+		},
+		{
+			"commitHash": "c7dc6c92109ce50611dcbc984c02a6ea5cb7fbb9",
+			"recap": "A fully playable Snake game was built for the browser, introducing a mechanic where the playing field itself grows as the player succeeds. Starting on a small 10×10 grid, the snake speeds up and the grid doubles in size each time the player fills a quarter of the available space, so the challenge escalates in direct proportion to skill rather than on a fixed timer. Players can pause at any time, and their best score persists across sessions.\n\nThe game launches from a menu screen and moves through game, pause, and game-over states without any page reloads. Movement does not begin until the player presses a directional key, giving them a moment to survey the board before committing to a direction. All visual feedback — the growing canvas, the score and level display, the pause overlay — updates in place as the game progresses.",
+			"topics": [
+				{
+					"title": "Snake game initial implementation with expanding grid and level progression",
+					"decisions": "- **Single-file class over modular architecture**: All game logic was placed in one TypeScript class rather than split across multiple modules. For a self-contained game of this scope, a single class keeps the code easy to follow and avoids the overhead of wiring together separate state, rendering, and input modules. The trade-off is that the file will become harder to maintain if the game grows significantly in complexity.\n- **Grid-fill threshold for level progression**: Expanding the grid when the snake reaches 25% fill — rather than at a fixed score milestone or time interval — ties difficulty directly to player performance on the current grid. This creates a natural sense of accomplishment before the challenge escalates, and avoids the awkwardness of a level-up happening while the grid still feels mostly empty.\n- **Deferred game start on first key press**: The game loop does not begin until the player presses a directional key, rather than starting immediately when the game screen appears. This gives the player a moment to see the initial board state and choose their first move deliberately, which is friendlier than an instant countdown or auto-start.",
+					"category": "feature",
+					"importance": "major",
+					"filesAffected": [
+						"src/main.ts",
+						"src/style.css",
+						"index.html"
+					]
+				}
+			]
 		}
 	]
 }
