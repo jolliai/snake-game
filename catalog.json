@@ -327,6 +327,21 @@
 					]
 				}
 			]
+		},
+		{
+			"commitHash": "ea18bf87e66146aebefae37044f63b51e497e07a",
+			"ticketId": "JOE-7",
+			"topics": [
+				{
+					"title": "Tease rainbow snake surprise in README coming soon section",
+					"decisions": "The change was placed in \"Coming soon\" rather than the \"Features\" section because the rainbow snake feature has not yet been implemented — the branch at commit time was identical to main with no feature code. Listing it as a shipped feature would have been inaccurate, so the tease was scoped to the roadmap section instead.",
+					"category": "docs",
+					"importance": "minor",
+					"filesAffected": [
+						"README.md"
+					]
+				}
+			]
 		}
 	]
 }
