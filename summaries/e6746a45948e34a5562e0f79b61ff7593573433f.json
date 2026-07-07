@@ -1,0 +1,52 @@
+{
+	"version": 5,
+	"commitHash": "e6746a45948e34a5562e0f79b61ff7593573433f",
+	"commitMessage": "Add per-mode leaderboards with stats",
+	"commitAuthor": "Joe Hart",
+	"commitDate": "2026-05-12T12:05:19-07:00",
+	"branch": "backfilled",
+	"generatedAt": "2026-07-07T15:10:42.696Z",
+	"commitType": "commit",
+	"commitSource": "cli",
+	"transcriptEntries": 0,
+	"conversationTurns": 0,
+	"llm": {
+		"model": "claude-sonnet-4-6",
+		"inputTokens": 12495,
+		"outputTokens": 800,
+		"cachedTokens": 0,
+		"apiLatencyMs": 30297,
+		"stopReason": null,
+		"source": "jolli-proxy"
+	},
+	"stats": {
+		"filesChanged": 4,
+		"insertions": 543,
+		"deletions": 0
+	},
+	"diffStats": {
+		"filesChanged": 4,
+		"insertions": 543,
+		"deletions": 0
+	},
+	"topics": [
+		{
+			"title": "Per-mode leaderboards with name entry and stat tracking",
+			"trigger": "The game had no way to record or compare scores across sessions. Players wanted to see how their runs stacked up over time, with separate rankings for single-player, two-player, and bot-versus-bot modes.",
+			"response": "- A new leaderboard data layer (`src/leaderboard.ts`) was introduced to handle all persistence. It stores up to ten entries per mode in browser local storage, with a sort order of score descending, then longest snake descending, then survival time descending. It exposes functions to read, add, and clear entries, plus a qualification check that determines whether a new score would crack the top ten before prompting the player.\n- The game-over screen was extended with a stat summary (longest snake length and formatted survival time) and a conditional name-entry prompt. For single-player and two-player modes the prompt appears only when the score qualifies; for bot-versus-bot both bots' results are recorded automatically with no prompt. The player's last-used name is remembered across sessions. After saving, a confirmation line shows the achieved rank.\n- A dedicated leaderboard screen was added to `index.html` and wired up in `src/main.ts`. It has three tabs (Single Player, Two Player, Bot vs Bot), a dynamically rendered table with columns appropriate to each mode (result and opponent columns appear only where relevant), a \"Clear This Board\" action, and a \"View Leaderboard\" shortcut on the game-over screen.",
+			"decisions": "- **Separate leaderboards per mode rather than one unified table**: Mixing single-player scores with two-player or bot scores would make the rankings meaningless — a bot-versus-bot run produces scores under completely different conditions than a solo game. Keeping three independent boards lets each mode's rankings reflect comparable play.\n- **Qualify-before-prompting rather than always asking for a name**: Interrupting every player with a name prompt regardless of their score would feel annoying and devalue the leaderboard. Checking eligibility first means only genuinely competitive runs trigger the prompt, which keeps the interaction feel rewarding rather than routine.\n- **Auto-record bot-versus-bot results with no prompt**: Bot runs are deterministic and unattended — there is no human present to type a name. Recording both bots automatically (using their display names) keeps the bot leaderboard populated without requiring any interaction, while still letting players browse those results for comparison.",
+			"filesAffected": [
+				"src/leaderboard.ts",
+				"src/main.ts",
+				"index.html",
+				"src/style.css"
+			],
+			"category": "feature",
+			"importance": "major"
+		}
+	],
+	"backfilled": true,
+	"backfillMethod": "diff-only",
+	"treeHash": "52c4467390d00acb18bd477189fb6bb03b83cdc6",
+	"recap": "The game now tracks and persists scores across sessions through a full leaderboard system. Three separate rankings — one each for single-player, two-player, and bot-versus-bot — are accessible from the main menu and from the game-over screen. Each leaderboard holds the top ten entries, sorted by score and broken ties by longest snake length and survival time.\n\nAt the end of every game, players see a stat summary showing their longest snake and how long they survived. When a score is good enough to crack the top ten, a name-entry prompt appears so the player can claim their rank; the game remembers the last name used to make repeat entries faster. Bot-versus-bot results are recorded automatically under each bot's name with no prompt needed. After saving, a confirmation line tells the player exactly where they landed on the board."
+}

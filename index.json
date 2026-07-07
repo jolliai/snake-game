@@ -372,6 +372,22 @@
 				"insertions": 543,
 				"deletions": 0
 			}
+		},
+		{
+			"commitHash": "e6746a45948e34a5562e0f79b61ff7593573433f",
+			"parentCommitHash": null,
+			"treeHash": "52c4467390d00acb18bd477189fb6bb03b83cdc6",
+			"commitType": "commit",
+			"commitMessage": "Add per-mode leaderboards with stats",
+			"commitDate": "2026-05-12T12:05:19-07:00",
+			"branch": "backfilled",
+			"generatedAt": "2026-07-07T15:10:42.696Z",
+			"topicCount": 1,
+			"diffStats": {
+				"filesChanged": 4,
+				"insertions": 543,
+				"deletions": 0
+			}
 		}
 	],
 	"commitAliases": {
