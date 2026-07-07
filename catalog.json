@@ -907,6 +907,34 @@
 					]
 				}
 			]
+		},
+		{
+			"commitHash": "b86322de7e03ae6c81bbc857f2edde1c724d243c",
+			"recap": "The snake game gained a full autoplay system across this batch of work. Three bot profiles — Survival, Hunter, and Explorer — were added, each with a distinct strategy: Survival prioritizes keeping as much open space as possible, Hunter aggressively pursues food, and Explorer favors open lanes and distance from walls. Players can pick a profile from a dropdown on the main menu or switch mid-game during an active run, with both controls staying in sync. Toggling the bot on or off is available via a button or a keyboard shortcut, and starting a demo from the menu launches the bot immediately without requiring a direction keypress.\n\nWhen the bot is running, the camera slowly rotates on its own, giving the game a more dynamic feel during unattended play. Players can still manually adjust the camera angle at any time, and the auto-rotation resumes on its own a few seconds after the last manual adjustment. The auto-rotation stops automatically when the game ends.",
+			"topics": [
+				{
+					"title": "Multiple selectable autoplay bot profiles added to snake game",
+					"decisions": "- **Scoring-function bots over a single configurable bot**: Each bot profile was given its own file with its own scoring weights rather than a single bot with tunable parameters. This keeps each profile's logic self-contained and easy to read or adjust independently, at the cost of some code duplication across the three scoring functions. It also makes adding a new profile a matter of dropping in a new file rather than editing shared logic.\n- **Helpers injected at call time rather than shared state**: The path-finding and simulation utilities live on the game engine and are passed to bots as a plain object of functions each tick. This avoids bots holding references to the game object or needing their own copies of grid state, keeping the bot interface narrow and the coupling one-directional.\n- **Bot selection synced across two dropdowns**: Rather than a single control, bot profile dropdowns appear both on the main menu and during active gameplay. Both are kept in sync programmatically so switching on either screen takes effect immediately, giving players the ability to experiment mid-run without resetting.",
+					"category": "feature",
+					"importance": "major",
+					"filesAffected": [
+						"src/bots/bot-types.ts",
+						"src/bots/survival-bot.ts",
+						"src/bots/hunter-bot.ts",
+						"src/bots/explorer-bot.ts",
+						"src/bots/index.ts"
+					]
+				},
+				{
+					"title": "Camera auto-rotates when bot is active, pauses on manual adjustment",
+					"decisions": "- **Pause-window over full stop on manual input**: When the player manually rotates the camera, the auto-rotate loop is not cancelled — it simply skips updates until a short pause window expires. This avoids the need to restart the loop after each keypress and means rotation resumes smoothly without any extra interaction.",
+					"category": "feature",
+					"importance": "major",
+					"filesAffected": [
+						"src/main.ts"
+					]
+				}
+			]
 		}
 	]
 }
