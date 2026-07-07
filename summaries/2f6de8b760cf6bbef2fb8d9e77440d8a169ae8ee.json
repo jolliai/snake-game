@@ -1,0 +1,64 @@
+{
+	"version": 5,
+	"commitHash": "2f6de8b760cf6bbef2fb8d9e77440d8a169ae8ee",
+	"commitMessage": "Add two-player and bot-vs-bot modes",
+	"commitAuthor": "Joe Hart",
+	"commitDate": "2026-05-12T11:35:31-07:00",
+	"branch": "backfilled",
+	"generatedAt": "2026-07-07T15:11:43.595Z",
+	"commitType": "commit",
+	"commitSource": "cli",
+	"transcriptEntries": 0,
+	"conversationTurns": 0,
+	"llm": {
+		"model": "claude-sonnet-4-6",
+		"inputTokens": 16211,
+		"outputTokens": 1221,
+		"cachedTokens": 0,
+		"apiLatencyMs": 28515,
+		"stopReason": null,
+		"source": "jolli-proxy"
+	},
+	"stats": {
+		"filesChanged": 4,
+		"insertions": 526,
+		"deletions": 64
+	},
+	"diffStats": {
+		"filesChanged": 4,
+		"insertions": 526,
+		"deletions": 64
+	},
+	"topics": [
+		{
+			"title": "Two-player local multiplayer mode added to snake game",
+			"trigger": "The game only supported a single player controlling one snake. The developer wanted to let two people play on the same keyboard simultaneously, each controlling their own snake.",
+			"response": "- A new \"Two Player\" button was added to the main menu. When selected, two snakes are placed on opposite sides of the grid — Player 1 uses WASD, Player 2 uses arrow keys. Each player has an independent score displayed during play, and the game ends when either snake hits a wall, itself, or the other snake, with head-to-head collisions counting as a draw. The game-over screen shows both scores and a winner announcement instead of the single-player high-score display.\n- `src/main.ts` was updated with a full second snake state (position list, direction, score, occupied-cell set), a dedicated `updateTwoPlayer()` method handling simultaneous movement and cross-snake collision detection each tick, and a separate `endGameTwoPlayer()` method that determines the winner and populates the two-player game-over UI.\n- `index.html` and `src/style.css` were updated to support the new mode: per-player score elements, a winner announcement element, two-player final score display, and a \"Menu\" back button on the game-over screen were all added, with visibility toggled by a new `updateModeUI()` method.",
+			"decisions": "- **Separate key sets per player**: Player 1 is locked to WASD and Player 2 to arrow keys in two-player mode, rather than sharing both input sets as in single-player. This prevents one player's input from accidentally controlling the other's snake and makes the control split unambiguous on a shared keyboard.\n- **Simultaneous collision resolution**: Both snakes move and are checked for collisions in the same game tick, including a head-to-head check, rather than resolving one player's move before the other's. This ensures neither player has an unfair advantage from move ordering, and a simultaneous crash into each other correctly results in a draw.\n- **Shared food and grid**: Both snakes compete for the same single food item on a shared grid rather than each having their own. This keeps the competitive dynamic tight and reuses the existing food-spawning and grid-expansion logic with only minor adjustments to account for combined snake length.",
+			"filesAffected": [
+				"src/main.ts",
+				"index.html",
+				"src/style.css"
+			],
+			"category": "feature",
+			"importance": "major"
+		},
+		{
+			"title": "Bot-vs-bot spectator mode added to snake game",
+			"trigger": "The game had no way to watch two AI bots compete against each other. The developer wanted a hands-off spectator mode where two independently configured bots play simultaneously.",
+			"response": "- A \"Bot vs Bot\" button was added to the main menu alongside a second bot selector, letting the player choose a different bot profile for each side before starting. The game loop starts immediately on launch (no keypress needed) and the isometric auto-rotation activates automatically, as it does for the existing single-player demo mode.\n- `src/main.ts` gained a `chooseBotDirectionForPlayer()` method that runs each bot's decision logic independently per tick, passing the opponent's snake positions as additional blocked cells so each bot is aware of the other. The `BotState` type in `src/bots/bot-types.ts` was extended with an optional `opponentSnake` field to carry this information to bot implementations.\n- The `analyzePosition()` helper was updated to accept an optional extra set of blocked positions, allowing bot pathfinding to treat the opponent's body as impassable without changing the method's existing single-player behavior.",
+			"decisions": "- **Independent bot instances with shared awareness**: Each bot runs its own decision function and receives the opponent's body as blocked space, rather than using a single shared planner. This keeps each bot's strategy self-contained and makes it straightforward to mix different bot profiles against each other.\n- **Opt-in opponent awareness via optional field**: The opponent snake is passed through an optional field on the bot state type rather than making it required. This preserves full backward compatibility with existing single-player bot implementations that don't need to know about an opponent.",
+			"filesAffected": [
+				"src/main.ts",
+				"src/bots/bot-types.ts",
+				"index.html"
+			],
+			"category": "feature",
+			"importance": "major"
+		}
+	],
+	"backfilled": true,
+	"backfillMethod": "diff-only",
+	"treeHash": "98a7709db48843c03e055213ba333de3b4f57a45",
+	"recap": "The snake game gained two new multiplayer modes in this commit. Two local players can now compete on the same keyboard, with Player 1 using WASD and Player 2 using the arrow keys. Both snakes move simultaneously each game tick, collisions between them are detected fairly, and a head-to-head crash results in a draw. The game-over screen now shows both players' scores and declares a winner.\n\nA bot-vs-bot spectator mode was also introduced. Players can select a different AI profile for each side from the main menu, then watch the two bots compete on the shared grid. Each bot runs its own decision logic every tick and is aware of the opponent's body as an obstacle, making the competition meaningful across different bot strategies. The auto-rotating isometric view activates automatically in this mode, giving it a polished hands-off presentation."
+}
