@@ -1,0 +1,49 @@
+{
+	"version": 5,
+	"commitHash": "484b35cd8f271cb38ce42c09807a75e7bb977b34",
+	"commitMessage": "Scale Edge Runner wall threshold with grid size",
+	"commitAuthor": "Joe Hart",
+	"commitDate": "2026-04-06T17:18:21-07:00",
+	"branch": "backfilled",
+	"generatedAt": "2026-07-07T15:16:07.671Z",
+	"commitType": "commit",
+	"commitSource": "cli",
+	"transcriptEntries": 0,
+	"conversationTurns": 0,
+	"llm": {
+		"model": "claude-sonnet-4-6",
+		"inputTokens": 4994,
+		"outputTokens": 399,
+		"cachedTokens": 0,
+		"apiLatencyMs": 10827,
+		"stopReason": null,
+		"source": "jolli-proxy"
+	},
+	"stats": {
+		"filesChanged": 1,
+		"insertions": 2,
+		"deletions": 1
+	},
+	"diffStats": {
+		"filesChanged": 1,
+		"insertions": 2,
+		"deletions": 1
+	},
+	"topics": [
+		{
+			"title": "Bot wall-proximity detection scales with grid size",
+			"trigger": "The Edge Runner bot used a fixed distance of 2 cells to decide whether food was near a wall, which would behave inconsistently across different grid sizes — too aggressive on large grids and too lenient on small ones.",
+			"response": "In `src/bots/edge-runner-bot.ts`, the `scoreDirection` function was updated to replace the hardcoded threshold of `2` with a dynamically computed edge zone equal to 20% of the current grid size (floored to the nearest integer). The `foodNearWall` flag now reflects a proportional boundary that grows and shrinks with the grid.",
+			"decisions": "Tying the wall threshold to a percentage of the grid size keeps the bot's spatial awareness consistent regardless of the arena it plays in. A fixed value would make the bot behave very differently on a 10-cell grid versus a 50-cell grid, while a proportional value preserves the same strategic intent at any scale. The 20% figure was chosen as a reasonable approximation of a meaningful \"edge zone\" without over-tuning to a specific grid dimension.",
+			"filesAffected": [
+				"src/bots/edge-runner-bot.ts"
+			],
+			"category": "bugfix",
+			"importance": "major"
+		}
+	],
+	"backfilled": true,
+	"backfillMethod": "diff-only",
+	"treeHash": "30dcdd22f3bbd8981a9d0cc98c9495262e16b839",
+	"recap": "The Edge Runner bot's sense of how close food is to a wall now adjusts automatically to the size of the playing grid. Previously, the boundary was a fixed two-cell margin, which produced inconsistent behavior as grid dimensions changed. The bot now treats the outer 20% of the grid as the edge zone, keeping its avoidance strategy proportionally consistent whether the arena is small or large."
+}

@@ -660,6 +660,22 @@
 				"insertions": 73,
 				"deletions": 1
 			}
+		},
+		{
+			"commitHash": "484b35cd8f271cb38ce42c09807a75e7bb977b34",
+			"parentCommitHash": null,
+			"treeHash": "30dcdd22f3bbd8981a9d0cc98c9495262e16b839",
+			"commitType": "commit",
+			"commitMessage": "Scale Edge Runner wall threshold with grid size",
+			"commitDate": "2026-04-06T17:18:21-07:00",
+			"branch": "backfilled",
+			"generatedAt": "2026-07-07T15:16:07.671Z",
+			"topicCount": 1,
+			"diffStats": {
+				"filesChanged": 1,
+				"insertions": 2,
+				"deletions": 1
+			}
 		}
 	],
 	"commitAliases": {

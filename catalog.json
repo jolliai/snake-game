@@ -829,6 +829,21 @@
 					]
 				}
 			]
+		},
+		{
+			"commitHash": "484b35cd8f271cb38ce42c09807a75e7bb977b34",
+			"recap": "The Edge Runner bot's sense of how close food is to a wall now adjusts automatically to the size of the playing grid. Previously, the boundary was a fixed two-cell margin, which produced inconsistent behavior as grid dimensions changed. The bot now treats the outer 20% of the grid as the edge zone, keeping its avoidance strategy proportionally consistent whether the arena is small or large.",
+			"topics": [
+				{
+					"title": "Bot wall-proximity detection scales with grid size",
+					"decisions": "Tying the wall threshold to a percentage of the grid size keeps the bot's spatial awareness consistent regardless of the arena it plays in. A fixed value would make the bot behave very differently on a 10-cell grid versus a 50-cell grid, while a proportional value preserves the same strategic intent at any scale. The 20% figure was chosen as a reasonable approximation of a meaningful \"edge zone\" without over-tuning to a specific grid dimension.",
+					"category": "bugfix",
+					"importance": "major",
+					"filesAffected": [
+						"src/bots/edge-runner-bot.ts"
+					]
+				}
+			]
 		}
 	]
 }
