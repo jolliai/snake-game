@@ -1346,6 +1346,21 @@
 					]
 				}
 			]
+		},
+		{
+			"commitHash": "a6e5d83b2a2bbe422c9b968b3d6d41344b66261a",
+			"topics": [
+				{
+					"title": "Remove keyboard shortcut to reset game from any state",
+					"decisions": "The reset-via-R-key feature was reverted wholesale rather than patched. Reverting cleanly restores the prior state without leaving partial remnants of the feature behind.",
+					"category": "feature",
+					"importance": "minor",
+					"filesAffected": [
+						"src/main.ts",
+						"index.html"
+					]
+				}
+			]
 		}
 	]
 }

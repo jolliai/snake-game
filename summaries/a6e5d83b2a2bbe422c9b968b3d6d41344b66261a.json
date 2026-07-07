@@ -1,0 +1,49 @@
+{
+	"version": 5,
+	"commitHash": "a6e5d83b2a2bbe422c9b968b3d6d41344b66261a",
+	"commitMessage": "Revert \"Add R key to reset game from any state\"",
+	"commitAuthor": "Joe Hart",
+	"commitDate": "2026-02-12T19:49:42-08:00",
+	"branch": "backfilled",
+	"generatedAt": "2026-07-07T15:23:33.511Z",
+	"commitType": "commit",
+	"commitSource": "cli",
+	"transcriptEntries": 0,
+	"conversationTurns": 0,
+	"llm": {
+		"model": "claude-sonnet-4-6",
+		"inputTokens": 5239,
+		"outputTokens": 279,
+		"cachedTokens": 0,
+		"apiLatencyMs": 7640,
+		"stopReason": null,
+		"source": "jolli-proxy"
+	},
+	"stats": {
+		"filesChanged": 2,
+		"insertions": 1,
+		"deletions": 7
+	},
+	"diffStats": {
+		"filesChanged": 2,
+		"insertions": 1,
+		"deletions": 7
+	},
+	"topics": [
+		{
+			"title": "Remove keyboard shortcut to reset game from any state",
+			"trigger": "A previously added feature allowed players to press the R key to reset the snake game at any time. This commit reverts that change, removing the reset shortcut entirely.",
+			"response": "- The R key handler was removed from `src/main.ts`, eliminating the ability to reset the game mid-session via keyboard. The branch that called `startNewGame()` on R/r keypress is gone.\n- A call to hide the pause overlay when starting a new game was also removed from `startNewGame()` in `src/main.ts`, reverting a side-effect fix that accompanied the original feature.\n- The on-screen controls hint in `index.html` was updated to remove the \"Press R to Reset\" instruction, keeping the UI consistent with the removed functionality.",
+			"decisions": "The reset-via-R-key feature was reverted wholesale rather than patched. Reverting cleanly restores the prior state without leaving partial remnants of the feature behind.",
+			"filesAffected": [
+				"src/main.ts",
+				"index.html"
+			],
+			"category": "feature",
+			"importance": "minor"
+		}
+	],
+	"backfilled": true,
+	"backfillMethod": "diff-only",
+	"treeHash": "4d88bccdb8065a7588b9b8b3380a80368fb9e42a"
+}
