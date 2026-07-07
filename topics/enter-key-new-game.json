@@ -1,0 +1,18 @@
+{
+	"schemaVersion": 1,
+	"stableSlug": "enter-key-new-game",
+	"title": "Enter Key to Start New Game from Menu or Game Over",
+	"content": "## Overview\n\nPressing **Enter** starts or restarts a game when the player is on the main menu or the game-over screen. During active gameplay, Enter has no effect.\n\n## Behavior\n\n| Game State | Enter Key Effect |\n|---|---|\n| Main menu (game not yet started) | Calls `startNewGame()` |\n| Game-over screen | Calls `startNewGame()` |\n| Active gameplay | No effect |\n\n## Implementation\n\nThe logic lives in `handleKeyPress` in **`src/main.ts`**. When a keypress event fires, the handler checks whether the game has not yet started or whether the game-over state is active. If either condition is true and the key is Enter, it calls `startNewGame()`. All other game states are ignored, so the handler is a no-op for Enter during live play.\n\nThe existing **`R` key** shortcut for restarting mid-session is unaffected by this change.\n\n## Rationale\n\nBefore this feature, keyboard-only players had no way to start or restart a game from the menu or game-over screen. Enter was chosen as the trigger because it is the conventional \"confirm/proceed\" key. The behavior is intentionally **contextual** — scoped to menu and game-over states only — to eliminate the risk of an accidental restart while a game is in progress.",
+	"relatedBranches": [
+		"backfilled"
+	],
+	"sourceRefs": [
+		{
+			"type": "summary",
+			"id": "6f96e53c6166f7955f1971409a820c1345398513",
+			"timestamp": "2026-02-23T19:09:02-08:00",
+			"branch": "backfilled"
+		}
+	],
+	"lastUpdatedAt": "2026-07-07T15:24:20.601Z"
+}
