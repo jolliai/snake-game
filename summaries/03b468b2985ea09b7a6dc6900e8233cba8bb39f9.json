@@ -1,0 +1,50 @@
+{
+	"version": 5,
+	"commitHash": "03b468b2985ea09b7a6dc6900e8233cba8bb39f9",
+	"commitMessage": "Merge branch 'main' into add-ambusher-bot",
+	"commitAuthor": "Joe Hart",
+	"commitDate": "2026-04-06T17:30:57-07:00",
+	"branch": "backfilled",
+	"generatedAt": "2026-07-07T15:15:04.393Z",
+	"commitType": "commit",
+	"commitSource": "cli",
+	"transcriptEntries": 0,
+	"conversationTurns": 0,
+	"llm": {
+		"model": "claude-sonnet-4-6",
+		"inputTokens": 6037,
+		"outputTokens": 557,
+		"cachedTokens": 0,
+		"apiLatencyMs": 18696,
+		"stopReason": null,
+		"source": "jolli-proxy"
+	},
+	"stats": {
+		"filesChanged": 2,
+		"insertions": 74,
+		"deletions": 1
+	},
+	"diffStats": {
+		"filesChanged": 2,
+		"insertions": 74,
+		"deletions": 1
+	},
+	"topics": [
+		{
+			"title": "New aggressive food-chasing bot added to snake game",
+			"trigger": "The game needed another bot personality that would actively pursue food along the shortest available path, rather than prioritizing survival or territory control like existing bots.",
+			"response": "- Created `src/bots/chaser-bot.ts` implementing a new bot that scores each candidate move using a weighted combination of BFS path length to food, manhattan distance to food, reachable open area, and a tail-chasing fallback. When the tail is unreachable after a simulated move, the bot switches to a survival mode that maximizes open space and closes distance to its own tail.\n- Registered the new bot in `src/bots/index.ts` by importing it and appending it to the `AVAILABLE_BOTS` array, making it selectable in the game UI alongside the existing bots.",
+			"decisions": "- **Tail-reachability as a safety gate**: The bot uses tail reachability as a hard filter before committing to any food-chasing move. Moves where the tail becomes unreachable are scored far below any safe move, preventing the snake from trapping itself in a dead end while still aggressively pursuing food when a safe path exists. This trades some food-collection speed for a meaningful reduction in self-trapping deaths.\n- **Weighted scoring over pure BFS**: Rather than following the shortest BFS path to food unconditionally, the bot blends BFS path length, manhattan distance, open area, and a tail-drift bonus into a single score. This allows the bot to gracefully degrade when no BFS path to food exists — drifting toward the tail to buy time — without needing a separate decision tree or mode-switching logic.",
+			"filesAffected": [
+				"src/bots/chaser-bot.ts",
+				"src/bots/index.ts"
+			],
+			"category": "feature",
+			"importance": "major"
+		}
+	],
+	"backfilled": true,
+	"backfillMethod": "diff-only",
+	"treeHash": "f065045da55c7b345f6c7add470d9d15117a8340",
+	"recap": "A new bot called Chaser is now available in the snake game. It pursues food along the shortest calculated path and plays aggressively by default, closing the gap to food faster than the existing bots. When the direct path to food would leave the snake with no safe escape route, Chaser automatically shifts into a holding pattern — drifting toward its own tail to keep options open until a safe path to food reopens. Players can now select Chaser alongside the existing roster of bot personalities."
+}
