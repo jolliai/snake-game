@@ -17,6 +17,29 @@
 				}
 			],
 			"lastUpdatedAt": "2026-07-07T02:20:01.705Z"
+		},
+		{
+			"stableSlug": "bot-ai-fixes",
+			"title": "Bot AI Fixes: Infinite Loop & Starvation Timer",
+			"summary": "Loop guard breaks bot oscillation cycles; starvation timer ends games when bots wander without eating. Both land in commit 4e91f64c.",
+			"relatedBranches": [
+				"bug/botupdate"
+			],
+			"sourceRefs": [
+				{
+					"type": "summary",
+					"id": "4e91f64cb71e1e858e3b492d8900d863fe447675",
+					"timestamp": "2026-07-02T02:03:27.000Z",
+					"branch": "bug/botupdate"
+				},
+				{
+					"type": "plan",
+					"id": "i-noticed-that-there-fluttering-frog-4e91f64c",
+					"timestamp": "2026-07-07T01:33:19.048Z",
+					"branch": "bug/botupdate"
+				}
+			],
+			"lastUpdatedAt": "2026-07-07T02:20:01.705Z"
 		}
 	]
 }
