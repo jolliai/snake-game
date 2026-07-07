@@ -1,0 +1,59 @@
+{
+	"version": 5,
+	"commitHash": "cf7df218edc27d13844e1e9688608ef6c8561d19",
+	"commitMessage": "Add hidden Rainbow Snake leaderboard (JOE-7)",
+	"commitAuthor": "Joe Hart",
+	"commitDate": "2026-07-07T16:18:17.000Z",
+	"branch": "josephhart/joe-7-add-rainbow-colored-snake-suprise",
+	"generatedAt": "2026-07-07T16:18:38.934Z",
+	"commitType": "commit",
+	"commitSource": "cli",
+	"transcriptEntries": 9,
+	"conversationTurns": 4,
+	"llm": {
+		"model": "claude-sonnet-4-6",
+		"inputTokens": 11257,
+		"outputTokens": 801,
+		"cachedTokens": 0,
+		"apiLatencyMs": 20877,
+		"stopReason": null,
+		"source": "jolli-proxy"
+	},
+	"stats": {
+		"filesChanged": 5,
+		"insertions": 134,
+		"deletions": 11
+	},
+	"topics": [
+		{
+			"title": "Hidden Rainbow Snake leaderboard revealed only after first rainbow score",
+			"trigger": "The developer wanted a secret fourth leaderboard that collects scores from rare rainbow games, staying completely invisible until a player actually earns a score during one of those rare runs.",
+			"response": "- Added `'rainbow'` to the leaderboard mode type in `src/leaderboard.ts` and gave it a `🌈 Rainbow Snake` display label. The board reuses the existing storage and ranking machinery without any new persistence logic, keying off `snake-leaderboard-v1:rainbow` automatically.\n- Wired score routing in `src/main.ts` via a new `leaderboardTargetMode()` helper that redirects any run flagged as a rainbow game to the secret board instead of the normal single/pvp/bvb board. All three scoring paths (single-player prompt, PvP prompt, and both auto-recorded Bot vs Bot entries) go through this helper, so rainbow scores never appear on the standard boards.\n- Added `updateRainbowTabVisibility()` in `src/main.ts` to show or hide the rainbow tab based on whether the board holds any entries. The tab starts `hidden` in `index.html` and is re-evaluated every time the leaderboard screen opens. After a rainbow run, the \"View Leaderboard\" button opens directly to the newly revealed board; clearing the rainbow board re-hides the tab and falls back to Single Player.",
+			"decisions": "- **Secret board only, no cross-posting**: Rainbow scores route exclusively to the hidden board and never appear on the normal leaderboards. The alternative — recording to both the mode board and the rainbow board — was explicitly rejected to keep the secret board meaningful as a distinct prize rather than a duplicate of existing standings.\n- **Data-driven reveal over a separate unlock flag**: The tab's visibility is derived purely from whether the board has entries, with no separate \"unlocked\" flag stored anywhere. This keeps the reveal stateless and self-healing: a cleared board automatically re-hides the tab, and there is no unlock state to get out of sync with the actual data.\n- **Mixed-column rendering for the aggregated board**: The rainbow board collects runs from all game modes, so its Result and Opponent columns are shown based on what the entries actually carry rather than a fixed mode assumption. This avoids showing empty columns for single-player entries or hiding result columns for PvP entries on the same board.",
+			"filesAffected": [
+				"src/leaderboard.ts",
+				"src/main.ts",
+				"index.html",
+				"src/style.css"
+			],
+			"category": "feature",
+			"importance": "major"
+		}
+	],
+	"ticketId": "JOE-7",
+	"recap": "A hidden \"Rainbow Snake\" leaderboard was added to the game, collecting scores earned during the rare rainbow runs that occur roughly once every hundred games. The tab for this board is invisible on a fresh install and stays hidden until a player actually completes a rainbow run and submits their name — at which point the tab appears with a rainbow-gradient sheen, signalling the discovery. Scores from rainbow games are routed exclusively to this secret board and never appear on the standard Single Player, Two Player, or Bot vs Bot standings. After a rainbow run ends, the \"View Leaderboard\" button takes the player straight to the newly revealed board rather than their usual mode, making the discovery feel intentional. Clearing the rainbow board re-hides the tab entirely, resetting the secret for future sessions.",
+	"conversationTokens": 300236,
+	"conversationTokenBreakdown": {
+		"input": 29422,
+		"output": 90596,
+		"cached": 180218
+	},
+	"diffStats": {
+		"filesChanged": 5,
+		"insertions": 134,
+		"deletions": 11
+	},
+	"transcripts": [
+		"1de9f5c3-89d9-47f7-8bba-019238e8f121"
+	]
+}

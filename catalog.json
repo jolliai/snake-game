@@ -1428,6 +1428,25 @@
 					]
 				}
 			]
+		},
+		{
+			"commitHash": "cf7df218edc27d13844e1e9688608ef6c8561d19",
+			"recap": "A hidden \"Rainbow Snake\" leaderboard was added to the game, collecting scores earned during the rare rainbow runs that occur roughly once every hundred games. The tab for this board is invisible on a fresh install and stays hidden until a player actually completes a rainbow run and submits their name — at which point the tab appears with a rainbow-gradient sheen, signalling the discovery. Scores from rainbow games are routed exclusively to this secret board and never appear on the standard Single Player, Two Player, or Bot vs Bot standings. After a rainbow run ends, the \"View Leaderboard\" button takes the player straight to the newly revealed board rather than their usual mode, making the discovery feel intentional. Clearing the rainbow board re-hides the tab entirely, resetting the secret for future sessions.",
+			"ticketId": "JOE-7",
+			"topics": [
+				{
+					"title": "Hidden Rainbow Snake leaderboard revealed only after first rainbow score",
+					"decisions": "- **Secret board only, no cross-posting**: Rainbow scores route exclusively to the hidden board and never appear on the normal leaderboards. The alternative — recording to both the mode board and the rainbow board — was explicitly rejected to keep the secret board meaningful as a distinct prize rather than a duplicate of existing standings.\n- **Data-driven reveal over a separate unlock flag**: The tab's visibility is derived purely from whether the board has entries, with no separate \"unlocked\" flag stored anywhere. This keeps the reveal stateless and self-healing: a cleared board automatically re-hides the tab, and there is no unlock state to get out of sync with the actual data.\n- **Mixed-column rendering for the aggregated board**: The rainbow board collects runs from all game modes, so its Result and Opponent columns are shown based on what the entries actually carry rather than a fixed mode assumption. This avoids showing empty columns for single-player entries or hiding result columns for PvP entries on the same board.",
+					"category": "feature",
+					"importance": "major",
+					"filesAffected": [
+						"src/leaderboard.ts",
+						"src/main.ts",
+						"index.html",
+						"src/style.css"
+					]
+				}
+			]
 		}
 	]
 }
