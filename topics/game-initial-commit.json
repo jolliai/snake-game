@@ -1,0 +1,18 @@
+{
+	"schemaVersion": 1,
+	"stableSlug": "game-initial-commit",
+	"title": "Snake Game Initial Commit",
+	"content": "## Overview\n\nA browser-based Snake game built from scratch in TypeScript, featuring classic gameplay mechanics plus an expanding grid that grows as the player fills it up, progressively increasing difficulty.\n\n## Files\n\n- **`src/main.ts`** — All game logic in a single `SnakeGame` class.\n- **`src/style.css`** — Dark-themed layout with green snake colors, responsive adjustments for small screens, and a fixed-position pause overlay.\n- **`index.html`** — Defines four screen states: menu, game, game over, and pause overlay; toggled via a `hidden` CSS class.\n\n## Architecture\n\nAll game logic lives in a single TypeScript class (`SnakeGame`) in `src/main.ts` rather than being split across multiple modules. The class manages:\n\n- Snake position and movement\n- Food spawning\n- Collision detection (walls and self)\n- Score tracking\n- A game loop driven by `setInterval`\n\nA single-file class was chosen over a modular architecture because the scope of the game is self-contained and this keeps the code easy to follow without the overhead of wiring together separate state, rendering, and input modules. The acknowledged trade-off is reduced maintainability if the game grows significantly in complexity.\n\n## Gameplay Behavior\n\n### Deferred Start\nThe game loop does not begin until the player presses a directional key. This gives the player a moment to see the initial board state and choose their first move deliberately, rather than reacting to an instant countdown or auto-start.\n\n### Grid Expansion and Level Progression\nLevel progression is triggered when the snake occupies **25% of the current grid's cells**. On expansion:\n\n1. The grid doubles in size: `10×10 → 20×20 → 40×40`\n2. The level counter increments\n3. The game loop interval is halved (speed increases)\n4. The canvas resizes dynamically to match the new grid\n\nTying expansion to grid-fill percentage (rather than a fixed score milestone or time interval) links difficulty directly to player performance on the current grid. This creates a natural sense of accomplishment before the challenge escalates and avoids a level-up occurring while the grid still feels mostly empty.\n\n## Screen States\n\n`index.html` defines four states managed by toggling a `hidden` CSS class:\n\n| State | Description |\n|---|---|\n| Menu | Initial landing screen |\n| Game | Active gameplay canvas |\n| Game Over | End state with score display |\n| Pause Overlay | Fixed-position overlay during pause |",
+	"relatedBranches": [
+		"backfilled"
+	],
+	"sourceRefs": [
+		{
+			"type": "summary",
+			"id": "c7dc6c92109ce50611dcbc984c02a6ea5cb7fbb9",
+			"timestamp": "2025-10-30T08:38:28-07:00",
+			"branch": "backfilled"
+		}
+	],
+	"lastUpdatedAt": "2026-07-07T15:24:20.601Z"
+}
