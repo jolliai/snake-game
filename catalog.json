@@ -1447,6 +1447,24 @@
 					]
 				}
 			]
+		},
+		{
+			"commitHash": "f01522c4bcf761c6a32036b7e4452c802d1ae07c",
+			"recap": "Iron Snake mode gained an active level-completion mechanic. Reaching a level's point goal no longer advances the board automatically; instead, a glowing cyan exit door appears on the outer rim of the irregular board. The player must steer their snake onto the door to trigger the transition into the next level, turning what was a passive side-effect of eating into a deliberate final objective.\n\nDuring the exit run, fruit disappears from the board and the starvation timer freezes, so the player's sole task is reaching the door. The goal readout in the heads-up display switches to \"Reach the exit!\" and a brief announcement banner flashes on screen. Bot-controlled snakes automatically retarget to the door, keeping bot and bot-versus-bot games from stalling. The door clears and fruit reappears the moment the next level begins.",
+			"ticketId": "JOE-9",
+			"topics": [
+				{
+					"title": "Iron Snake level completion now requires navigating to an exit door",
+					"decisions": "- **Active navigation beat over passive instant advance**: Making the player steer to a door turns level completion into a deliberate moment rather than a side-effect of eating the last fruit. The trade-off is added complexity in the tick loop and render path, but the payoff is a clear, satisfying transition that gives the player a final objective each level.\n- **Fruit hidden and starvation paused during the exit run**: Keeping fruit visible while the door is open would split the player's attention and create an ambiguous objective. Hiding fruit removes the distraction entirely. Pausing starvation ensures the trek to the door — which could be across a large irregular board — is never a death sentence, making the mechanic feel fair regardless of where the door spawns.\n- **Cyan portal color distinct from all snake palettes**: The door needed to read as \"not the snake\" at a glance. Cyan sits far enough from the green/blue snake colors and the red/violet/white fruit countdown colors that it is unambiguous in both isometric and overhead views. The same `drawBlock` path used for food handles both views automatically, so no overhead-specific branch was needed.",
+					"category": "feature",
+					"importance": "major",
+					"filesAffected": [
+						"src/main.ts",
+						"index.html",
+						"src/style.css"
+					]
+				}
+			]
 		}
 	]
 }

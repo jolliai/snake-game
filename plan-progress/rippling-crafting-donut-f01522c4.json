@@ -1,0 +1,103 @@
+{
+	"version": 1,
+	"commitHash": "f01522c4bcf761c6a32036b7e4452c802d1ae07c",
+	"commitMessage": "Add exit door to Iron Snake level progression (JOE-9)",
+	"commitDate": "2026-07-07T18:07:42.000Z",
+	"planSlug": "rippling-crafting-donut-f01522c4",
+	"originalSlug": "rippling-crafting-donut",
+	"summary": "The developer implemented JOE-9 'Add Exit' for Iron Snake mode, replacing the instant level-advance with an active navigation beat where a glowing cyan exit door appears on a border cell after the goal is met, requiring the player to steer into it to trigger the level transition. The full feature was completed in a single session including state management, rendering, HUD updates, banner signaling, bot retargeting, reset/teardown, and E2E tests.",
+	"steps": [
+		{
+			"id": "1",
+			"description": "New state fields: exitCell, exitPulseTick, exitBannerTimer, ironExitOverride",
+			"status": "completed",
+			"note": "All four fields were added near the rainbow fields (~line 257 in the diff). The ironExitOverride mirrors parseRainbowOverride() exactly, and exitBannerTimer mirrors rainbowBannerTimer — a deliberate structural parallel to the JOE-7 rainbow banner pattern established as the project convention."
+		},
+		{
+			"id": "2",
+			"description": "Modify checkLevelAdvance() to call openExit() instead of advanceLevel() when goal is reached",
+			"status": "completed",
+			"note": "The guard `combined >= this.levelGoal && this.exitCell === null` was added so a stray re-check never re-picks the door. The double-guard on exitCell being null was a deliberate safety measure to prevent the door from being re-opened mid-exit-run."
+		},
+		{
+			"id": "3",
+			"description": "New openExit() method: enumerate border cells, exclude snake/head-proximity, pick random, fallback to advanceLevel()",
+			"status": "completed",
+			"note": "The implementation mirrors the spawnFood() enumerate-on-board loop pattern identified during exploration. EXIT_MIN_HEAD_DISTANCE=3 keeps the door off the snake's doorstep. The fallback to advanceLevel() on empty candidates ensures the game can never stall on tiny/crowded boards."
+		},
+		{
+			"id": "4",
+			"description": "New isBorderCell(x, y) helper using onBoard() and orthogonal neighbor checks",
+			"status": "completed",
+			"note": "Defined locally in main.ts since NEIGHBORS offsets in iron-snake.ts are not exported. The exploration agent confirmed no existing border-cell helper existed, so this was a net-new addition using the same onBoard() source of truth."
+		},
+		{
+			"id": "5",
+			"description": "Detect head-on-exit in updateSinglePlayer and updateTwoPlayer to call advanceLevel()",
+			"status": "completed",
+			"note": "Both single-player (after tail removal) and two-player (either head matching exitCell) paths were wired. The exitPulseTick increment is co-located with the exit check in both paths, advancing the pulse animation each tick the door is open."
+		},
+		{
+			"id": "6",
+			"description": "Make fruit inert while exit is open: guard eat comparison and fruit render",
+			"status": "completed",
+			"note": "The decision to hide fruit entirely (rather than keep it visible) was explicitly confirmed with the user to remove split-attention ambiguity. Both the eat comparison guards (single and 2P) and the render guard (only push food object when exitCell === null) were implemented."
+		},
+		{
+			"id": "7",
+			"description": "Pause starvation during exit run in both single-player and two-player paths",
+			"status": "completed",
+			"note": "Starvation pause was confirmed as essential because no fruit is available to reset the timer during the exit run, making starvation a potential death sentence on large irregular boards. Both single and 2P starvation checks are wrapped with exitCell === null guards."
+		},
+		{
+			"id": "8",
+			"description": "Bot retargeting: add botTarget() and use it in both BotState builders",
+			"status": "completed",
+			"note": "The exploration agent identified that both chooseBotDirection (line 1581) and chooseBotDirectionForPlayer (line 1610) passed this.food directly, which would stall bot/bvb games once fruit is hidden. The botTarget() helper was added and wired to both sites, and a behavioral E2E test confirmed bots successfully navigate to and take the exit."
+		},
+		{
+			"id": "9",
+			"description": "Render the exit door: add 'exit' to DrawType, push to objects, add case in draw switch with pulsed emerald/cyan palette",
+			"status": "completed",
+			"note": "The color was shifted from teal/emerald to cyan during visual spot-checking after screenshots revealed the original palette was too close to the green snake. The pulse uses Math.sin on exitPulseTick via lerpHex, honoring the tick-paced transitions preference. drawBlock handles both isometric and overhead views automatically with no overhead-specific branch needed."
+		},
+		{
+			"id": "10",
+			"description": "HUD update in updateUI: show 'Reach the exit!' when exitCell is non-null",
+			"status": "completed",
+			"note": "The existing iron-snake-goal-display element is reused, switching its text content between the normal 'N pts' readout and 'Reach the exit!' based on exitCell state. This keeps the HUD layout stable while repurposing the existing goal readout as the exit prompt."
+		},
+		{
+			"id": "11",
+			"description": "Exit banner: showExitBanner/hideExitBanner/clearExitBannerTimer methods, #exit-banner in index.html, .exit-banner CSS",
+			"status": "completed",
+			"note": "The rainbow banner's pop-in→hold→fade pattern was cloned exactly, reusing the friendship-pop keyframe for the animation. The emerald/cyan accent color was updated to match the final door color after the palette was shifted during visual verification. EXIT_BANNER_MS=2600 vs RAINBOW_BANNER_MS=3000 is a minor timing differentiation."
+		},
+		{
+			"id": "12",
+			"description": "Reset/teardown: clear exitCell, exitPulseTick, banner in applyLevelAdvance(), startNewGame, and screen-change hook",
+			"status": "completed",
+			"note": "All three teardown sites were addressed: applyLevelAdvance() clears the exit before spawnFood() restores fruit, startNewGame resets state and hides the banner, and the showScreen() screen-change hook hides the exit banner alongside the rainbow banner to prevent lingering overlays on quick deaths."
+		},
+		{
+			"id": "13",
+			"description": "Test hook: parseIronExitOverride() and openExit() call in startNewGame when ?ironExit=1",
+			"status": "completed",
+			"note": "Mirrors parseRainbowOverride() exactly in structure and placement. The hook is called after the Iron Snake board is built in startNewGame, ensuring border cells exist when openExit() is called. This makes the exit DOM state deterministically assertable without needing to reach a level goal."
+		},
+		{
+			"id": "14",
+			"description": "E2E tests: ?ironExit=1 HUD/banner assertions, negative test (no override), and bot behavioral test",
+			"status": "completed",
+			"note": "Three tests were added: the URL-override DOM assertion test, a negative test confirming the normal 'N pts' readout and hidden banner, and a behavioral bot test that drives a single-bot demo into the exit and asserts #level advances to 2. The bot test was confirmed non-flaky across 5 runs — the snake stays length 1 (fruit inert) so self-collision is impossible, making it fully reliable."
+		}
+	],
+	"llm": {
+		"model": "claude-haiku-4-5-20251001",
+		"inputTokens": 21691,
+		"outputTokens": 1918,
+		"apiLatencyMs": 42259,
+		"stopReason": null,
+		"source": "jolli-proxy"
+	}
+}

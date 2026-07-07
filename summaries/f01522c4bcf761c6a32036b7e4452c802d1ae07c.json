@@ -1,0 +1,91 @@
+{
+	"version": 5,
+	"commitHash": "f01522c4bcf761c6a32036b7e4452c802d1ae07c",
+	"commitMessage": "Add exit door to Iron Snake level progression (JOE-9)",
+	"commitAuthor": "Joe Hart",
+	"commitDate": "2026-07-07T18:07:42.000Z",
+	"branch": "josephhart/joe-9-add-exit",
+	"generatedAt": "2026-07-07T18:08:52.581Z",
+	"commitType": "commit",
+	"commitSource": "cli",
+	"transcriptEntries": 9,
+	"conversationTurns": 5,
+	"llm": {
+		"model": "claude-sonnet-4-6",
+		"inputTokens": 25740,
+		"outputTokens": 999,
+		"cachedTokens": 0,
+		"apiLatencyMs": 27506,
+		"stopReason": null,
+		"source": "jolli-proxy"
+	},
+	"stats": {
+		"filesChanged": 4,
+		"insertions": 279,
+		"deletions": 16
+	},
+	"topics": [
+		{
+			"title": "Iron Snake level completion now requires navigating to an exit door",
+			"trigger": "In Iron Snake mode, reaching a level's point goal instantly advanced to the next level with no player agency. The feature request asked for an exit door to appear on the board's edge after the goal is met, requiring the player to steer into it to trigger the level transition.",
+			"response": "- `src/main.ts` gained the full exit-phase state machine: `checkLevelAdvance()` now calls `openExit()` instead of advancing immediately when the goal is reached. `openExit()` enumerates playable rim cells (cells touching the void or grid edge), filters out occupied cells and any cell within 3 Manhattan steps of a snake head, picks one at random, and sets `exitCell`. A safe fallback advances instantly if no rim cell is available. The tick loops in both single-player and two-player paths were updated to detect when a snake head lands on `exitCell` and call `advanceLevel()`, and `applyLevelAdvance()` clears the exit state so each new level starts fresh.\n- Fruit is hidden and made inert for the duration of the exit run: the food-eating comparisons in both tick paths are guarded by `exitCell === null`, the food object is excluded from the render list while the door is open, and starvation timers are paused. Bots are redirected via a new `botTarget()` helper that returns `exitCell` when set and `food` otherwise, preventing bot and bot-vs-bot games from stalling at the goal.\n- The exit door is rendered as a pulsing cyan prism via the existing `drawBlock` helper, depth-sorted alongside snakes and food. The HUD goal readout switches to \"Reach the exit!\" while the door is open, and a pop-in banner (\"🚪 Exit open — reach the door!\") auto-dismisses after a hold period, mirroring the existing rainbow banner pattern. The `#exit-banner` element was added to `index.html` and styled in `src/style.css` with a cyan accent and the existing pop/fade keyframes.",
+			"decisions": "- **Active navigation beat over passive instant advance**: Making the player steer to a door turns level completion into a deliberate moment rather than a side-effect of eating the last fruit. The trade-off is added complexity in the tick loop and render path, but the payoff is a clear, satisfying transition that gives the player a final objective each level.\n- **Fruit hidden and starvation paused during the exit run**: Keeping fruit visible while the door is open would split the player's attention and create an ambiguous objective. Hiding fruit removes the distraction entirely. Pausing starvation ensures the trek to the door — which could be across a large irregular board — is never a death sentence, making the mechanic feel fair regardless of where the door spawns.\n- **Cyan portal color distinct from all snake palettes**: The door needed to read as \"not the snake\" at a glance. Cyan sits far enough from the green/blue snake colors and the red/violet/white fruit countdown colors that it is unambiguous in both isometric and overhead views. The same `drawBlock` path used for food handles both views automatically, so no overhead-specific branch was needed.",
+			"filesAffected": [
+				"src/main.ts",
+				"index.html",
+				"src/style.css"
+			],
+			"category": "feature",
+			"importance": "major"
+		}
+	],
+	"ticketId": "JOE-9",
+	"recap": "Iron Snake mode gained an active level-completion mechanic. Reaching a level's point goal no longer advances the board automatically; instead, a glowing cyan exit door appears on the outer rim of the irregular board. The player must steer their snake onto the door to trigger the transition into the next level, turning what was a passive side-effect of eating into a deliberate final objective.\n\nDuring the exit run, fruit disappears from the board and the starvation timer freezes, so the player's sole task is reaching the door. The goal readout in the heads-up display switches to \"Reach the exit!\" and a brief announcement banner flashes on screen. Bot-controlled snakes automatically retarget to the door, keeping bot and bot-versus-bot games from stalling. The door clears and fruit reappears the moment the next level begins.",
+	"conversationTokens": 847243,
+	"conversationTokenBreakdown": {
+		"input": 31344,
+		"output": 250521,
+		"cached": 565378
+	},
+	"diffStats": {
+		"filesChanged": 4,
+		"insertions": 279,
+		"deletions": 16
+	},
+	"plans": [
+		{
+			"slug": "rippling-crafting-donut-f01522c4",
+			"title": "JOE-9 — Add Exit (Iron Snake)",
+			"addedAt": "2026-07-07T17:52:26.394Z",
+			"updatedAt": "2026-07-07T18:08:10.232Z"
+		}
+	],
+	"references": [
+		{
+			"archivedKey": "linear:JOE-9-f01522c4",
+			"source": "linear",
+			"nativeId": "JOE-9",
+			"title": "Add Exit",
+			"url": "https://linear.app/joesthewizardworkspace/issue/JOE-9/add-exit",
+			"fields": [
+				{
+					"key": "status",
+					"label": "Status",
+					"value": "Backlog",
+					"icon": "circle-large-filled"
+				},
+				{
+					"key": "priority",
+					"label": "Priority",
+					"value": "No priority",
+					"icon": "flame"
+				}
+			],
+			"referencedAt": "2026-07-07T17:41:20.425Z",
+			"sourceToolName": "mcp__claude_ai_Linear__get_issue"
+		}
+	],
+	"transcripts": [
+		"bc6677f8-2cdf-476e-915a-bae2a971d182"
+	]
+}

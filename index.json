@@ -1316,6 +1316,22 @@
 				"insertions": 134,
 				"deletions": 11
 			}
+		},
+		{
+			"commitHash": "f01522c4bcf761c6a32036b7e4452c802d1ae07c",
+			"parentCommitHash": null,
+			"treeHash": "927e7afedf43eb7d272a3091eda923eadf5a6d1b",
+			"commitType": "commit",
+			"commitMessage": "Add exit door to Iron Snake level progression (JOE-9)",
+			"commitDate": "2026-07-07T18:07:42.000Z",
+			"branch": "josephhart/joe-9-add-exit",
+			"generatedAt": "2026-07-07T18:08:52.581Z",
+			"topicCount": 1,
+			"diffStats": {
+				"filesChanged": 4,
+				"insertions": 279,
+				"deletions": 16
+			}
 		}
 	],
 	"commitAliases": {
