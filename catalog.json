@@ -2,21 +2,6 @@
 	"version": 1,
 	"entries": [
 		{
-			"commitHash": "937bb4b31e84f937429a362141d8da1d95f581ee",
-			"recap": "The snake game gained an overhead view mode, accessible by pressing the `O` key during any game mode. Activating it collapses the isometric 3D board into a true top-down layout where the board, snake segments, and food all appear as flat squares with no depth or perspective. The view locks out rotation and perspective controls for the duration, and auto-rotation pauses automatically. Pressing `O` a second time returns the board to exactly the isometric angle and perspective settings the player had before switching, preserving any customisation they had made.",
-			"topics": [
-				{
-					"title": "Overhead top-down view toggle added to snake game board",
-					"decisions": "- **Two-pass fix for true flatness**: The first implementation only zeroed the camera angles and perspective, which was not enough — the blocks themselves still had extruded height and appeared as cubes viewed straight-on. Rather than adding a separate rendering path, the block height calculation was made aware of the overhead flag, keeping the fix minimal and contained to a single expression.\n- **Save-and-restore over a fixed overhead preset**: When entering overhead view the current isometric settings are saved to private fields and restored on exit, rather than snapping back to hardcoded defaults. This means users who have customised the rotation angle or perspective before pressing `O` get their exact view back, with no loss of state.\n- **Input lockout during overhead view**: Rotation and perspective keys are silently ignored while overhead is active, and auto-rotation is suspended. The alternative — allowing those keys to work and immediately re-flattening — would have been confusing. Locking input keeps the overhead view stable and predictable without requiring a separate mode indicator in the UI.",
-					"category": "feature",
-					"importance": "major",
-					"filesAffected": [
-						"src/main.ts"
-					]
-				}
-			]
-		},
-		{
 			"commitHash": "ea18bf87e66146aebefae37044f63b51e497e07a",
 			"ticketId": "JOE-7",
 			"topics": [
@@ -342,6 +327,21 @@
 		},
 		{
 			"commitHash": "31d93c3f670b49f2eb5583d128ce61bdc2a98299"
+		},
+		{
+			"commitHash": "937bb4b31e84f937429a362141d8da1d95f581ee",
+			"recap": "The snake game gained an overhead view mode, accessible by pressing the `O` key during any game mode. Activating it collapses the isometric 3D board into a true top-down layout where the board, snake segments, and food all appear as flat squares with no depth or perspective. The view locks out rotation and perspective controls for the duration, and auto-rotation pauses automatically. Pressing `O` a second time returns the board to exactly the isometric angle and perspective settings the player had before switching, preserving any customisation they had made.",
+			"topics": [
+				{
+					"title": "Overhead top-down view toggle added to snake game board",
+					"decisions": "- **Two-pass fix for true flatness**: The first implementation only zeroed the camera angles and perspective, which was not enough — the blocks themselves still had extruded height and appeared as cubes viewed straight-on. Rather than adding a separate rendering path, the block height calculation was made aware of the overhead flag, keeping the fix minimal and contained to a single expression.\n- **Save-and-restore over a fixed overhead preset**: When entering overhead view the current isometric settings are saved to private fields and restored on exit, rather than snapping back to hardcoded defaults. This means users who have customised the rotation angle or perspective before pressing `O` get their exact view back, with no loss of state.\n- **Input lockout during overhead view**: Rotation and perspective keys are silently ignored while overhead is active, and auto-rotation is suspended. The alternative — allowing those keys to work and immediately re-flattening — would have been confusing. Locking input keeps the overhead view stable and predictable without requiring a separate mode indicator in the UI.",
+					"category": "feature",
+					"importance": "major",
+					"filesAffected": [
+						"src/main.ts"
+					]
+				}
+			]
 		}
 	]
 }
