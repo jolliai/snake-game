@@ -46,5 +46,7 @@
 	"backfilled": true,
 	"backfillMethod": "diff-only",
 	"treeHash": "849749f64bfe789fe1322f7375eeffbe8bfd76bc",
-	"recap": "A new Zigzag bot joined the roster of available snake bots. Unlike the existing bots that move in spirals, along edges, or reactively toward food, the Zigzag bot weaves back and forth in a sawtooth pattern as it advances — turning perpendicular to its current heading whenever it safely can. The bot still pursues food and avoids trapping itself, but its movement has a visually distinctive alternating rhythm. Players can now select Zigzag alongside the nine previously available bots."
+	"recap": "A new Zigzag bot joined the roster of available snake bots. Unlike the existing bots that move in spirals, along edges, or reactively toward food, the Zigzag bot weaves back and forth in a sawtooth pattern as it advances — turning perpendicular to its current heading whenever it safely can. The bot still pursues food and avoids trapping itself, but its movement has a visually distinctive alternating rhythm. Players can now select Zigzag alongside the nine previously available bots.",
+	"jolliDocUrl": "https://jolli.ai/brckbmk4/articles?doc=2650",
+	"jolliDocId": 2650
 }
