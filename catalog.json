@@ -233,34 +233,6 @@
 			]
 		},
 		{
-			"commitHash": "4e91f64cb71e1e858e3b492d8900d863fe447675",
-			"recap": "Bots in Iron Snake mode could previously get locked into permanent approach-and-retreat cycles, approaching a food cell, refusing to enter a tight pocket, retreating, and then repeating the exact same sequence indefinitely. A new loop detection system now tracks each bot's recent movement history and, when it recognises the snake is circling rather than making progress, steers it toward the least-recently-visited safe cell for several ticks to break the cycle. All bot personalities are preserved during normal play — the override only activates when a genuine loop is detected. The same fix was applied to the animated snakes on the title screen.\n\nA complementary starvation system was added to handle the remaining edge case: a bot that wanders productively but can never reach walled-off food. Each snake now has a move budget between meals that scales with the size of the playable board. If a snake exhausts its budget without eating, it dies and the game ends cleanly with a \"Starved!\" result screen. In two-player modes, the outcome correctly names which snake starved, and simultaneous starvation resolves as a draw. As a snake approaches its limit, its colour gradually shifts from green toward amber and red, and a pulsing warning banner appears over the game board so players know to race for the food.",
-			"topics": [
-				{
-					"title": "Add starvation timer so stuck bots eventually lose automatically",
-					"decisions": "- **Area-based limit over length-based:** The budget scales with how large the playable board is rather than how long the snake is. A bigger board means food can legitimately be farther away, so the limit grows with the board. The user asked whether longer snakes should get more time (a natural assumption), and the decision was to keep the limit board-area-based with a reset-on-eat mechanic — a competent snake never approaches the limit, it only fires as a backstop when food is genuinely unreachable.\n- **Reuse existing loss paths rather than a new death type:** Starvation is routed through the same `endGame` / `endGameTwoPlayer` calls already used for collision deaths, with a `deathCause` flag to adjust the displayed text. This kept the win/loss/draw resolution logic untouched and meant two-player starvation draws (both snakes starving on the same tick) were handled for free by the existing symmetry in `endGameTwoPlayer`.\n- **Overlay banner over inline HUD text:** The warning is a pulsing pill overlaid on the canvas rather than a line added to the score HUD, so it grabs attention without shifting the game layout. A plain urgent message was chosen over a live countdown to avoid per-tick number flicker that could itself be distracting during play.",
-					"category": "feature",
-					"importance": "major",
-					"filesAffected": [
-						"src/main.ts",
-						"index.html",
-						"src/style.css"
-					]
-				},
-				{
-					"title": "Add loop guard to break bot oscillation cycles in tight board pockets",
-					"decisions": "- **Harness-level guard over per-bot changes:** All 11 bots are stateless pure functions that return only a direction — they have no mechanism to store history or vary their scoring across ticks. Adding memory to each bot would have required changing the shared bot interface and rewriting every bot. A centralized guard at the harness level intercepts the chosen direction only when a loop is actually detected, leaving all bot personalities completely intact during normal play.\n- **Confinement ratio added after revisit-count alone proved insufficient:** Initial testing showed that a pure revisit counter (3 hits in a window) cannot catch a ~20-cell \"approach, give up, wander back\" circuit — on a period-20 loop, no cell recurs 3 times until 60 moves have passed. A secondary confinement signal (distinct cells / total moves below a threshold over a 24-move sample) was added to catch these larger circuits, confirmed by a simulation where the guard broke a bot out of a 20-cell ring to explore 125 cells.",
-					"category": "bugfix",
-					"importance": "major",
-					"filesAffected": [
-						"src/bots/loop-guard.ts",
-						"src/main.ts",
-						"src/menu-demo.ts"
-					]
-				}
-			]
-		},
-		{
 			"commitHash": "a00b5c620c8105d59d06c34e2567a3b78fbcd1ac",
 			"recap": "Iron Snake Mode was added as an optional toggle on the game's main menu, composing with all three existing play configurations (single-player, two-player, and bot-vs-bot). When enabled, each game starts on a freshly generated irregular board shape — a connected region free of narrow one-or-two-cell corridors — rather than the usual square grid. The board outline and grid lines update to trace the true playable area, food only appears on reachable cells, and bots navigate the new shape automatically without any changes to their logic.\n\nProgression works through a level system that replaces the grid-doubling mechanic active in classic mode. Players advance by reaching cumulative score thresholds that grow with each level — 5 points to clear level one, 15 for level two, 30 for level three, and so on — with each level demanding more than the last. On advancing, a brand-new board shape is generated, snakes reset to length one on safe starting positions, and game speed increases slightly. A live countdown in the heads-up display shows exactly how many points remain until the next level, updating with every piece of food eaten.",
 			"topics": [
@@ -339,6 +311,34 @@
 					"importance": "major",
 					"filesAffected": [
 						"src/main.ts"
+					]
+				}
+			]
+		},
+		{
+			"commitHash": "4e91f64cb71e1e858e3b492d8900d863fe447675",
+			"recap": "Bots in Iron Snake mode could previously get locked into permanent approach-and-retreat cycles, approaching a food cell, refusing to enter a tight pocket, retreating, and then repeating the exact same sequence indefinitely. A new loop detection system now tracks each bot's recent movement history and, when it recognises the snake is circling rather than making progress, steers it toward the least-recently-visited safe cell for several ticks to break the cycle. All bot personalities are preserved during normal play — the override only activates when a genuine loop is detected. The same fix was applied to the animated snakes on the title screen.\n\nA complementary starvation system was added to handle the remaining edge case: a bot that wanders productively but can never reach walled-off food. Each snake now has a move budget between meals that scales with the size of the playable board. If a snake exhausts its budget without eating, it dies and the game ends cleanly with a \"Starved!\" result screen. In two-player modes, the outcome correctly names which snake starved, and simultaneous starvation resolves as a draw. As a snake approaches its limit, its colour gradually shifts from green toward amber and red, and a pulsing warning banner appears over the game board so players know to race for the food.",
+			"topics": [
+				{
+					"title": "Add starvation timer so stuck bots eventually lose automatically",
+					"decisions": "- **Area-based limit over length-based:** The budget scales with how large the playable board is rather than how long the snake is. A bigger board means food can legitimately be farther away, so the limit grows with the board. The user asked whether longer snakes should get more time (a natural assumption), and the decision was to keep the limit board-area-based with a reset-on-eat mechanic — a competent snake never approaches the limit, it only fires as a backstop when food is genuinely unreachable.\n- **Reuse existing loss paths rather than a new death type:** Starvation is routed through the same `endGame` / `endGameTwoPlayer` calls already used for collision deaths, with a `deathCause` flag to adjust the displayed text. This kept the win/loss/draw resolution logic untouched and meant two-player starvation draws (both snakes starving on the same tick) were handled for free by the existing symmetry in `endGameTwoPlayer`.\n- **Overlay banner over inline HUD text:** The warning is a pulsing pill overlaid on the canvas rather than a line added to the score HUD, so it grabs attention without shifting the game layout. A plain urgent message was chosen over a live countdown to avoid per-tick number flicker that could itself be distracting during play.",
+					"category": "feature",
+					"importance": "major",
+					"filesAffected": [
+						"src/main.ts",
+						"index.html",
+						"src/style.css"
+					]
+				},
+				{
+					"title": "Add loop guard to break bot oscillation cycles in tight board pockets",
+					"decisions": "- **Harness-level guard over per-bot changes:** All 11 bots are stateless pure functions that return only a direction — they have no mechanism to store history or vary their scoring across ticks. Adding memory to each bot would have required changing the shared bot interface and rewriting every bot. A centralized guard at the harness level intercepts the chosen direction only when a loop is actually detected, leaving all bot personalities completely intact during normal play.\n- **Confinement ratio added after revisit-count alone proved insufficient:** Initial testing showed that a pure revisit counter (3 hits in a window) cannot catch a ~20-cell \"approach, give up, wander back\" circuit — on a period-20 loop, no cell recurs 3 times until 60 moves have passed. A secondary confinement signal (distinct cells / total moves below a threshold over a 24-move sample) was added to catch these larger circuits, confirmed by a simulation where the guard broke a bot out of a 20-cell ring to explore 125 cells.",
+					"category": "bugfix",
+					"importance": "major",
+					"filesAffected": [
+						"src/bots/loop-guard.ts",
+						"src/main.ts",
+						"src/menu-demo.ts"
 					]
 				}
 			]
