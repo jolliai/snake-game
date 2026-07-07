@@ -46,5 +46,7 @@
 	"backfilled": true,
 	"backfillMethod": "diff-only",
 	"treeHash": "243e987e440af0609decc3aa1603079f6ccd1ee5",
-	"recap": "A new bot called Sweeper was added to the game's roster of AI opponents. It navigates the grid in a back-and-forth lawnmower pattern, sweeping each row horizontally and stepping down to the next row at the end, aiming for full grid coverage rather than purely chasing food or reacting to other snakes. The bot balances this pattern against survival: it continuously checks whether it can still reach its own tail and how much open space remains, and will abandon the sweep path when following it would put it in danger. Players can now select Sweeper alongside the existing ten bots."
+	"recap": "A new bot called Sweeper was added to the game's roster of AI opponents. It navigates the grid in a back-and-forth lawnmower pattern, sweeping each row horizontally and stepping down to the next row at the end, aiming for full grid coverage rather than purely chasing food or reacting to other snakes. The bot balances this pattern against survival: it continuously checks whether it can still reach its own tail and how much open space remains, and will abandon the sweep path when following it would put it in danger. Players can now select Sweeper alongside the existing ten bots.",
+	"jolliDocUrl": "https://jolli.ai/brckbmk4/articles?doc=2662",
+	"jolliDocId": 2662
 }
