@@ -224,6 +224,101 @@
 				}
 			],
 			"lastUpdatedAt": "2026-07-07T15:24:20.601Z"
+		},
+		{
+			"stableSlug": "reset-key",
+			"title": "Reset Key (Shift+R) to Restart Game",
+			"summary": "Shift+R resets the snake game from any state (running, paused, or game over); plain R was rejected to avoid accidental resets.",
+			"relatedBranches": [
+				"backfilled"
+			],
+			"sourceRefs": [
+				{
+					"type": "summary",
+					"id": "3f1385f0725ec89cdd48335b5b3d7b6fe9c22904",
+					"timestamp": "2026-02-12T19:29:06-08:00",
+					"branch": "backfilled"
+				},
+				{
+					"type": "summary",
+					"id": "8fc36ca61a091e484fb848f974b3e6602042cc0a",
+					"timestamp": "2026-02-12T19:31:52-08:00",
+					"branch": "backfilled"
+				},
+				{
+					"type": "summary",
+					"id": "a6e5d83b2a2bbe422c9b968b3d6d41344b66261a",
+					"timestamp": "2026-02-12T19:49:42-08:00",
+					"branch": "backfilled"
+				},
+				{
+					"type": "summary",
+					"id": "b43163cd730114014cf8ace3639b291170f92bee",
+					"timestamp": "2026-02-12T19:49:49-08:00",
+					"branch": "backfilled"
+				},
+				{
+					"type": "summary",
+					"id": "4010c429cb7bc88839654d402fdef528316a40d8",
+					"timestamp": "2026-02-12T20:00:37-08:00",
+					"branch": "backfilled"
+				},
+				{
+					"type": "summary",
+					"id": "5daac7a44ffa8be20e7a790dded179275ae813ad",
+					"timestamp": "2026-02-12T20:00:43-08:00",
+					"branch": "backfilled"
+				},
+				{
+					"type": "summary",
+					"id": "23b8def245f9a79c5a3fa5535668ad1fd0094257",
+					"timestamp": "2026-02-12T21:12:50-08:00",
+					"branch": "backfilled"
+				},
+				{
+					"type": "summary",
+					"id": "6a246da4709c33699770b508d8bc0d333aa33c98",
+					"timestamp": "2026-02-12T21:12:56-08:00",
+					"branch": "backfilled"
+				},
+				{
+					"type": "summary",
+					"id": "ece3dace0888050c6dbaf9280a9036d2ad503754",
+					"timestamp": "2026-02-12T23:25:58-08:00",
+					"branch": "backfilled"
+				},
+				{
+					"type": "summary",
+					"id": "6035fb2baefd3ff03427b0555dfec5fd3386ade0",
+					"timestamp": "2026-02-12T23:26:04-08:00",
+					"branch": "backfilled"
+				},
+				{
+					"type": "summary",
+					"id": "fdc0482b3763252734dc76ce44c87c24f87e8d5f",
+					"timestamp": "2026-02-12T23:59:29-08:00",
+					"branch": "backfilled"
+				},
+				{
+					"type": "summary",
+					"id": "73e560987466db4a911987519f9f71a45c38af8c",
+					"timestamp": "2026-02-13T00:10:42-08:00",
+					"branch": "backfilled"
+				},
+				{
+					"type": "summary",
+					"id": "1bc698e5847f04005aacece58b5853fe9720235e",
+					"timestamp": "2026-02-13T00:15:46-08:00",
+					"branch": "backfilled"
+				},
+				{
+					"type": "summary",
+					"id": "189aa45fafec4aa32c096f17de769a25cde56ea2",
+					"timestamp": "2026-02-13T00:24:59-08:00",
+					"branch": "backfilled"
+				}
+			],
+			"lastUpdatedAt": "2026-07-07T15:24:20.601Z"
 		}
 	]
 }
