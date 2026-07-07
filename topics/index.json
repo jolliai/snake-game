@@ -319,6 +319,35 @@
 				}
 			],
 			"lastUpdatedAt": "2026-07-07T15:24:20.601Z"
+		},
+		{
+			"stableSlug": "grid-resolution-adjust",
+			"title": "Grid Resolution Adjustment with +/- Keys",
+			"summary": "Players can adjust the snake game grid size (5–50 cells) before starting using +/- keys; canvas stays fixed at 300×300 px.",
+			"relatedBranches": [
+				"backfilled"
+			],
+			"sourceRefs": [
+				{
+					"type": "summary",
+					"id": "6e5c38e162b7660dbd2a4c157b37f5a62dead6ce",
+					"timestamp": "2026-02-13T00:48:08-08:00",
+					"branch": "backfilled"
+				},
+				{
+					"type": "summary",
+					"id": "f0f3c0dc95822910c271d71807a147c60a115733",
+					"timestamp": "2026-02-13T00:54:53-08:00",
+					"branch": "backfilled"
+				},
+				{
+					"type": "summary",
+					"id": "c149ca2cae9ee5c7283013705dde89027d4fbefd",
+					"timestamp": "2026-02-13T00:55:01-08:00",
+					"branch": "backfilled"
+				}
+			],
+			"lastUpdatedAt": "2026-07-07T15:24:20.601Z"
 		}
 	]
 }
