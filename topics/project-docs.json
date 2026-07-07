@@ -1,0 +1,32 @@
+{
+	"schemaVersion": 1,
+	"stableSlug": "project-docs",
+	"title": "Project Documentation & README",
+	"content": "## Overview\n\nThe project maintains a single `README.md` at the repo root as the authoritative source of documentation. Two previously existing extra README files (`README2.md`, `README3.md`) were deleted and their relevant content merged into `README.md`.\n\nA `CLAUDE.md` file also exists at the repo root, providing project-level guidance for AI agents.\n\n---\n\n## README.md\n\n### Structure\n\nThe README was rewritten top-to-bottom (commit `4b0f9fd7`) based on a direct inventory of the source files rather than from memory or prior README text. It contains:\n\n- **Headline description** — leads with the isometric 3D board as the defining feature\n- **Game modes section** — documents all four entry points: single player, two-player PvP, solo bot, and bot-vs-bot\n- **Bot strategy table** — covers all 11 bots\n- **Controls table** — includes rotation, perspective toggle, overhead view, Enter, and Esc keys\n- **Coming soon section** — trimmed to only genuinely unshipped items (see below)\n\n### Shipped features (in main feature list)\n\n- Isometric 3D board\n- Two-player PvP mode\n\nThese were previously listed as \"coming soon\" despite being fully implemented. They were moved into the main feature list during the rewrite.\n\n### Coming soon (roadmap)\n\nOnly unimplemented items are listed here:\n\n- Color blind mode (requested in both former extra READMEs; deduplicated to one entry)\n- First-person view\n- Possible rename to \"snek\"\n- Global/online leaderboard — framed as distinct from the local per-mode leaderboards that already exist\n- 🌈 Rainbow snake surprise (teased in commit `ea18bf87`; feature not yet implemented)\n\n---\n\n## CLAUDE.md\n\nCreated in commit `7fdbb7ae`. Contains a **\"Use Jolli Memory\"** section instructing Claude to:\n\n- Recall prior branch context before planning or coding\n- Search across branches when design questions arise\n- Use the Jolli PR skill when opening pull requests\n\n### Why a project-level file\n\nA project-level guidance file is loaded into context every session and applies to anyone working in the repo. A memory entry would not be reliably loaded; a hook would be too rigid for a \"when relevant\" guideline and would misfire on unrelated tasks.\n\n---\n\n## Content consolidation decisions\n\n- `README2.md` and `README3.md` were deleted; their content was merged into the \"Coming soon\" section of `README.md`\n- Redundant framing (separate \"future plans\" and \"user feedback\" headers) was dropped rather than preserved as subsections\n- The overlapping color blind mode request that appeared in both deleted files was deduplicated to a single roadmap entry\n- Global leaderboards were explicitly re-added to the roadmap (not dropped) because they represent a genuine user request distinct from existing local leaderboards",
+	"relatedBranches": [
+		"docs/cleanup",
+		"docs/claude-md-jolli-memory",
+		"josephhart/joe-7-add-rainbow-colored-snake-suprise"
+	],
+	"sourceRefs": [
+		{
+			"type": "summary",
+			"id": "4b0f9fd779a7e8cbdc3dd702d41ad4f55eb2836a",
+			"timestamp": "2026-07-01T18:53:35.000Z",
+			"branch": "docs/cleanup"
+		},
+		{
+			"type": "summary",
+			"id": "7fdbb7aefeb1311c20012868220c2b11de0597fd",
+			"timestamp": "2026-07-01T20:46:17-07:00",
+			"branch": "docs/claude-md-jolli-memory"
+		},
+		{
+			"type": "summary",
+			"id": "ea18bf87e66146aebefae37044f63b51e497e07a",
+			"timestamp": "2026-07-07T02:19:54.000Z",
+			"branch": "josephhart/joe-7-add-rainbow-colored-snake-suprise"
+		}
+	],
+	"lastUpdatedAt": "2026-07-07T02:20:01.705Z"
+}
