@@ -1,0 +1,24 @@
+{
+	"schemaVersion": 1,
+	"stableSlug": "iron-snake-fruit-colors",
+	"title": "Iron Snake Final-Stretch Fruit Recoloring",
+	"content": "## Overview\n\nIn **Iron Snake Mode**, players clear a level by reaching a cumulative point goal (`ironSnakeGoalForLevel(L) = 5·L(L+1)/2` → 5, 15, 30, 50, 75…). Each fruit is worth exactly 1 point, so \"points remaining to goal\" equals \"fruits remaining in the level.\"\n\nPreviously, the fruit was always red (`#ef4444`) with no visual warning that a level was about to end. The final-stretch recoloring feature changes the fruit color for each of the **last 3 fruits** of a level, giving an unambiguous per-fruit countdown before the level completes.\n\n## Color Scheme\n\n| Fruits remaining | Color   | Top face  | Right face | Left face |\n|------------------|---------|-----------|------------|-----------|\n| 3                | Violet  | `#8b5cf6` | `#7c3aed`  | `#6d28d9` |\n| 2                | Magenta | `#ec4899` | `#db2777`  | `#be185d` |\n| 1 (final fruit)  | White   | `#f8fafc` | `#e2e8f0`  | `#cbd5e1` |\n| all others       | Red     | `#ef4444` | `#dc2626`  | `#b91c1c` |\n\nThe progression toward white on the final fruit is intentionally climactic and unmistakable against the dark isometric board. Outside Iron Snake Mode (classic), the fruit stays red — no behavior change.\n\n## Implementation (`src/main.ts`)\n\n### Color lookup table\nA module-level constant `IRON_SNAKE_FINAL_FRUIT_COLORS` is defined as a `Record<number, [string, string, string]>` keyed by fruits-remaining values 3, 2, and 1, placed next to the existing `HUNGER_*` palette constants.\n\n### `ironSnakeRemaining()` helper\nA private method computes fruits left in the current level:\n\n```ts\nprivate ironSnakeRemaining(): number {\n  if (!this.ironSnakeMode) return 0\n  const combined = this.score + (this.isTwoSnakeMode() ? this.score2 : 0)\n  return Math.max(0, this.levelGoal - combined)\n}\n```\n\nReturns 0 outside Iron Snake Mode and 0 once the goal is reached. Both `draw()` and `updateScore()` call this helper — the previously duplicated `combined`/`remaining` arithmetic in `updateScore()` was replaced with a call to the shared helper.\n\n### Fruit rendering in `draw()`\nAlongside the existing hunger-tint color computation, `draw()` now selects the fruit color triad before the render switch:\n\n```ts\nconst remainingFruit = this.ironSnakeRemaining()\nconst foodColors: [string, string, string] =\n  IRON_SNAKE_FINAL_FRUIT_COLORS[remainingFruit] ?? ['#ef4444', '#dc2626', '#b91c1c']\n```\n\nThe `case 'food':` branch uses `foodColors` directly:\n\n```ts\ncase 'food':\n  this.drawBlock(obj.x, obj.y, foodColors[0], foodColors[1], foodColors[2])\n  break\n```\n\nThe `?? red` fallback covers classic mode (helper returns 0) and early-level states (remaining > 3). This single insertion point covers both the isometric and overhead views, which share the same `case 'food':` path.\n\n## Edge Cases\n\n- **No lingering \"remaining 0\" fruit.** When the goal fruit is eaten, `checkLevelAdvance()` → `advanceLevel()` runs synchronously, raising `levelGoal` and re-spawning fruit before the next `draw()`. The `{1,2,3}`-only lookup guards against any edge case anyway.\n- **Two-player mode** uses the combined `score + score2` via the shared helper, so the last 3 fruits of the *shared* goal are recolored — consistent with the existing HUD countdown.\n- **Menu demo screen** (`src/menu-demo.ts`) decorative fruit is intentionally left unchanged. It has no connection to level state, and introducing that dependency would be incorrect.\n\n## Scope\n\nAll changes are confined to **`src/main.ts`**. No new rendering infrastructure or per-object state was introduced. `src/menu-demo.ts` is untouched.",
+	"relatedBranches": [
+		"feature/fruitcolor"
+	],
+	"sourceRefs": [
+		{
+			"type": "summary",
+			"id": "6aeabc387455a2e195e08ecce50f26d3eea1c19c",
+			"timestamp": "2026-07-01T20:40:06-07:00",
+			"branch": "feature/fruitcolor"
+		},
+		{
+			"type": "plan",
+			"id": "also-use-jolli-memory-snazzy-kahan-132523e0",
+			"timestamp": "2026-07-07T01:33:19.013Z",
+			"branch": "feature/fruitcolor"
+		}
+	],
+	"lastUpdatedAt": "2026-07-07T16:01:09.463Z"
+}
