@@ -513,44 +513,6 @@
 			]
 		},
 		{
-			"commitHash": "33d73c531daf7232a4dfcd80eb14a2f75bf90f3b",
-			"recap": "The game gained a full autoplay system with three distinct bot personalities: Survival, Hunter, and Explorer. Each bot evaluates every possible move using a scoring formula tuned to a different risk appetite -- Survival maximizes open space, Hunter chases food aggressively, and Explorer favors wide lanes away from walls. Players can switch profiles at any time from a dropdown on both the menu and the in-game overlay, toggle the bot on and off with a button or keyboard shortcut, and launch straight into a bot demo from the main menu. Manual direction input is disabled while the bot is active to prevent conflicting control.\n\nWhile the bot plays, the camera slowly rotates around the board, giving the demo mode a more dynamic feel. If the player manually adjusts the camera angle, the auto-rotation pauses for a few seconds before resuming, so a manual reposition is respected without requiring any extra action to restore the animation.\n\n---",
-			"topics": [
-				{
-					"title": "Three selectable autoplay bot profiles added to snake game",
-					"decisions": "- **Three named profiles over a single configurable bot**: Giving each strategy a name and description (\"Survival\", \"Hunter\", \"Explorer\") makes the choice legible to players without exposing any numeric weights. A single bot with sliders would have been more flexible but far harder to understand at a glance, and the three profiles cover the interesting ends of the risk/reward spectrum.\n- **Bots receive helpers rather than direct game access**: Each bot's decision function receives a frozen snapshot of game state plus a set of named helper functions, rather than a reference to the game object itself. This keeps bot logic self-contained and testable in isolation, and prevents a bot from accidentally mutating live game state.\n- **Manual direction input is blocked while the bot is active**: When the bot is on, arrow key and WASD presses are silently ignored rather than queued or merged. This avoids a confusing tug-of-war where the player's input and the bot's choice fight each other mid-game, at the cost of the player being unable to nudge the bot.",
-					"category": "feature",
-					"importance": "major",
-					"filesAffected": [
-						"src/bots/bot-types.ts",
-						"src/bots/survival-bot.ts",
-						"src/bots/hunter-bot.ts",
-						"src/bots/explorer-bot.ts",
-						"src/bots/index.ts"
-					]
-				},
-				{
-					"title": "Camera auto-rotates while bot is playing, pauses on manual adjustment",
-					"decisions": "- **Pause-then-resume over stopping auto-rotation on manual input**: When the player manually rotates the camera, the auto-rotation pauses for three seconds rather than stopping permanently. A permanent stop would require the player to re-enable it; a brief pause respects the manual adjustment while returning to the animated demo feel automatically.",
-					"category": "feature",
-					"importance": "major",
-					"filesAffected": [
-						"src/main.ts"
-					]
-				},
-				{
-					"title": "Shared direction and position constants extracted into a dedicated types file",
-					"decisions": "Centralizing these constants in one file eliminates the risk of the bot files and the game engine disagreeing on what \"opposite of UP\" means, and makes it straightforward to add a new direction (e.g. diagonal) in one place in the future.",
-					"category": "refactor",
-					"importance": "minor",
-					"filesAffected": [
-						"src/game-types.ts",
-						"src/main.ts"
-					]
-				}
-			]
-		},
-		{
 			"commitHash": "6f96e53c6166f7955f1971409a820c1345398513",
 			"recap": "Players can now press Enter to start a new game from the main menu or after a game ends. The shortcut is active only when the game is not in progress, so there is no risk of accidentally triggering a restart during play.",
 			"topics": [
@@ -1407,6 +1369,44 @@
 					"importance": "major",
 					"filesAffected": [
 						"src/bots/edge-runner-bot.ts"
+					]
+				}
+			]
+		},
+		{
+			"commitHash": "33d73c531daf7232a4dfcd80eb14a2f75bf90f3b",
+			"recap": "The game gained a full autoplay system with three distinct bot personalities: Survival, Hunter, and Explorer. Each bot evaluates every possible move using a scoring formula tuned to a different risk appetite -- Survival maximizes open space, Hunter chases food aggressively, and Explorer favors wide lanes away from walls. Players can switch profiles at any time from a dropdown on both the menu and the in-game overlay, toggle the bot on and off with a button or keyboard shortcut, and launch straight into a bot demo from the main menu. Manual direction input is disabled while the bot is active to prevent conflicting control.\n\nWhile the bot plays, the camera slowly rotates around the board, giving the demo mode a more dynamic feel. If the player manually adjusts the camera angle, the auto-rotation pauses for a few seconds before resuming, so a manual reposition is respected without requiring any extra action to restore the animation.\n\n---",
+			"topics": [
+				{
+					"title": "Three selectable autoplay bot profiles added to snake game",
+					"decisions": "- **Three named profiles over a single configurable bot**: Giving each strategy a name and description (\"Survival\", \"Hunter\", \"Explorer\") makes the choice legible to players without exposing any numeric weights. A single bot with sliders would have been more flexible but far harder to understand at a glance, and the three profiles cover the interesting ends of the risk/reward spectrum.\n- **Bots receive helpers rather than direct game access**: Each bot's decision function receives a frozen snapshot of game state plus a set of named helper functions, rather than a reference to the game object itself. This keeps bot logic self-contained and testable in isolation, and prevents a bot from accidentally mutating live game state.\n- **Manual direction input is blocked while the bot is active**: When the bot is on, arrow key and WASD presses are silently ignored rather than queued or merged. This avoids a confusing tug-of-war where the player's input and the bot's choice fight each other mid-game, at the cost of the player being unable to nudge the bot.",
+					"category": "feature",
+					"importance": "major",
+					"filesAffected": [
+						"src/bots/bot-types.ts",
+						"src/bots/survival-bot.ts",
+						"src/bots/hunter-bot.ts",
+						"src/bots/explorer-bot.ts",
+						"src/bots/index.ts"
+					]
+				},
+				{
+					"title": "Camera auto-rotates while bot is playing, pauses on manual adjustment",
+					"decisions": "- **Pause-then-resume over stopping auto-rotation on manual input**: When the player manually rotates the camera, the auto-rotation pauses for three seconds rather than stopping permanently. A permanent stop would require the player to re-enable it; a brief pause respects the manual adjustment while returning to the animated demo feel automatically.",
+					"category": "feature",
+					"importance": "major",
+					"filesAffected": [
+						"src/main.ts"
+					]
+				},
+				{
+					"title": "Shared direction and position constants extracted into a dedicated types file",
+					"decisions": "Centralizing these constants in one file eliminates the risk of the bot files and the game engine disagreeing on what \"opposite of UP\" means, and makes it straightforward to add a new direction (e.g. diagonal) in one place in the future.",
+					"category": "refactor",
+					"importance": "minor",
+					"filesAffected": [
+						"src/game-types.ts",
+						"src/main.ts"
 					]
 				}
 			]
