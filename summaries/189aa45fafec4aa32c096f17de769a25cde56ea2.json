@@ -1,0 +1,50 @@
+{
+	"version": 5,
+	"commitHash": "189aa45fafec4aa32c096f17de769a25cde56ea2",
+	"commitMessage": "Merge pull request #3 from jeverest/feature/reset-key",
+	"commitAuthor": "Joe Hart",
+	"commitDate": "2026-02-13T00:24:59-08:00",
+	"branch": "backfilled",
+	"generatedAt": "2026-07-07T15:21:26.694Z",
+	"commitType": "commit",
+	"commitSource": "cli",
+	"transcriptEntries": 0,
+	"conversationTurns": 0,
+	"llm": {
+		"model": "claude-sonnet-4-6",
+		"inputTokens": 5233,
+		"outputTokens": 545,
+		"cachedTokens": 0,
+		"apiLatencyMs": 14543,
+		"stopReason": null,
+		"source": "jolli-proxy"
+	},
+	"stats": {
+		"filesChanged": 2,
+		"insertions": 7,
+		"deletions": 1
+	},
+	"diffStats": {
+		"filesChanged": 2,
+		"insertions": 7,
+		"deletions": 1
+	},
+	"topics": [
+		{
+			"title": "Keyboard shortcut to reset the snake game mid-session",
+			"trigger": "Players had no way to restart the game without waiting for a game-over screen or refreshing the page. A quick reset shortcut was needed for convenience during active play.",
+			"response": "- Added a Shift+R key handler in `src/main.ts` inside `handleKeyPress` that calls `startNewGame()` immediately, regardless of game state. The check uses the uppercase `'R'` character, which the browser only produces when Shift is held, making the shortcut intentional and unlikely to trigger accidentally.\n- Fixed a bug in `startNewGame()` in `src/main.ts` where the pause overlay was not hidden when restarting. A call to add the `hidden` CSS class to the pause element was added so the game canvas is always clean on reset.\n- Updated the on-screen control hint in `index.html` to include \"Press Shift+R to Reset\" so players can discover the shortcut without consulting documentation.",
+			"decisions": "- **Shift+R over plain R**: Using Shift+R rather than an unmodified key reduces the chance of an accidental reset during normal play, since the snake is controlled with letter keys and a bare R could be pressed by mistake. Relying on the browser's native capitalisation behaviour (uppercase `'R'` only fires when Shift is held) keeps the implementation simple with no extra modifier-key tracking needed.\n- **Reset from any game state**: The reset handler runs before all other key checks and returns immediately, meaning it works whether the game is running, paused, or on the game-over screen. This gives players a single, consistent escape hatch without needing separate handling per state.",
+			"filesAffected": [
+				"src/main.ts",
+				"index.html"
+			],
+			"category": "feature",
+			"importance": "major"
+		}
+	],
+	"backfilled": true,
+	"backfillMethod": "diff-only",
+	"treeHash": "3d49d1acbb78ea98aa2a3516de3f9beac06ca443",
+	"recap": "Players can now reset the snake game at any time by pressing Shift+R, without waiting for a game-over screen or navigating away from the page. The shortcut works in every game state — mid-round, paused, or after losing — and the game canvas is always fully cleared on restart, including the pause overlay that previously lingered if a reset happened while paused. The on-screen control hint was updated to advertise the new shortcut, making it discoverable without any external guidance."
+}

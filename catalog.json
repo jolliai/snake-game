@@ -1172,6 +1172,22 @@
 					]
 				}
 			]
+		},
+		{
+			"commitHash": "189aa45fafec4aa32c096f17de769a25cde56ea2",
+			"recap": "Players can now reset the snake game at any time by pressing Shift+R, without waiting for a game-over screen or navigating away from the page. The shortcut works in every game state — mid-round, paused, or after losing — and the game canvas is always fully cleared on restart, including the pause overlay that previously lingered if a reset happened while paused. The on-screen control hint was updated to advertise the new shortcut, making it discoverable without any external guidance.",
+			"topics": [
+				{
+					"title": "Keyboard shortcut to reset the snake game mid-session",
+					"decisions": "- **Shift+R over plain R**: Using Shift+R rather than an unmodified key reduces the chance of an accidental reset during normal play, since the snake is controlled with letter keys and a bare R could be pressed by mistake. Relying on the browser's native capitalisation behaviour (uppercase `'R'` only fires when Shift is held) keeps the implementation simple with no extra modifier-key tracking needed.\n- **Reset from any game state**: The reset handler runs before all other key checks and returns immediately, meaning it works whether the game is running, paused, or on the game-over screen. This gives players a single, consistent escape hatch without needing separate handling per state.",
+					"category": "feature",
+					"importance": "major",
+					"filesAffected": [
+						"src/main.ts",
+						"index.html"
+					]
+				}
+			]
 		}
 	]
 }
