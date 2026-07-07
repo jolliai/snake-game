@@ -1,0 +1,64 @@
+{
+	"version": 5,
+	"commitHash": "b893d96ebf814ebf7f0bbf7d250038ea348c0161",
+	"commitMessage": "Optimize bot performance by combining 3 BFS per direction into 1",
+	"commitAuthor": "Joe Hart",
+	"commitDate": "2026-03-09T15:56:29-07:00",
+	"branch": "backfilled",
+	"generatedAt": "2026-07-07T15:17:08.403Z",
+	"commitType": "commit",
+	"commitSource": "cli",
+	"transcriptEntries": 0,
+	"conversationTurns": 0,
+	"llm": {
+		"model": "claude-sonnet-4-6",
+		"inputTokens": 9325,
+		"outputTokens": 1208,
+		"cachedTokens": 0,
+		"apiLatencyMs": 30182,
+		"stopReason": null,
+		"source": "jolli-proxy"
+	},
+	"stats": {
+		"filesChanged": 5,
+		"insertions": 83,
+		"deletions": 78
+	},
+	"diffStats": {
+		"filesChanged": 5,
+		"insertions": 83,
+		"deletions": 78
+	},
+	"topics": [
+		{
+			"title": "Combine three separate pathfinding passes into one unified scan",
+			"trigger": "Each time the bot evaluated a potential move, it ran three independent flood-fill or breadth-first searches: one to count reachable area, one to check whether the tail was reachable, and one to find the shortest path to food. This tripled the work done per candidate direction on every game tick.",
+			"response": "- Replaced the three separate helper methods (`countReachableArea`, `hasPath`, `findShortestPathLength`) with a single `analyzePosition` method in `src/main.ts`. The new method runs one BFS from the candidate position and simultaneously accumulates all three results: visited cell count (reachable area), adjacency to the tail position, and shortest distance to food. A pointer-based queue index replaces `shift()` to avoid O(n) array mutations on every dequeue.\n- Updated `src/bots/bot-types.ts` to replace the three individual helper signatures with a single `analyzePosition` entry that returns an `AnalysisResult` type (`reachableArea`, `canReachTail`, `pathToFood`). All three bot files (`explorer-bot.ts`, `hunter-bot.ts`, `survival-bot.ts`) were updated to call the unified helper and destructure results from the returned object.",
+			"decisions": "- **Single-pass over separate passes**: Running one BFS instead of three cuts the per-move computation to roughly one-third. The tail reachability check was redesigned to work within the same traversal: rather than treating the tail as a traversable target cell, the algorithm keeps the tail blocked and flags reachability the moment any visited cell is adjacent to it. This preserves the original blocking semantics while avoiding a dedicated search.\n- **Tail adjacency instead of direct path**: The original `hasPath` call allowed the tail cell to be entered (via `allowTargetOccupied`). The new approach detects reachability by checking whether any explored cell neighbors the tail, which is equivalent for the bot's scoring purposes and avoids the need for special-case target handling inside the traversal loop.",
+			"filesAffected": [
+				"src/main.ts",
+				"src/bots/bot-types.ts",
+				"src/bots/explorer-bot.ts",
+				"src/bots/hunter-bot.ts",
+				"src/bots/survival-bot.ts"
+			],
+			"category": "performance",
+			"importance": "major"
+		},
+		{
+			"title": "Track occupied snake cells in a set for fast collision and food checks",
+			"trigger": "Several hot-path operations — collision detection, food spawning, and the new unified position analysis — were scanning the entire snake array linearly. As the snake grows, these O(n) scans become increasingly expensive.",
+			"response": "- Added a `snakeSet` (`Set<string>`) field to `SnakeGame` in `src/main.ts`, maintained in sync with the `snake` array. The set is initialized on game start and grid-size change, updated on every move (head added on advance, tail key deleted when the snake does not eat), and used in `checkCollision` and `spawnFood` to replace array scans with O(1) lookups.\n- `spawnFood` gained a high-fill-ratio fast path: when the snake occupies more than half the grid, it iterates all cells once to collect empty positions and picks randomly from that list, avoiding the rejection-sampling loop that becomes slow at high density.",
+			"decisions": "- **Set maintained alongside array**: The snake array is kept for ordered access (head, tail, iteration), while the set handles membership tests. Keeping both in sync adds a small constant overhead per move but eliminates linear scans in the collision and food paths, which are called far more frequently as the snake grows.\n- **Threshold-based food spawn strategy**: At low fill ratios the existing random-sample-and-reject loop is fast on average, so it is preserved. The set-based full-grid scan is only activated above 50% fill, where rejection sampling degrades. This avoids paying the scan cost on every food spawn during normal play.",
+			"filesAffected": [
+				"src/main.ts"
+			],
+			"category": "performance",
+			"importance": "major"
+		}
+	],
+	"backfilled": true,
+	"backfillMethod": "diff-only",
+	"treeHash": "805a5dcfde51a15ffc432ebc8d5f5144375770d9",
+	"recap": "The bot's per-move decision logic previously ran three independent graph searches for every direction it considered — one to measure open space, one to verify tail reachability, and one to find the path to food. These three passes were collapsed into a single traversal that collects all three results simultaneously, cutting the search work to roughly one-third per candidate move. Tail reachability is now detected by checking whether any explored cell sits next to the tail, rather than running a dedicated search, preserving the same scoring behavior with no extra traversal cost.\n\nAlongside the search consolidation, the game now maintains a fast-lookup set of all cells the snake currently occupies. Collision detection and food placement previously scanned the full snake array on every check; both now resolve in constant time regardless of snake length. Food spawning also gained a separate strategy for late-game situations where the snake fills more than half the board: instead of repeatedly guessing random positions and rejecting occupied ones, it scans the grid once and picks from the known empty cells directly."
+}
