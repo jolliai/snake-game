@@ -45,46 +45,6 @@
 			]
 		},
 		{
-			"commitHash": "a00b5c620c8105d59d06c34e2567a3b78fbcd1ac",
-			"recap": "Iron Snake Mode was added as an optional toggle on the game's main menu, composing with all three existing play configurations (single-player, two-player, and bot-vs-bot). When enabled, each game starts on a freshly generated irregular board shape — a connected region free of narrow one-or-two-cell corridors — rather than the usual square grid. The board outline and grid lines update to trace the true playable area, food only appears on reachable cells, and bots navigate the new shape automatically without any changes to their logic.\n\nProgression works through a level system that replaces the grid-doubling mechanic active in classic mode. Players advance by reaching cumulative score thresholds that grow with each level — 5 points to clear level one, 15 for level two, 30 for level three, and so on — with each level demanding more than the last. On advancing, a brand-new board shape is generated, snakes reset to length one on safe starting positions, and game speed increases slightly. A live countdown in the heads-up display shows exactly how many points remain until the next level, updating with every piece of food eaten.",
-			"topics": [
-				{
-					"title": "Iron Snake Mode: irregular random board shapes with level goals",
-					"decisions": "- **Single collision chokepoint over distributed guards**: Rather than updating bot code, movement loops, and food spawning separately, the mask check was injected only into `inBounds()`, which every collision path already funnels through. This kept the bot API completely unchanged and made the irregular shape an automatic constraint everywhere at once, at the cost of a slightly less transparent call chain.\n- **Overlapping rectangles over cellular automata or random walks**: Rectangular rooms with a minimum side of 3 make the no-narrow-corridor property nearly free by construction, overlap guarantees connectivity between rooms, and area is easy to tune. Cellular automata caves and random-walk accretion were considered but rejected as harder to control for minimum corridor width and fill ratio without extensive tuning.\n- **Cumulative score goals over per-level resets**: Goals are thresholds on the running total score rather than points earned within a level. This keeps the leaderboard score honest (it is always the true final score), means each goal is crossed exactly once as the snake keeps eating, and avoids a confusing score reset mid-game. The trade-off is that early levels feel shorter since the snake already has momentum.",
-					"category": "feature",
-					"importance": "major",
-					"filesAffected": [
-						"src/iron-snake.ts",
-						"src/main.ts",
-						"index.html",
-						"src/style.css"
-					]
-				},
-				{
-					"title": "Iron Snake Mode toggle label and placement refined",
-					"decisions": "- **Rename internals to match the final user-facing name**: Keeping internal identifiers as `arena` while the label read \"Iron Snake Mode\" would have created a confusing mismatch for future contributors. The full rename (file, exports, DOM ids, CSS classes, state fields, constants) was done in one pass to keep the vocabulary consistent, accepting a slightly larger diff in exchange for a coherent codebase.",
-					"category": "ux",
-					"importance": "minor",
-					"filesAffected": [
-						"index.html",
-						"src/main.ts",
-						"src/iron-snake.ts",
-						"src/style.css"
-					]
-				},
-				{
-					"title": "Level goals made larger with strictly increasing per-level requirements",
-					"decisions": "- **Triangular number curve over a flat increment or exponential**: A triangular progression (`5·L(L+1)/2`) gives deltas that grow linearly (5, 10, 15…), which feels fair and predictable to players — each level is harder by a fixed additional amount rather than doubling or jumping unpredictably. A flat increment was rejected as too easy at high levels; an exponential was considered too punishing.\n- **Cumulative threshold with a countdown display**: Showing \"points remaining to next goal\" rather than \"points scored this level\" lets players track progress against a single moving target without needing to remember what the level started at. The countdown also naturally handles the multiplayer combined-score case with no extra UI.",
-					"category": "ux",
-					"importance": "major",
-					"filesAffected": [
-						"src/main.ts",
-						"index.html"
-					]
-				}
-			]
-		},
-		{
 			"commitHash": "ea18bf87e66146aebefae37044f63b51e497e07a",
 			"ticketId": "JOE-7",
 			"topics": [
@@ -339,6 +299,46 @@
 						"src/bots/loop-guard.ts",
 						"src/main.ts",
 						"src/menu-demo.ts"
+					]
+				}
+			]
+		},
+		{
+			"commitHash": "a00b5c620c8105d59d06c34e2567a3b78fbcd1ac",
+			"recap": "Iron Snake Mode was added as an optional toggle on the game's main menu, composing with all three existing play configurations (single-player, two-player, and bot-vs-bot). When enabled, each game starts on a freshly generated irregular board shape — a connected region free of narrow one-or-two-cell corridors — rather than the usual square grid. The board outline and grid lines update to trace the true playable area, food only appears on reachable cells, and bots navigate the new shape automatically without any changes to their logic.\n\nProgression works through a level system that replaces the grid-doubling mechanic active in classic mode. Players advance by reaching cumulative score thresholds that grow with each level — 5 points to clear level one, 15 for level two, 30 for level three, and so on — with each level demanding more than the last. On advancing, a brand-new board shape is generated, snakes reset to length one on safe starting positions, and game speed increases slightly. A live countdown in the heads-up display shows exactly how many points remain until the next level, updating with every piece of food eaten.",
+			"topics": [
+				{
+					"title": "Iron Snake Mode: irregular random board shapes with level goals",
+					"decisions": "- **Single collision chokepoint over distributed guards**: Rather than updating bot code, movement loops, and food spawning separately, the mask check was injected only into `inBounds()`, which every collision path already funnels through. This kept the bot API completely unchanged and made the irregular shape an automatic constraint everywhere at once, at the cost of a slightly less transparent call chain.\n- **Overlapping rectangles over cellular automata or random walks**: Rectangular rooms with a minimum side of 3 make the no-narrow-corridor property nearly free by construction, overlap guarantees connectivity between rooms, and area is easy to tune. Cellular automata caves and random-walk accretion were considered but rejected as harder to control for minimum corridor width and fill ratio without extensive tuning.\n- **Cumulative score goals over per-level resets**: Goals are thresholds on the running total score rather than points earned within a level. This keeps the leaderboard score honest (it is always the true final score), means each goal is crossed exactly once as the snake keeps eating, and avoids a confusing score reset mid-game. The trade-off is that early levels feel shorter since the snake already has momentum.",
+					"category": "feature",
+					"importance": "major",
+					"filesAffected": [
+						"src/iron-snake.ts",
+						"src/main.ts",
+						"index.html",
+						"src/style.css"
+					]
+				},
+				{
+					"title": "Iron Snake Mode toggle label and placement refined",
+					"decisions": "- **Rename internals to match the final user-facing name**: Keeping internal identifiers as `arena` while the label read \"Iron Snake Mode\" would have created a confusing mismatch for future contributors. The full rename (file, exports, DOM ids, CSS classes, state fields, constants) was done in one pass to keep the vocabulary consistent, accepting a slightly larger diff in exchange for a coherent codebase.",
+					"category": "ux",
+					"importance": "minor",
+					"filesAffected": [
+						"index.html",
+						"src/main.ts",
+						"src/iron-snake.ts",
+						"src/style.css"
+					]
+				},
+				{
+					"title": "Level goals made larger with strictly increasing per-level requirements",
+					"decisions": "- **Triangular number curve over a flat increment or exponential**: A triangular progression (`5·L(L+1)/2`) gives deltas that grow linearly (5, 10, 15…), which feels fair and predictable to players — each level is harder by a fixed additional amount rather than doubling or jumping unpredictably. A flat increment was rejected as too easy at high levels; an exponential was considered too punishing.\n- **Cumulative threshold with a countdown display**: Showing \"points remaining to next goal\" rather than \"points scored this level\" lets players track progress against a single moving target without needing to remember what the level started at. The countdown also naturally handles the multiplayer combined-score case with no extra UI.",
+					"category": "ux",
+					"importance": "major",
+					"filesAffected": [
+						"src/main.ts",
+						"index.html"
 					]
 				}
 			]
