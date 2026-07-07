@@ -652,22 +652,6 @@
 			]
 		},
 		{
-			"commitHash": "4585346b57a553b0e7c9046f375b0bb9dbc4be06",
-			"recap": "A new bot called Spiral joined the snake game's roster of playable opponents. Rather than chasing food directly or patrolling edges, it moves in a clockwise sweeping pattern across the grid, running straight until it nears a wall and then turning inward to continue the spiral. Food collection is still part of its behavior, but the spiral motion takes priority, giving it a visually distinct movement style compared to the existing bots. The bot also checks at every step that it can still reach its own tail, keeping it from trapping itself as the spiral tightens.",
-			"topics": [
-				{
-					"title": "New spiral movement bot added to snake game",
-					"decisions": "- **Straight-first, clockwise-second priority**: The bot awards a higher score to continuing straight than to turning clockwise, with counter-clockwise receiving nothing. This produces a natural spiral: the snake runs along a straight path until a wall forces a clockwise turn, then repeats. A pure clockwise-always rule would cause tight circles; the straight preference creates wider, grid-sweeping loops.\n- **Tail-reachability as a hard gate**: Any move that leaves the snake unable to reach its own tail is scored at a large negative value, with only a small partial credit for reachable open area. This keeps the spiral from painting itself into a corner, trading some spiral purity for survival safety.\n- **Moderate food pursuit layered on top**: Food proximity and path-to-food scores are included but weighted lower than the spiral and safety signals. This means the bot will detour toward food when a clear path exists, but will not abandon the spiral pattern to chase food aggressively — a deliberate balance between score-seeking and pattern consistency.",
-					"category": "feature",
-					"importance": "major",
-					"filesAffected": [
-						"src/bots/spiral-bot.ts",
-						"src/bots/index.ts"
-					]
-				}
-			]
-		},
-		{
 			"commitHash": "572e53700a554fa72b31a06688e05e0f8da928bc",
 			"recap": "A new Spiral bot was added to the game's roster of playable bots. Unlike the existing bots that react primarily to food or threats, the Spiral bot attempts to sweep the grid in wide clockwise arcs, turning inward whenever it approaches a wall. Players can now select it alongside the existing options and observe a distinctly different movement personality — one that prioritizes grid coverage over direct food pursuit. The bot still avoids collisions and self-trapping, so it plays safely while maintaining its spiral character.",
 			"topics": [
@@ -1406,6 +1390,22 @@
 						"src/bots/ambusher-bot.ts",
 						"src/bots/chaser-bot.ts",
 						"src/bots/nomad-bot.ts",
+						"src/bots/index.ts"
+					]
+				}
+			]
+		},
+		{
+			"commitHash": "4585346b57a553b0e7c9046f375b0bb9dbc4be06",
+			"recap": "A new bot called Spiral joined the snake game's roster of playable opponents. Rather than chasing food directly or patrolling edges, it moves in a clockwise sweeping pattern across the grid, running straight until it nears a wall and then turning inward to continue the spiral. Food collection is still part of its behavior, but the spiral motion takes priority, giving it a visually distinct movement style compared to the existing bots. The bot also checks at every step that it can still reach its own tail, keeping it from trapping itself as the spiral tightens.",
+			"topics": [
+				{
+					"title": "New spiral movement bot added to snake game",
+					"decisions": "- **Straight-first, clockwise-second priority**: The bot awards a higher score to continuing straight than to turning clockwise, with counter-clockwise receiving nothing. This produces a natural spiral: the snake runs along a straight path until a wall forces a clockwise turn, then repeats. A pure clockwise-always rule would cause tight circles; the straight preference creates wider, grid-sweeping loops.\n- **Tail-reachability as a hard gate**: Any move that leaves the snake unable to reach its own tail is scored at a large negative value, with only a small partial credit for reachable open area. This keeps the spiral from painting itself into a corner, trading some spiral purity for survival safety.\n- **Moderate food pursuit layered on top**: Food proximity and path-to-food scores are included but weighted lower than the spiral and safety signals. This means the bot will detour toward food when a clear path exists, but will not abandon the spiral pattern to chase food aggressively — a deliberate balance between score-seeking and pattern consistency.",
+					"category": "feature",
+					"importance": "major",
+					"filesAffected": [
+						"src/bots/spiral-bot.ts",
 						"src/bots/index.ts"
 					]
 				}

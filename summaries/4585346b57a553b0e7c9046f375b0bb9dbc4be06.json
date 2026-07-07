@@ -46,5 +46,7 @@
 	"backfilled": true,
 	"backfillMethod": "diff-only",
 	"treeHash": "822c5f83df0de67981d7dd90673fe04507e24732",
-	"recap": "A new bot called Spiral joined the snake game's roster of playable opponents. Rather than chasing food directly or patrolling edges, it moves in a clockwise sweeping pattern across the grid, running straight until it nears a wall and then turning inward to continue the spiral. Food collection is still part of its behavior, but the spiral motion takes priority, giving it a visually distinct movement style compared to the existing bots. The bot also checks at every step that it can still reach its own tail, keeping it from trapping itself as the spiral tightens."
+	"recap": "A new bot called Spiral joined the snake game's roster of playable opponents. Rather than chasing food directly or patrolling edges, it moves in a clockwise sweeping pattern across the grid, running straight until it nears a wall and then turning inward to continue the spiral. Food collection is still part of its behavior, but the spiral motion takes priority, giving it a visually distinct movement style compared to the existing bots. The bot also checks at every step that it can still reach its own tail, keeping it from trapping itself as the spiral tightens.",
+	"jolliDocUrl": "https://jolli.ai/brckbmk4/articles?doc=2648",
+	"jolliDocId": 2648
 }
