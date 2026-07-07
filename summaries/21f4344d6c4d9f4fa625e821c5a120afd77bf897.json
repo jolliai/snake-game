@@ -1,0 +1,50 @@
+{
+	"version": 5,
+	"commitHash": "21f4344d6c4d9f4fa625e821c5a120afd77bf897",
+	"commitMessage": "Add Ambusher bot that lurks near center and strikes at nearby food",
+	"commitAuthor": "Joe Hart",
+	"commitDate": "2026-04-06T17:28:28-07:00",
+	"branch": "backfilled",
+	"generatedAt": "2026-07-07T15:15:38.439Z",
+	"commitType": "commit",
+	"commitSource": "cli",
+	"transcriptEntries": 0,
+	"conversationTurns": 0,
+	"llm": {
+		"model": "claude-sonnet-4-6",
+		"inputTokens": 6035,
+		"outputTokens": 704,
+		"cachedTokens": 0,
+		"apiLatencyMs": 19710,
+		"stopReason": null,
+		"source": "jolli-proxy"
+	},
+	"stats": {
+		"filesChanged": 2,
+		"insertions": 76,
+		"deletions": 1
+	},
+	"diffStats": {
+		"filesChanged": 2,
+		"insertions": 76,
+		"deletions": 1
+	},
+	"topics": [
+		{
+			"title": "New Ambusher bot that waits near center and strikes at nearby food",
+			"trigger": "The project needed a new snake bot with a distinct play style — one that holds position near the middle of the board rather than actively chasing food, only committing to a pursuit when food spawns close enough to reach safely.",
+			"response": "- `src/bots/ambusher-bot.ts` was created with a `scoreDirection` function that evaluates each candidate move using a two-mode strategy: when food is within a configurable strike threshold (30% of grid size, minimum 3 tiles), the bot aggressively pursues it using path length scoring; when food is farther away, the bot drifts toward it while penalizing distance from the grid center to maintain its ambush position.\n- Survival is enforced as a hard constraint — any move that leaves the snake unable to reach its own tail is scored at −200,000 (with a small reachable-area bonus to break ties), effectively eliminating it from consideration before any positional scoring applies.\n- `src/bots/index.ts` was updated to import `ambusherBot` and append it to the `AVAILABLE_BOTS` array, making it selectable alongside the existing bots.",
+			"decisions": "- **Strike threshold over fixed range**: The strike range scales with grid size (30% of the grid, floored at 3) rather than using a fixed tile count. This keeps the bot's behavior proportionally consistent across different board sizes — a fixed range would make the bot either too passive on large grids or too aggressive on small ones.\n- **Center-biased idle drift**: When outside strike range, the bot penalizes distance from the center rather than simply waiting in place. This keeps the snake mobile enough to avoid getting trapped in a corner while still gravitating toward the ambush position, balancing survivability against the thematic behavior.\n- **Tail-reachability as a hard gate**: Rather than folding survival into the score as a large negative weight, moves that cut off tail access are scored below any recoverable threshold. This prevents the optimizer from ever trading long-term survival for a short-term positional gain, which would undermine the bot's ability to sustain its lurking strategy.",
+			"filesAffected": [
+				"src/bots/ambusher-bot.ts",
+				"src/bots/index.ts"
+			],
+			"category": "feature",
+			"importance": "major"
+		}
+	],
+	"backfilled": true,
+	"backfillMethod": "diff-only",
+	"treeHash": "7ae0ba62be66d16432af27ac4fc7204adc7acc58",
+	"recap": "A new Ambusher bot was added to the snake game's roster of playable AI opponents. Unlike the existing bots that actively chase food around the board, the Ambusher holds position near the center and only commits to a pursuit when food appears within a short distance. When food is farther away, the bot drifts gradually toward it while staying close to the middle, keeping itself in a ready position without overextending. Survival is treated as an absolute constraint — the bot will never make a move that cuts off its escape route, no matter how tempting the food. The new bot is immediately available for selection alongside all existing opponents."
+}

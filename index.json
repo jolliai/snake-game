@@ -628,6 +628,22 @@
 				"insertions": 73,
 				"deletions": 1
 			}
+		},
+		{
+			"commitHash": "21f4344d6c4d9f4fa625e821c5a120afd77bf897",
+			"parentCommitHash": null,
+			"treeHash": "7ae0ba62be66d16432af27ac4fc7204adc7acc58",
+			"commitType": "commit",
+			"commitMessage": "Add Ambusher bot that lurks near center and strikes at nearby food",
+			"commitDate": "2026-04-06T17:28:28-07:00",
+			"branch": "backfilled",
+			"generatedAt": "2026-07-07T15:15:38.439Z",
+			"topicCount": 1,
+			"diffStats": {
+				"filesChanged": 2,
+				"insertions": 76,
+				"deletions": 1
+			}
 		}
 	],
 	"commitAliases": {
