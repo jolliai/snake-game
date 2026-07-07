@@ -1,0 +1,36 @@
+{
+	"version": 5,
+	"commitHash": "a438a7bb2831cd2ae81767014116e26f4528b75e",
+	"commitMessage": "Ignore entire .claude/ directory in .gitignore",
+	"commitAuthor": "Joe Hart",
+	"commitDate": "2026-03-18T08:06:51-07:00",
+	"branch": "backfilled",
+	"generatedAt": "2026-07-07T15:16:38.098Z",
+	"commitType": "commit",
+	"commitSource": "cli",
+	"transcriptEntries": 0,
+	"conversationTurns": 0,
+	"llm": {
+		"model": "claude-sonnet-4-6",
+		"inputTokens": 4975,
+		"outputTokens": 8,
+		"cachedTokens": 0,
+		"apiLatencyMs": 1206,
+		"stopReason": null,
+		"source": "jolli-proxy"
+	},
+	"stats": {
+		"filesChanged": 2,
+		"insertions": 1,
+		"deletions": 10
+	},
+	"diffStats": {
+		"filesChanged": 2,
+		"insertions": 1,
+		"deletions": 10
+	},
+	"topics": [],
+	"backfilled": true,
+	"backfillMethod": "diff-only",
+	"treeHash": "b6e398f7a6edb611878890957808e404726955b8"
+}

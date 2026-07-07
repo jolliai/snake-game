@@ -708,6 +708,22 @@
 				"insertions": 62,
 				"deletions": 1
 			}
+		},
+		{
+			"commitHash": "a438a7bb2831cd2ae81767014116e26f4528b75e",
+			"parentCommitHash": null,
+			"treeHash": "b6e398f7a6edb611878890957808e404726955b8",
+			"commitType": "commit",
+			"commitMessage": "Ignore entire .claude/ directory in .gitignore",
+			"commitDate": "2026-03-18T08:06:51-07:00",
+			"branch": "backfilled",
+			"generatedAt": "2026-07-07T15:16:38.098Z",
+			"topicCount": 0,
+			"diffStats": {
+				"filesChanged": 2,
+				"insertions": 1,
+				"deletions": 10
+			}
 		}
 	],
 	"commitAliases": {
