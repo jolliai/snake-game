@@ -1,0 +1,49 @@
+{
+	"version": 5,
+	"commitHash": "b055a1b30a3193160789bc854a7e87f51189c85b",
+	"commitMessage": "Fix depth sorting to use projected Y for correct ordering at all angles",
+	"commitAuthor": "Joe Hart",
+	"commitDate": "2026-02-22T13:27:59-08:00",
+	"branch": "backfilled",
+	"generatedAt": "2026-07-07T15:18:38.129Z",
+	"commitType": "commit",
+	"commitSource": "cli",
+	"transcriptEntries": 0,
+	"conversationTurns": 0,
+	"llm": {
+		"model": "claude-sonnet-4-6",
+		"inputTokens": 5026,
+		"outputTokens": 338,
+		"cachedTokens": 0,
+		"apiLatencyMs": 8922,
+		"stopReason": null,
+		"source": "jolli-proxy"
+	},
+	"stats": {
+		"filesChanged": 1,
+		"insertions": 4,
+		"deletions": 2
+	},
+	"diffStats": {
+		"filesChanged": 1,
+		"insertions": 4,
+		"deletions": 2
+	},
+	"topics": [
+		{
+			"title": "Fix depth sorting for isometric rendering at all camera angles",
+			"trigger": "Objects in the game were being drawn in the wrong order at certain camera angles, causing visual layering errors where foreground objects appeared behind background ones.",
+			"response": "In `src/main.ts`, the painter's algorithm sort comparator was updated to project each object's position onto the screen's vertical axis using the isometric basis vectors (`basisXy` and `basisYy`) rather than summing raw grid coordinates. This ensures the sort order reflects true visual depth regardless of the viewing angle.",
+			"decisions": "The sort key was changed from a simple sum of grid coordinates to a dot product against the vertical component of the isometric projection basis. The naive coordinate sum only produces correct depth ordering for one specific camera orientation; using the actual projected Y value generalizes the sort to work correctly at any angle without requiring separate sorting logic per view.",
+			"filesAffected": [
+				"src/main.ts"
+			],
+			"category": "bugfix",
+			"importance": "major"
+		}
+	],
+	"backfilled": true,
+	"backfillMethod": "diff-only",
+	"treeHash": "9719173c17f11e25ddcc6a7ed61fc829fa94896e",
+	"recap": "The depth-sorting logic for the game's isometric renderer was corrected so that objects always appear in the right visual order regardless of the camera angle. Previously, layering errors could occur when the view was rotated, causing objects to render in front of or behind others incorrectly. The fix generalizes the sort to use the actual projected screen position of each object, so the painter's algorithm produces correct results across all orientations."
+}

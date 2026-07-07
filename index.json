@@ -804,6 +804,22 @@
 				"insertions": 7,
 				"deletions": 0
 			}
+		},
+		{
+			"commitHash": "b055a1b30a3193160789bc854a7e87f51189c85b",
+			"parentCommitHash": null,
+			"treeHash": "9719173c17f11e25ddcc6a7ed61fc829fa94896e",
+			"commitType": "commit",
+			"commitMessage": "Fix depth sorting to use projected Y for correct ordering at all angles",
+			"commitDate": "2026-02-22T13:27:59-08:00",
+			"branch": "backfilled",
+			"generatedAt": "2026-07-07T15:18:38.129Z",
+			"topicCount": 1,
+			"diffStats": {
+				"filesChanged": 1,
+				"insertions": 4,
+				"deletions": 2
+			}
 		}
 	],
 	"commitAliases": {
