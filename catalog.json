@@ -975,20 +975,6 @@
 			]
 		},
 		{
-			"commitHash": "aa60e54001ccf9ac4c6d03b41422ba10a39c93ac",
-			"topics": [
-				{
-					"title": "First person snake view added to user feedback list",
-					"decisions": "No design decisions were made in this session; the change is a verbatim transcription of a user's feature request into the feedback log.",
-					"category": "docs",
-					"importance": "minor",
-					"filesAffected": [
-						"README3.md"
-					]
-				}
-			]
-		},
-		{
 			"commitHash": "6f96e53c6166f7955f1971409a820c1345398513",
 			"recap": "Players can now press Enter to start a new game from the main menu or after a game ends. The shortcut is active only when the game is not in progress, so there is no risk of accidentally triggering a restart during play.",
 			"topics": [
@@ -1407,6 +1393,20 @@
 						"src/main.ts",
 						"src/style.css",
 						"index.html"
+					]
+				}
+			]
+		},
+		{
+			"commitHash": "aa60e54001ccf9ac4c6d03b41422ba10a39c93ac",
+			"topics": [
+				{
+					"title": "First person snake view added to user feedback list",
+					"decisions": "No design decisions were made in this session; the change is a verbatim transcription of a user's feature request into the feedback log.",
+					"category": "docs",
+					"importance": "minor",
+					"filesAffected": [
+						"README3.md"
 					]
 				}
 			]
