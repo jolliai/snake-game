@@ -1204,6 +1204,21 @@
 					]
 				}
 			]
+		},
+		{
+			"commitHash": "73e560987466db4a911987519f9f71a45c38af8c",
+			"topics": [
+				{
+					"title": "Remove keyboard shortcut for resetting the game",
+					"decisions": "Removing the reset shortcut entirely, rather than rebinding it to a different key, keeps the control scheme simpler and eliminates the risk of players accidentally wiping their game state mid-run. The on-screen hint was updated in the same change to avoid misleading players about available controls.",
+					"category": "ux",
+					"importance": "minor",
+					"filesAffected": [
+						"src/main.ts",
+						"index.html"
+					]
+				}
+			]
 		}
 	]
 }
