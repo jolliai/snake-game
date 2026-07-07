@@ -1,0 +1,43 @@
+{
+	"version": 1,
+	"commitHash": "a186ad204e48dc5770e2761f453e391ab34d240a",
+	"commitMessage": "Add Rainbow Snake surprise (JOE-7)",
+	"commitDate": "2026-07-07T16:00:16.000Z",
+	"planSlug": "optimized-petting-donut-a186ad20",
+	"originalSlug": "optimized-petting-donut",
+	"summary": "The developer implemented the full JOE-7 Rainbow Snake easter egg feature, including the per-game random roll, animated rainbow snake rendering, a Mortal Kombat 'FRIENDSHIP!'-style banner, and Playwright E2E tests — all verified with a clean build and passing test suite.",
+	"steps": [
+		{
+			"id": "1",
+			"description": "Per-game roll (the '1 in 100'): add RAINBOW_CHANCE constant, rainbowSnake state field, rainbowOverride query-param seam, set in startNewGame(), scoped to P1 only",
+			"status": "completed",
+			"note": "All four sub-items are implemented: RAINBOW_CHANCE=0.01 constant added near other tuning constants, rainbowSnake/rainbowOverride/rainbowBannerTimer fields added to the class, parseRainbowOverride() parses ?rainbow=1/0/true/false, and startNewGame() sets this.rainbowSnake = this.rainbowOverride ?? (Math.random() < RAINBOW_CHANCE). The URL override seam was a deliberate trade-off to avoid flaky 1% tests — the conversation explicitly notes this adds a small amount of URL-parsing code with no production effect. P2 snake tuples are untouched per the plan's scope decision."
+		},
+		{
+			"id": "2",
+			"description": "Rainbow rendering in draw(): add seg/segLen to objects array, rainbowFaces() helper, compute phase once per frame, apply per-segment colors in render switch, hunger tint interaction",
+			"status": "completed",
+			"note": "The objects array was extended with seg/segLen fields for P1 segments; rainbowFaces() computes HSL face shades with lightness steps matching the existing 3D shading model (top 62%, right 50%, left 40%); rainbowPhase is computed once at the top of draw() using performance.now(); and the head/body/tail switch cases conditionally use p1Faces(obj) vs the existing tint-blended tuples. The animated shimmer approach was chosen over a static gradient specifically to match the project's documented preference for visible, gameplay-paced motion, as noted in the conversation topics."
+		},
+		{
+			"id": "3",
+			"description": "'Rainbow Snake' banner — Mortal Kombat 'FRIENDSHIP!' style: HTML element, CSS arc/text/animations, showRainbowBanner/hideRainbowBanner logic, called from startNewGame and cleanup paths",
+			"status": "completed",
+			"note": "The HTML wrapper with rainbow-arc and rainbow-text divs was added to index.html; CSS implements the semicircular radial-gradient arc, chunky arcade text with layered text-shadow outline, friendship-pop bounce keyframe, and friendship-flash blink; showRainbowBanner/hideRainbowBanner/clearRainbowBannerTimer methods mirror the death-banner pattern with a two-stage fade (fading class → hidden after RAINBOW_BANNER_FADE_MS); and showScreen() calls hideRainbowBanner() when leaving the game view. The MK 'FRIENDSHIP!' aesthetic was chosen over a plain colored overlay to make the rare event feel genuinely special — the conversation notes the deliberately wholesome, over-the-top tone is the point. An optional announcer sound sting was discussed but explicitly deferred (no audio system exists; noted as easy to add later)."
+		},
+		{
+			"id": "4",
+			"description": "E2E test: Playwright spec asserting ?rainbow=1 shows banner with 'Rainbow Snake' text and auto-hides after ~3s, and ?rainbow=0 keeps banner hidden",
+			"status": "completed",
+			"note": "tests/e2e/rainbow.spec.ts was added with both test cases matching the existing harness conventions (SCREENS helper, page.goto, locator assertions). The ?rainbow=1 test asserts visibility, text content, and auto-dismissal within 5s timeout; the ?rainbow=0 test waits 300ms then asserts hidden. Canvas pixel colors are explicitly not asserted — the conversation notes the DOM banner plus forced flag are the reliable observable, which is why the URL seam was added in the first place. The full suite ran 10/10 passing."
+		}
+	],
+	"llm": {
+		"model": "claude-haiku-4-5-20251001",
+		"inputTokens": 15859,
+		"outputTokens": 1051,
+		"apiLatencyMs": 25980,
+		"stopReason": null,
+		"source": "jolli-proxy"
+	}
+}

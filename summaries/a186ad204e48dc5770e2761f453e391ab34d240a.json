@@ -1,0 +1,92 @@
+{
+	"version": 5,
+	"commitHash": "a186ad204e48dc5770e2761f453e391ab34d240a",
+	"commitMessage": "Add Rainbow Snake surprise (JOE-7)",
+	"commitAuthor": "Joe Hart",
+	"commitDate": "2026-07-07T16:00:16.000Z",
+	"branch": "josephhart/joe-7-add-rainbow-colored-snake-suprise",
+	"generatedAt": "2026-07-07T16:01:09.283Z",
+	"commitType": "commit",
+	"commitSource": "cli",
+	"transcriptEntries": 12,
+	"conversationTurns": 6,
+	"llm": {
+		"model": "claude-sonnet-4-6",
+		"inputTokens": 19878,
+		"outputTokens": 950,
+		"cachedTokens": 0,
+		"apiLatencyMs": 26224,
+		"stopReason": null,
+		"source": "jolli-proxy"
+	},
+	"stats": {
+		"filesChanged": 4,
+		"insertions": 192,
+		"deletions": 6
+	},
+	"topics": [
+		{
+			"title": "Rainbow Snake surprise with Mortal Kombat friendship banner",
+			"trigger": "The user wanted a rare, delightful easter egg where roughly one in every hundred games transforms the snake into an animated rainbow and announces it with a celebratory banner. The feature needed to feel visually exciting without affecting normal gameplay at all.",
+			"response": "- Added a per-game random roll in `src/main.ts` (`startNewGame`) that activates rainbow mode with a 1-in-100 probability. A `?rainbow=1` or `?rainbow=0` URL parameter overrides the roll deterministically for testing. The rainbow flag is stored as a private field on the game class and held for the entire game session, with the banner hidden whenever the player navigates away from the game screen via `showScreen`.\n- Implemented per-segment rainbow coloring in the `draw()` method of `src/main.ts`. Each player-1 snake segment is assigned an HSL hue derived from its position along the body, and the hue offset scrolls over time using `performance.now()`, producing an animated shimmer. The existing per-frame canvas redraw (driven by the board auto-rotation loop) animates the effect for free. Player 2's snake is unaffected in two-player modes.\n- Built the Mortal Kombat \"FRIENDSHIP!\"-style banner in `index.html`, `src/style.css`, and `src/main.ts`. The banner consists of a CSS radial-gradient rainbow arc behind chunky all-caps arcade text that pops in with a bounce keyframe animation, flashes three times, then auto-dismisses via a JavaScript timer after three seconds with a CSS opacity fade.",
+			"decisions": "- **Animated shimmer over static gradient**: The rainbow hue was made to scroll continuously along the snake body rather than being a fixed head-to-tail gradient. This keeps the effect visually alive throughout the game and matches the project's established preference for visible, gameplay-paced motion. A static gradient would have been simpler but would have felt inert after the first few seconds.\n- **Mortal Kombat \"FRIENDSHIP!\" aesthetic for the banner**: Rather than a plain colored text overlay (the minimal interpretation of the ticket), the banner was styled as the classic MK friendship finisher — a rainbow arc, chunky arcade lettering, a bounce-in animation, and a flash effect. The deliberately wholesome, over-the-top tone amplifies the surprise and makes the rare event feel genuinely special rather than just informational.\n- **URL override seam for testing**: Because a 1-in-100 random event cannot be reliably exercised in automated tests, a `?rainbow=1/0` query parameter was added to force the outcome. This avoids flaky tests and lets manual verification happen instantly without waiting on probability, at the cost of a small amount of URL-parsing code that has no effect in production.",
+			"todo": "An optional Mortal Kombat-style announcer sound sting was discussed but left out. There is no audio system in the project yet; adding a short WebAudio-generated jingle was noted as an easy future addition if desired.",
+			"filesAffected": [
+				"src/main.ts",
+				"src/style.css",
+				"index.html"
+			],
+			"category": "feature",
+			"importance": "major"
+		}
+	],
+	"ticketId": "JOE-7",
+	"recap": "The snake game gained a rare easter egg: on roughly one in every hundred games, the player's snake renders as a full animated rainbow that shifts and scrolls along the body throughout the entire session. The effect is exclusive to the player's own snake, so two-player games remain visually distinct with the second player's snake staying its usual blue.\n\nWhen a rainbow game triggers, a Mortal Kombat \"FRIENDSHIP!\" inspired banner appears over the board. A semicircular rainbow arc sits behind chunky all-caps arcade lettering that bounces into view, flashes three times, and then fades away automatically after about three seconds — leaving the board unobstructed for the rest of the game. The banner never reappears mid-game and clears itself immediately if the player exits to the menu or dies quickly.",
+	"conversationTokens": 492919,
+	"conversationTokenBreakdown": {
+		"input": 33381,
+		"output": 162216,
+		"cached": 297322
+	},
+	"diffStats": {
+		"filesChanged": 4,
+		"insertions": 192,
+		"deletions": 6
+	},
+	"plans": [
+		{
+			"slug": "optimized-petting-donut-a186ad20",
+			"title": "JOE-7 — Rainbow Snake Surprise",
+			"addedAt": "2026-07-07T15:45:24.678Z",
+			"updatedAt": "2026-07-07T16:00:43.214Z"
+		}
+	],
+	"references": [
+		{
+			"archivedKey": "linear:JOE-7-a186ad20",
+			"source": "linear",
+			"nativeId": "JOE-7",
+			"title": "Add rainbow colored snake suprise",
+			"url": "https://linear.app/joesthewizardworkspace/issue/JOE-7/add-rainbow-colored-snake-suprise",
+			"fields": [
+				{
+					"key": "status",
+					"label": "Status",
+					"value": "Backlog",
+					"icon": "circle-large-filled"
+				},
+				{
+					"key": "priority",
+					"label": "Priority",
+					"value": "No priority",
+					"icon": "flame"
+				}
+			],
+			"referencedAt": "2026-07-07T15:38:25.202Z",
+			"sourceToolName": "mcp__claude_ai_Linear__list_issues"
+		}
+	],
+	"transcripts": [
+		"5e88848b-ba70-49b6-902d-a88da5364468"
+	]
+}

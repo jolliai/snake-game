@@ -1410,6 +1410,24 @@
 					]
 				}
 			]
+		},
+		{
+			"commitHash": "a186ad204e48dc5770e2761f453e391ab34d240a",
+			"recap": "The snake game gained a rare easter egg: on roughly one in every hundred games, the player's snake renders as a full animated rainbow that shifts and scrolls along the body throughout the entire session. The effect is exclusive to the player's own snake, so two-player games remain visually distinct with the second player's snake staying its usual blue.\n\nWhen a rainbow game triggers, a Mortal Kombat \"FRIENDSHIP!\" inspired banner appears over the board. A semicircular rainbow arc sits behind chunky all-caps arcade lettering that bounces into view, flashes three times, and then fades away automatically after about three seconds — leaving the board unobstructed for the rest of the game. The banner never reappears mid-game and clears itself immediately if the player exits to the menu or dies quickly.",
+			"ticketId": "JOE-7",
+			"topics": [
+				{
+					"title": "Rainbow Snake surprise with Mortal Kombat friendship banner",
+					"decisions": "- **Animated shimmer over static gradient**: The rainbow hue was made to scroll continuously along the snake body rather than being a fixed head-to-tail gradient. This keeps the effect visually alive throughout the game and matches the project's established preference for visible, gameplay-paced motion. A static gradient would have been simpler but would have felt inert after the first few seconds.\n- **Mortal Kombat \"FRIENDSHIP!\" aesthetic for the banner**: Rather than a plain colored text overlay (the minimal interpretation of the ticket), the banner was styled as the classic MK friendship finisher — a rainbow arc, chunky arcade lettering, a bounce-in animation, and a flash effect. The deliberately wholesome, over-the-top tone amplifies the surprise and makes the rare event feel genuinely special rather than just informational.\n- **URL override seam for testing**: Because a 1-in-100 random event cannot be reliably exercised in automated tests, a `?rainbow=1/0` query parameter was added to force the outcome. This avoids flaky tests and lets manual verification happen instantly without waiting on probability, at the cost of a small amount of URL-parsing code that has no effect in production.",
+					"category": "feature",
+					"importance": "major",
+					"filesAffected": [
+						"src/main.ts",
+						"src/style.css",
+						"index.html"
+					]
+				}
+			]
 		}
 	]
 }
