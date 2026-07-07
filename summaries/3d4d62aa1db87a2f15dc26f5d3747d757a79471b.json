@@ -1,0 +1,51 @@
+{
+	"version": 5,
+	"commitHash": "3d4d62aa1db87a2f15dc26f5d3747d757a79471b",
+	"commitMessage": "Merge branch 'main' into add-nomad-bot",
+	"commitAuthor": "Joe Hart",
+	"commitDate": "2026-04-06T18:10:31-07:00",
+	"branch": "backfilled",
+	"generatedAt": "2026-07-07T15:14:11.870Z",
+	"commitType": "commit",
+	"commitSource": "cli",
+	"transcriptEntries": 0,
+	"conversationTurns": 0,
+	"llm": {
+		"model": "claude-sonnet-4-6",
+		"inputTokens": 7027,
+		"outputTokens": 669,
+		"cachedTokens": 0,
+		"apiLatencyMs": 16252,
+		"stopReason": null,
+		"source": "jolli-proxy"
+	},
+	"stats": {
+		"filesChanged": 3,
+		"insertions": 150,
+		"deletions": 1
+	},
+	"diffStats": {
+		"filesChanged": 3,
+		"insertions": 150,
+		"deletions": 1
+	},
+	"topics": [
+		{
+			"title": "Two new snake bot personalities added: Ambusher and Chaser",
+			"trigger": "The game needed more variety in bot behavior. Two new bots with distinct strategies were added to give players more options when selecting an opponent or watching bots compete.",
+			"response": "- `src/bots/ambusher-bot.ts` was created implementing a center-hugging strategy. The bot drifts toward the middle of the grid and waits, only pursuing food aggressively when it spawns within a configurable strike radius (30% of grid size, minimum 3 tiles). Outside that range it prefers central positioning over direct food pursuit.\n- `src/bots/chaser-bot.ts` was created implementing an aggressive food-pursuit strategy. It always follows the shortest path to food, but falls back to tail-chasing when the direct path would leave it unable to reach its own tail, preventing self-trapping.\n- `src/bots/index.ts` was updated to import and register both new bots in the `AVAILABLE_BOTS` array, making them selectable in the game UI.",
+			"decisions": "- **Distinct behavioral archetypes over parameter tuning**: Rather than creating bots that differ only in how aggressively they weight food distance, each bot was given a fundamentally different spatial strategy — one anchored to the center, one always chasing. This produces more visibly different play styles that players can observe and distinguish, at the cost of more code to maintain per bot.\n- **Survival as a hard constraint, not a scored preference**: Both bots treat tail-reachability as a near-disqualifying condition (a large negative score floor) rather than just another factor in the scoring sum. This ensures the bots rarely self-trap even when food is very close, trading some short-term food efficiency for long-term survival.\n- **Strike threshold for the Ambusher**: The ambusher's switch from passive to aggressive mode uses a dynamic threshold tied to grid size rather than a fixed tile count. This keeps the behavior proportional across different board sizes without requiring separate tuning per grid configuration.",
+			"filesAffected": [
+				"src/bots/ambusher-bot.ts",
+				"src/bots/chaser-bot.ts",
+				"src/bots/index.ts"
+			],
+			"category": "feature",
+			"importance": "major"
+		}
+	],
+	"backfilled": true,
+	"backfillMethod": "diff-only",
+	"treeHash": "ea2f333315bfa9357a03b3be56541aaa2f6c7b7c",
+	"recap": "Two new bot personalities joined the snake game's roster. The Ambusher stakes out the center of the board and holds position, only breaking into a chase when food spawns close enough to strike — giving it a patient, territorial feel that looks noticeably different from existing bots. The Chaser takes the opposite approach, always hunting the shortest route to food and only pulling back when the direct path would leave it cornered, at which point it shadows its own tail to stay alive until a safe opening appears. Both bots are now available for players to select alongside the existing lineup."
+}

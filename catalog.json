@@ -716,6 +716,23 @@
 					]
 				}
 			]
+		},
+		{
+			"commitHash": "3d4d62aa1db87a2f15dc26f5d3747d757a79471b",
+			"recap": "Two new bot personalities joined the snake game's roster. The Ambusher stakes out the center of the board and holds position, only breaking into a chase when food spawns close enough to strike — giving it a patient, territorial feel that looks noticeably different from existing bots. The Chaser takes the opposite approach, always hunting the shortest route to food and only pulling back when the direct path would leave it cornered, at which point it shadows its own tail to stay alive until a safe opening appears. Both bots are now available for players to select alongside the existing lineup.",
+			"topics": [
+				{
+					"title": "Two new snake bot personalities added: Ambusher and Chaser",
+					"decisions": "- **Distinct behavioral archetypes over parameter tuning**: Rather than creating bots that differ only in how aggressively they weight food distance, each bot was given a fundamentally different spatial strategy — one anchored to the center, one always chasing. This produces more visibly different play styles that players can observe and distinguish, at the cost of more code to maintain per bot.\n- **Survival as a hard constraint, not a scored preference**: Both bots treat tail-reachability as a near-disqualifying condition (a large negative score floor) rather than just another factor in the scoring sum. This ensures the bots rarely self-trap even when food is very close, trading some short-term food efficiency for long-term survival.\n- **Strike threshold for the Ambusher**: The ambusher's switch from passive to aggressive mode uses a dynamic threshold tied to grid size rather than a fixed tile count. This keeps the behavior proportional across different board sizes without requiring separate tuning per grid configuration.",
+					"category": "feature",
+					"importance": "major",
+					"filesAffected": [
+						"src/bots/ambusher-bot.ts",
+						"src/bots/chaser-bot.ts",
+						"src/bots/index.ts"
+					]
+				}
+			]
 		}
 	]
 }
