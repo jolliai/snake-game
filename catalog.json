@@ -344,22 +344,6 @@
 			]
 		},
 		{
-			"commitHash": "b227c9ee2a5d1df574a7ca81d9bdfde215dae09c",
-			"recap": "Scores achieved with bot assistance are now fully excluded from the human leaderboard, even when the bot was only active for part of a run. Previously, a player could turn the bot on mid-game and then switch it off before dying, and the game would still invite them to submit their score. The game now tracks whether the bot was used at any point during a run, and if it was, the name-entry prompt is suppressed entirely at game over. Runs that begin with the bot already enabled are also disqualified from the first moment, with no gap where an early assisted score could be submitted.",
-			"topics": [
-				{
-					"title": "Bot-assisted runs excluded from leaderboard name prompt",
-					"decisions": "- **Lifetime tracking over point-in-time check**: The previous approach only checked whether the bot was active at the instant the game ended, which allowed players to use the bot mid-run and then switch it off before dying to sneak onto the leaderboard. Tracking whether the bot was ever active during the run closes this gap entirely. The trade-off is a small amount of extra state to carry through the run, but the integrity benefit is clear and the cost is negligible.\n- **Flag initialized from current bot state at run start**: When a new run begins, the \"ever active\" flag is seeded from whether the bot is already on, rather than always starting at false. This means a player who starts a run with the bot already enabled is immediately disqualified, with no window where an early-game bot score could slip through.",
-					"category": "bugfix",
-					"importance": "major",
-					"filesAffected": [
-						"src/main.ts",
-						"src/style.css"
-					]
-				}
-			]
-		},
-		{
 			"commitHash": "93a06b13e6ca82df430151e3dfd807fdac3f75bd",
 			"recap": "The game now supports persistent leaderboards across all three play modes — single player, two-player, and bot vs bot. After finishing a game, players who achieve a top-10 score are shown an inline prompt to enter their name, with their projected rank displayed before they commit. The entry is saved immediately and a confirmation shows the final rank. Players can browse all three leaderboards from the main menu, switching between modes with tabs, and can clear any board individually. Bot-vs-bot results are recorded automatically using each bot's name, keeping that leaderboard populated without any manual input.\n\nAlongside the leaderboard feature, the game-over screen now surfaces two additional stats for every run: the longest snake length reached and the total survival time. In two-player games both players' peak lengths are shown side by side. These same stats feed directly into the leaderboard ranking, so ties on score are broken first by longest snake and then by how long the player survived.",
 			"topics": [
@@ -1402,6 +1386,22 @@
 				{
 					"title": "Bot involvement now fully disqualifies a run from the leaderboard name prompt",
 					"decisions": "- **Lifetime flag over snapshot check**: Checking only whether the bot was active at the moment the game ended allowed players to game the system by toggling the bot off before dying. Tracking whether the bot was ever active during the run closes this loophole with minimal complexity — a single boolean that is set once and never cleared until the next game starts.\n- **Reset on new game, not on toggle-off**: The flag resets only when a new run begins, not when the bot is disabled mid-run. This keeps the disqualification permanent for the lifetime of a single run while still allowing a fresh run to be fully human-played and eligible for the leaderboard.",
+					"category": "bugfix",
+					"importance": "major",
+					"filesAffected": [
+						"src/main.ts",
+						"src/style.css"
+					]
+				}
+			]
+		},
+		{
+			"commitHash": "b227c9ee2a5d1df574a7ca81d9bdfde215dae09c",
+			"recap": "Scores achieved with bot assistance are now fully excluded from the human leaderboard, even when the bot was only active for part of a run. Previously, a player could turn the bot on mid-game and then switch it off before dying, and the game would still invite them to submit their score. The game now tracks whether the bot was used at any point during a run, and if it was, the name-entry prompt is suppressed entirely at game over. Runs that begin with the bot already enabled are also disqualified from the first moment, with no gap where an early assisted score could be submitted.",
+			"topics": [
+				{
+					"title": "Bot-assisted runs excluded from leaderboard name prompt",
+					"decisions": "- **Lifetime tracking over point-in-time check**: The previous approach only checked whether the bot was active at the instant the game ended, which allowed players to use the bot mid-run and then switch it off before dying to sneak onto the leaderboard. Tracking whether the bot was ever active during the run closes this gap entirely. The trade-off is a small amount of extra state to carry through the run, but the integrity benefit is clear and the cost is negligible.\n- **Flag initialized from current bot state at run start**: When a new run begins, the \"ever active\" flag is seeded from whether the bot is already on, rather than always starting at false. This means a player who starts a run with the bot already enabled is immediately disqualified, with no window where an early-game bot score could slip through.",
 					"category": "bugfix",
 					"importance": "major",
 					"filesAffected": [

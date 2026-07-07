@@ -46,5 +46,7 @@
 	"backfilled": true,
 	"backfillMethod": "diff-only",
 	"treeHash": "4814f9104b10769258d4862993532ad9f2454d07",
-	"recap": "Scores achieved with bot assistance are now fully excluded from the human leaderboard, even when the bot was only active for part of a run. Previously, a player could turn the bot on mid-game and then switch it off before dying, and the game would still invite them to submit their score. The game now tracks whether the bot was used at any point during a run, and if it was, the name-entry prompt is suppressed entirely at game over. Runs that begin with the bot already enabled are also disqualified from the first moment, with no gap where an early assisted score could be submitted."
+	"recap": "Scores achieved with bot assistance are now fully excluded from the human leaderboard, even when the bot was only active for part of a run. Previously, a player could turn the bot on mid-game and then switch it off before dying, and the game would still invite them to submit their score. The game now tracks whether the bot was used at any point during a run, and if it was, the name-entry prompt is suppressed entirely at game over. Runs that begin with the bot already enabled are also disqualified from the first moment, with no gap where an early assisted score could be submitted.",
+	"jolliDocUrl": "https://jolli.ai/brckbmk4/articles?doc=2684",
+	"jolliDocId": 2684
 }
