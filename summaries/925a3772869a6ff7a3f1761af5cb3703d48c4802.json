@@ -1,0 +1,49 @@
+{
+	"version": 5,
+	"commitHash": "925a3772869a6ff7a3f1761af5cb3703d48c4802",
+	"commitMessage": "Add T key to pause/resume board auto-rotation (#19)",
+	"commitAuthor": "Joe Hart",
+	"commitDate": "2026-06-15T15:30:40-07:00",
+	"branch": "backfilled",
+	"generatedAt": "2026-07-07T15:07:46.024Z",
+	"commitType": "commit",
+	"commitSource": "cli",
+	"transcriptEntries": 0,
+	"conversationTurns": 0,
+	"llm": {
+		"model": "claude-sonnet-4-6",
+		"inputTokens": 5607,
+		"outputTokens": 394,
+		"cachedTokens": 0,
+		"apiLatencyMs": 14307,
+		"stopReason": null,
+		"source": "jolli-proxy"
+	},
+	"stats": {
+		"filesChanged": 1,
+		"insertions": 14,
+		"deletions": 3
+	},
+	"diffStats": {
+		"filesChanged": 1,
+		"insertions": 14,
+		"deletions": 3
+	},
+	"topics": [
+		{
+			"title": "Add keyboard shortcut to pause and resume board auto-rotation",
+			"trigger": "Players wanted a way to temporarily freeze the board's automatic spinning without having to manually rotate it themselves or lose their current viewing angle.",
+			"response": "- Added a boolean toggle flag to the game class to track whether auto-rotation is user-paused, and wired it into the rotation update loop in `src/main.ts` so that rotation stops advancing when the flag is set.\n- Added a `toggleAutoRotatePause()` method that flips the pause flag when auto-rotation is active, bound to the T key in the keyboard event handler.\n- Updated the on-screen controls text for both PvP and bot-vs-bot modes to include the new T key hint.",
+			"decisions": "The pause toggle was implemented as a separate boolean flag rather than reusing the existing timed-override mechanism (which temporarily suppresses rotation after a manual Q/E rotation). Keeping them separate means the T key pause persists indefinitely until the player presses T again, while the timed override continues to work independently for its own purpose. Merging the two would have required tracking intent and complicated the expiry logic.",
+			"filesAffected": [
+				"src/main.ts"
+			],
+			"category": "feature",
+			"importance": "major"
+		}
+	],
+	"backfilled": true,
+	"backfillMethod": "diff-only",
+	"treeHash": "87f2d13c3874d893cda5dc8aced412792f48263a",
+	"recap": "Players can now press T during a game to freeze the board's automatic spinning in place, then press T again to resume it. The pause holds indefinitely until toggled off, giving players full control over their viewing angle without interrupting gameplay. Both the two-player and bot-vs-bot modes display the new shortcut in the on-screen controls bar so players can discover it without consulting documentation."
+}
