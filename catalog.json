@@ -602,6 +602,22 @@
 					]
 				}
 			]
+		},
+		{
+			"commitHash": "be770370e5d257ac297dca8c92c8c6c05aa665f3",
+			"recap": "A new Sweeper bot joined the roster of available snake strategies. It navigates the grid in a lawnmower pattern, sweeping each row in alternating directions and stepping downward at the end of each pass. Unlike purely reactive bots, the Sweeper treats coverage as its primary goal, with food-seeking and open-space awareness playing a supporting role.\n\nThe bot stays alive by treating the ability to reach its own tail as a near-disqualifying condition for any move, so it will break from the sweep pattern when necessary to avoid trapping itself. Players selecting the Sweeper can expect methodical, grid-wide coverage under normal conditions, with graceful deviation when the pattern would otherwise be fatal.",
+			"topics": [
+				{
+					"title": "New Sweeper bot covers the grid in a lawnmower pattern",
+					"decisions": "- **Safety as a hard gate, sweep preference as a soft nudge**: The bot treats the ability to reach its own tail as a near-disqualifying condition rather than just another scoring factor. This keeps the snake alive even when the ideal sweep direction would trap it, accepting occasional deviation from the lawnmower path in exchange for survival. A purely pattern-driven bot would be elegant but fragile.\n- **Scoring over deterministic rules**: Rather than hard-coding turn logic, every candidate direction is scored and the highest wins. This lets food proximity and open space naturally override the sweep preference when the situation demands it, without requiring explicit exception handling for every edge case. The trade-off is that the sweep pattern is a tendency rather than a guarantee.\n- **Top-to-bottom sweep direction**: Moving downward through rows was chosen as the primary axis of progression, with upward movement penalized. This gives the bot a consistent, predictable coverage direction and avoids oscillating between rows, at the cost of making it slightly less adaptive when food appears above the current row.",
+					"category": "feature",
+					"importance": "major",
+					"filesAffected": [
+						"src/bots/sweeper-bot.ts",
+						"src/bots/index.ts"
+					]
+				}
+			]
 		}
 	]
 }
