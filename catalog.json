@@ -344,9 +344,6 @@
 			]
 		},
 		{
-			"commitHash": "cd6ac54603270151807381a9d1f7173ed25091c0"
-		},
-		{
 			"commitHash": "3e3909722cdf4066f2601d6ea2dce11b60449262",
 			"recap": "The start screen received a substantial visual and interaction overhaul. The most prominent addition is a live animated snake running on an isometric 3D grid, displayed as a hero element at the top of the menu. The snake is driven by the same bot logic used in real gameplay, so it moves intelligently, eats food, and restarts after dying — giving new visitors an immediate sense of the game's style before they press a single button. The canvas fades softly into the background using a CSS mask, and the game title and tagline float over it as an overlay.\n\nThe button layout was also redesigned. Bot configuration options — previously shown as always-visible dropdowns — now live inside expandable inline panels that appear only when a player chooses \"Solo Bot\" or \"Bot vs Bot.\" Each panel contains the relevant bot selectors and a launch button, and collapses cleanly with a cancel action. This keeps the default view focused on the two primary actions (New Game and Two Player) while still making advanced options accessible without a separate screen or modal.",
 			"topics": [
@@ -1410,6 +1407,9 @@
 		},
 		{
 			"commitHash": "d2f765bd7ee9665192df87ef50f379ff9906b079"
+		},
+		{
+			"commitHash": "cd6ac54603270151807381a9d1f7173ed25091c0"
 		}
 	]
 }
