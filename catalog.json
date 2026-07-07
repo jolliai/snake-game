@@ -402,6 +402,45 @@
 					]
 				}
 			]
+		},
+		{
+			"commitHash": "59bd7331340f6332ee62e1774b2fb2622fbe163b",
+			"recap": "The main menu was redesigned around an animated isometric snake demo that plays automatically when the menu is shown. A rotating 3D board — complete with perspective foreshortening, a checkerboard ground, block shadows, and a bot-driven snake — fills the hero area above the title, giving players an immediate sense of the game's visual style before they start. The animation runs continuously while the menu is visible and pauses cleanly whenever a game or leaderboard screen takes over.\n\nBot configuration options for the solo-bot and bot-vs-bot modes were moved out of the main menu layout and into expandable inline panels that appear only when the player selects those modes. The menu now shows just three primary actions by default; choosing \"Solo Bot\" or \"Bot vs Bot\" reveals a compact panel with a bot picker, description, and dedicated Launch and Cancel buttons. This keeps the menu uncluttered for players who simply want to start a game, while still giving full bot selection to those who want it.",
+			"topics": [
+				{
+					"title": "Animated rotating snake demo added to the main menu screen",
+					"decisions": "- **Self-contained module over reusing the main game renderer**: The demo needed its own isolated game state, bot helpers, and draw loop running independently of any active game session. Sharing the main renderer would have coupled the demo's lifecycle to the game's state machine, making it fragile to pause, restart, or stop cleanly on screen transitions. A standalone class keeps the menu concern fully encapsulated.\n- **Continuous camera rotation as the hero visual**: A slowly rotating isometric view communicates the game's 3D aesthetic immediately and creates motion that draws the eye without requiring any user interaction. A static screenshot or a fixed-angle board would have been less distinctive and harder to differentiate from a 2D game at a glance.\n- **Radial gradient mask on the canvas edges**: Rather than cropping the canvas with a hard border or a container clip, a CSS mask fades the demo into the dark background. This avoids a visible rectangular frame around the animation and makes the hero feel integrated with the page rather than embedded as a widget.",
+					"category": "feature",
+					"importance": "major",
+					"filesAffected": [
+						"src/menu-demo.ts",
+						"src/main.ts",
+						"index.html",
+						"src/style.css"
+					]
+				},
+				{
+					"title": "Bot selection moved into expandable inline panels on the menu",
+					"decisions": "- **Inline expand panel rather than a modal or separate screen**: Keeping the bot options in-place within the menu flow avoids a context switch and lets the player see their selection alongside the launch button without navigating away. A modal would have required an overlay layer and dismiss logic; a separate screen would have broken the single-page feel of the menu.\n- **Hiding the trigger button while the panel is open**: When a panel is open, its trigger button disappears rather than staying visible in a toggled/active state. This prevents the layout from growing awkwardly tall with both the button and the panel stacked, and makes the Cancel button inside the panel the clear way to go back.",
+					"category": "ux",
+					"importance": "major",
+					"filesAffected": [
+						"index.html",
+						"src/main.ts",
+						"src/style.css"
+					]
+				},
+				{
+					"title": "Footer with leaderboards link and GitHub link added to menu",
+					"decisions": "Styling the leaderboards button as a plain text link rather than a secondary button visually separates navigational/utility actions from game-start actions. This lets the primary buttons dominate the menu hierarchy without removing the leaderboards feature, and it naturally accommodates the GitHub link sitting beside it at the same weight.",
+					"category": "ux",
+					"importance": "minor",
+					"filesAffected": [
+						"index.html",
+						"src/style.css"
+					]
+				}
+			]
 		}
 	]
 }

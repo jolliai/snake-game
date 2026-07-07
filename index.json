@@ -308,6 +308,22 @@
 				"insertions": 744,
 				"deletions": 40
 			}
+		},
+		{
+			"commitHash": "59bd7331340f6332ee62e1774b2fb2622fbe163b",
+			"parentCommitHash": null,
+			"treeHash": "01112439c533037df1ff0e6525bde38f2a5668ba",
+			"commitType": "commit",
+			"commitMessage": "Redesign menu with rotating demo, expand panels, and footer",
+			"commitDate": "2026-05-13T17:07:41-07:00",
+			"branch": "backfilled",
+			"generatedAt": "2026-07-07T15:09:09.737Z",
+			"topicCount": 3,
+			"diffStats": {
+				"filesChanged": 4,
+				"insertions": 744,
+				"deletions": 40
+			}
 		}
 	],
 	"commitAliases": {
