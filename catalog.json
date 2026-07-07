@@ -258,41 +258,6 @@
 			]
 		},
 		{
-			"commitHash": "ee8ce65e95eb466316f41f0f744879957887d040",
-			"recap": "Iron Snake mode now animates the board transition between levels: the playable region reshapes cell-by-cell from the completed level's outline into the next level's shape, with each beat of the reshape held for roughly the same duration as one snake move. The arena grows outward from the center in a wave, and old-only cells peel away as the new boundary fills in. The snake and food remain visible and grounded throughout, and normal play resumes automatically once the reshape completes.\n\nTwo bugs discovered during testing were also fixed. The snake was teleporting to the center of the new board on every level advance — the new approach generates the board around the snake's current position rather than relocating the snake onto a freshly generated board, so the snake never moves. A separate issue caused some level transitions to show no shape change at all: the board generation was seeding from the previous board's shape, which was already at target fill when the grid size stayed the same. Seeding from the snake's bounding box instead ensures a genuinely different shape is generated every level regardless of whether the grid grows.",
-			"ticketId": "JOE-5",
-			"topics": [
-				{
-					"title": "Board grows fresh random shape around stationary snake each level",
-					"decisions": "- **Seed from the snake, not the old board**: The previous grow approach embedded the old board into the new grid and added rooms until target fill. When the grid size stayed the same (common at early levels floored at size 12), the old board was already at target fill and zero new rooms were added — producing an identical shape. Seeding from only the snake's bounding box means the surrounding region is always regenerated fresh, so the shape changes every level regardless of whether the grid grows.\n- **Grow around the snake rather than relocate it**: The original design generated a random board first and then relocated the snake to a preferred anchor, which caused the visible teleport the user reported. Growing the board around the snake's current cells eliminates relocation entirely — the snake never moves, and the board is guaranteed to include every cell the snake occupies by construction. This also simplified the code substantially by removing the multi-tier rigid-placement and Warnsdorff fallback chain.",
-					"category": "bugfix",
-					"importance": "major",
-					"filesAffected": [
-						"src/iron-snake.ts",
-						"src/main.ts"
-					]
-				},
-				{
-					"title": "Snake stays in place during level transitions instead of teleporting",
-					"decisions": "The relocation approach was originally designed to place the snake at a \"preferred anchor\" (board center) on the freshly generated board, which required capturing the snake's shape as head-relative offsets before the board was replaced and then re-seating it afterward. Keeping the snake stationary made this entire mechanism unnecessary: the board is now generated to fit the snake rather than the snake being fitted to the board. This removed a significant amount of placement complexity and eliminated the teleport as a side effect.",
-					"category": "bugfix",
-					"importance": "major",
-					"filesAffected": [
-						"src/main.ts"
-					]
-				},
-				{
-					"title": "Level transitions animate board reshape cell-by-cell at snake-move pace",
-					"decisions": "- **Discrete steps held at move cadence rather than a continuous real-time tween**: An initial implementation ran the morph over a fixed 600ms wall-clock duration, which the user could not see because the reduced-motion gate bypassed it entirely. Re-pacing to the snake's own move interval makes the transition feel deliberate and game-native — each reshape beat corresponds to one tick the snake would have taken — and remains visible at any game speed.\n- **Mutate the live board mask each frame rather than compositing snapshots**: All three board-drawing functions read a single mask field, so feeding the renderer an interpolated display mask each frame causes the floor tiles, grid lines, and border outline to all reshape for free with no changes to any rendering code. A snapshot crossfade approach would have required offscreen canvas compositing and would not have produced the cell-by-cell geometric effect the user described.\n- **Inside-out wave ordering for the changed cells**: Cells that differ between the old and new shape are revealed in order of distance from the board center, so the arena appears to grow outward and old-only cells peel away as the wave passes. This was chosen over a random or scanline order because it reads as a coherent spatial event rather than noise, and it required only a sort — no additional data structures.",
-					"category": "feature",
-					"importance": "major",
-					"filesAffected": [
-						"src/main.ts"
-					]
-				}
-			]
-		},
-		{
 			"commitHash": "ea18bf87e66146aebefae37044f63b51e497e07a",
 			"ticketId": "JOE-7",
 			"topics": [
@@ -338,6 +303,41 @@
 					"importance": "major",
 					"filesAffected": [
 						"src/iron-snake.ts",
+						"src/main.ts"
+					]
+				}
+			]
+		},
+		{
+			"commitHash": "ee8ce65e95eb466316f41f0f744879957887d040",
+			"recap": "Iron Snake mode now animates the board transition between levels: the playable region reshapes cell-by-cell from the completed level's outline into the next level's shape, with each beat of the reshape held for roughly the same duration as one snake move. The arena grows outward from the center in a wave, and old-only cells peel away as the new boundary fills in. The snake and food remain visible and grounded throughout, and normal play resumes automatically once the reshape completes.\n\nTwo bugs discovered during testing were also fixed. The snake was teleporting to the center of the new board on every level advance — the new approach generates the board around the snake's current position rather than relocating the snake onto a freshly generated board, so the snake never moves. A separate issue caused some level transitions to show no shape change at all: the board generation was seeding from the previous board's shape, which was already at target fill when the grid size stayed the same. Seeding from the snake's bounding box instead ensures a genuinely different shape is generated every level regardless of whether the grid grows.",
+			"ticketId": "JOE-5",
+			"topics": [
+				{
+					"title": "Board grows fresh random shape around stationary snake each level",
+					"decisions": "- **Seed from the snake, not the old board**: The previous grow approach embedded the old board into the new grid and added rooms until target fill. When the grid size stayed the same (common at early levels floored at size 12), the old board was already at target fill and zero new rooms were added — producing an identical shape. Seeding from only the snake's bounding box means the surrounding region is always regenerated fresh, so the shape changes every level regardless of whether the grid grows.\n- **Grow around the snake rather than relocate it**: The original design generated a random board first and then relocated the snake to a preferred anchor, which caused the visible teleport the user reported. Growing the board around the snake's current cells eliminates relocation entirely — the snake never moves, and the board is guaranteed to include every cell the snake occupies by construction. This also simplified the code substantially by removing the multi-tier rigid-placement and Warnsdorff fallback chain.",
+					"category": "bugfix",
+					"importance": "major",
+					"filesAffected": [
+						"src/iron-snake.ts",
+						"src/main.ts"
+					]
+				},
+				{
+					"title": "Snake stays in place during level transitions instead of teleporting",
+					"decisions": "The relocation approach was originally designed to place the snake at a \"preferred anchor\" (board center) on the freshly generated board, which required capturing the snake's shape as head-relative offsets before the board was replaced and then re-seating it afterward. Keeping the snake stationary made this entire mechanism unnecessary: the board is now generated to fit the snake rather than the snake being fitted to the board. This removed a significant amount of placement complexity and eliminated the teleport as a side effect.",
+					"category": "bugfix",
+					"importance": "major",
+					"filesAffected": [
+						"src/main.ts"
+					]
+				},
+				{
+					"title": "Level transitions animate board reshape cell-by-cell at snake-move pace",
+					"decisions": "- **Discrete steps held at move cadence rather than a continuous real-time tween**: An initial implementation ran the morph over a fixed 600ms wall-clock duration, which the user could not see because the reduced-motion gate bypassed it entirely. Re-pacing to the snake's own move interval makes the transition feel deliberate and game-native — each reshape beat corresponds to one tick the snake would have taken — and remains visible at any game speed.\n- **Mutate the live board mask each frame rather than compositing snapshots**: All three board-drawing functions read a single mask field, so feeding the renderer an interpolated display mask each frame causes the floor tiles, grid lines, and border outline to all reshape for free with no changes to any rendering code. A snapshot crossfade approach would have required offscreen canvas compositing and would not have produced the cell-by-cell geometric effect the user described.\n- **Inside-out wave ordering for the changed cells**: Cells that differ between the old and new shape are revealed in order of distance from the board center, so the arena appears to grow outward and old-only cells peel away as the wave passes. This was chosen over a random or scanline order because it reads as a coherent spatial event rather than noise, and it required only a sort — no additional data structures.",
+					"category": "feature",
+					"importance": "major",
+					"filesAffected": [
 						"src/main.ts"
 					]
 				}
