@@ -58,7 +58,9 @@
 			"slug": "optimized-petting-donut-a186ad20",
 			"title": "JOE-7 — Rainbow Snake Surprise",
 			"addedAt": "2026-07-07T15:45:24.678Z",
-			"updatedAt": "2026-07-07T16:00:43.214Z"
+			"updatedAt": "2026-07-07T16:00:43.214Z",
+			"jolliPlanDocUrl": "https://jolli.ai/brckbmk4/articles?doc=2687",
+			"jolliPlanDocId": 2687
 		}
 	],
 	"references": [
@@ -88,5 +90,7 @@
 	],
 	"transcripts": [
 		"5e88848b-ba70-49b6-902d-a88da5364468"
-	]
+	],
+	"jolliDocUrl": "https://jolli.ai/brckbmk4/articles?doc=2689",
+	"jolliDocId": 2689
 }
