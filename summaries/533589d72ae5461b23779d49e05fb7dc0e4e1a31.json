@@ -46,5 +46,7 @@
 	"backfilled": true,
 	"backfillMethod": "diff-only",
 	"treeHash": "4814f9104b10769258d4862993532ad9f2454d07",
-	"recap": "Players can no longer earn a leaderboard entry by briefly enabling the bot during a run and then switching it off before the game ends. The game now tracks whether the bot was active at any point during a run, and any bot involvement — even momentary — permanently disqualifies that run from the name prompt. A new run started without the bot remains fully eligible for the leaderboard as normal."
+	"recap": "Players can no longer earn a leaderboard entry by briefly enabling the bot during a run and then switching it off before the game ends. The game now tracks whether the bot was active at any point during a run, and any bot involvement — even momentary — permanently disqualifies that run from the name prompt. A new run started without the bot remains fully eligible for the leaderboard as normal.",
+	"jolliDocUrl": "https://jolli.ai/brckbmk4/articles?doc=2682",
+	"jolliDocId": 2682
 }

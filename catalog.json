@@ -344,22 +344,6 @@
 			]
 		},
 		{
-			"commitHash": "533589d72ae5461b23779d49e05fb7dc0e4e1a31",
-			"recap": "Players can no longer earn a leaderboard entry by briefly enabling the bot during a run and then switching it off before the game ends. The game now tracks whether the bot was active at any point during a run, and any bot involvement — even momentary — permanently disqualifies that run from the name prompt. A new run started without the bot remains fully eligible for the leaderboard as normal.",
-			"topics": [
-				{
-					"title": "Bot involvement now fully disqualifies a run from the leaderboard name prompt",
-					"decisions": "- **Lifetime flag over snapshot check**: Checking only whether the bot was active at the moment the game ended allowed players to game the system by toggling the bot off before dying. Tracking whether the bot was ever active during the run closes this loophole with minimal complexity — a single boolean that is set once and never cleared until the next game starts.\n- **Reset on new game, not on toggle-off**: The flag resets only when a new run begins, not when the bot is disabled mid-run. This keeps the disqualification permanent for the lifetime of a single run while still allowing a fresh run to be fully human-played and eligible for the leaderboard.",
-					"category": "bugfix",
-					"importance": "major",
-					"filesAffected": [
-						"src/main.ts",
-						"src/style.css"
-					]
-				}
-			]
-		},
-		{
 			"commitHash": "b227c9ee2a5d1df574a7ca81d9bdfde215dae09c",
 			"recap": "Scores achieved with bot assistance are now fully excluded from the human leaderboard, even when the bot was only active for part of a run. Previously, a player could turn the bot on mid-game and then switch it off before dying, and the game would still invite them to submit their score. The game now tracks whether the bot was used at any point during a run, and if it was, the name-entry prompt is suppressed entirely at game over. Runs that begin with the bot already enabled are also disqualified from the first moment, with no gap where an early assisted score could be submitted.",
 			"topics": [
@@ -1406,6 +1390,22 @@
 					"importance": "minor",
 					"filesAffected": [
 						"index.html",
+						"src/style.css"
+					]
+				}
+			]
+		},
+		{
+			"commitHash": "533589d72ae5461b23779d49e05fb7dc0e4e1a31",
+			"recap": "Players can no longer earn a leaderboard entry by briefly enabling the bot during a run and then switching it off before the game ends. The game now tracks whether the bot was active at any point during a run, and any bot involvement — even momentary — permanently disqualifies that run from the name prompt. A new run started without the bot remains fully eligible for the leaderboard as normal.",
+			"topics": [
+				{
+					"title": "Bot involvement now fully disqualifies a run from the leaderboard name prompt",
+					"decisions": "- **Lifetime flag over snapshot check**: Checking only whether the bot was active at the moment the game ended allowed players to game the system by toggling the bot off before dying. Tracking whether the bot was ever active during the run closes this loophole with minimal complexity — a single boolean that is set once and never cleared until the next game starts.\n- **Reset on new game, not on toggle-off**: The flag resets only when a new run begins, not when the bot is disabled mid-run. This keeps the disqualification permanent for the lifetime of a single run while still allowing a fresh run to be fully human-played and eligible for the leaderboard.",
+					"category": "bugfix",
+					"importance": "major",
+					"filesAffected": [
+						"src/main.ts",
 						"src/style.css"
 					]
 				}
