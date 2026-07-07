@@ -1,0 +1,77 @@
+{
+	"version": 5,
+	"commitHash": "3e3909722cdf4066f2601d6ea2dce11b60449262",
+	"commitMessage": "Merge pull request #17 from jeverest/better-start-screen",
+	"commitAuthor": "Joe Hart",
+	"commitDate": "2026-05-13T17:10:24-07:00",
+	"branch": "backfilled",
+	"generatedAt": "2026-07-07T15:08:32.426Z",
+	"commitType": "commit",
+	"commitSource": "cli",
+	"transcriptEntries": 0,
+	"conversationTurns": 0,
+	"llm": {
+		"model": "claude-sonnet-4-6",
+		"inputTokens": 16432,
+		"outputTokens": 1793,
+		"cachedTokens": 0,
+		"apiLatencyMs": 41207,
+		"stopReason": null,
+		"source": "jolli-proxy"
+	},
+	"stats": {
+		"filesChanged": 4,
+		"insertions": 744,
+		"deletions": 40
+	},
+	"diffStats": {
+		"filesChanged": 4,
+		"insertions": 744,
+		"deletions": 40
+	},
+	"topics": [
+		{
+			"title": "Animated isometric snake demo added to the start screen",
+			"trigger": "The start screen felt static and plain. The developer wanted a visually engaging hero element that would immediately communicate the game's distinctive isometric 3D style before a player starts a game.",
+			"response": "- A new `src/menu-demo.ts` module (`MenuDemo` class) implements a fully self-contained animated snake simulation running on a dedicated canvas element in the menu. It handles its own game loop via `requestAnimationFrame`, runs the default bot to drive the snake, and renders the isometric 3D projection (ground plane, grid lines, checkerboard tiles, perspective-scaled blocks with top/side faces, block shadows, and a death-pause-then-restart cycle). The projection math mirrors the main game's isometric renderer, including a configurable perspective strength and a pre-computed per-frame coordinate cache for performance.\n- `src/main.ts` was updated to instantiate `MenuDemo` on startup, start it when the menu screen is shown, and stop it when any other screen is active, preventing off-screen animation work.\n- `index.html` gained a `<canvas id=\"menu-demo-canvas\">` inside a new `.menu-hero` wrapper, and `src/style.css` added styles that fade the canvas edges with a radial mask and layer the title/tagline text over it as an overlay.",
+			"decisions": "- **Self-contained module over reusing the main game renderer**: The demo was built as an independent class with its own projection, bot helpers, and game loop rather than sharing code with the main `SnakeGame` class. This avoids coupling the menu's lightweight visual to the full game's state machine and lifecycle, making it safe to start and stop independently without risk of interfering with an in-progress game.\n- **Canvas edge fade via CSS mask instead of canvas drawing**: The vignette effect that softens the demo canvas into the background is applied as a CSS radial gradient mask rather than being drawn inside the canvas itself. This keeps the rendering code free of presentation concerns and makes the fade trivially adjustable through CSS without touching the animation logic.\n- **Bot reuse for the demo snake**: Rather than scripting a fixed movement pattern, the demo runs the same configurable bot used in actual gameplay. This ensures the demo always looks competent and dynamic, and it automatically benefits from any future bot improvements without extra maintenance.",
+			"filesAffected": [
+				"src/menu-demo.ts",
+				"src/main.ts",
+				"index.html",
+				"src/style.css"
+			],
+			"category": "feature",
+			"importance": "major"
+		},
+		{
+			"title": "Bot and mode selection moved into expandable inline panels",
+			"trigger": "The start screen previously showed bot selector dropdowns at all times alongside the main action buttons, which cluttered the layout. The developer wanted secondary options (solo bot and bot-vs-bot) to stay out of the way until the player actively chooses them.",
+			"response": "- `index.html` was restructured so the \"Solo Bot\" and \"Bot vs Bot\" buttons each own an expand-control container. Clicking either button hides that button and reveals an inline panel with the relevant bot selectors, a cancel button, and a launch button. The old always-visible bot selector section was removed entirely.\n- `src/main.ts` gained `setExpandPanel` and `closeAllExpandPanels` helpers to toggle the hidden class on the button and panel pair. Event listeners were wired for the new cancel and launch buttons; launching a bot game now closes the panel first, then starts the game. Returning to the menu from any screen also closes all panels.\n- Bot selector registration in `setupBotSelectors` was updated to target the new panel-scoped select elements (`bvb-bot1-select`, `bvb-bot2-select`, `demo-bot-select`) and drop the old menu-level selectors.",
+			"decisions": "- **Expand-in-place panels over a modal or separate screen**: The bot configuration expands inline beneath its trigger button rather than opening a modal overlay or navigating to a new screen. This keeps the interaction lightweight and reversible with a single cancel tap, and avoids the visual disruption of a full overlay for what is a small set of options.\n- **Hiding the trigger button while the panel is open**: When a panel opens, its trigger button is hidden rather than left visible in a toggled/active state. This prevents double-tap confusion and keeps the button row uncluttered while the panel is in use, at the cost of a slightly less conventional toggle pattern.",
+			"filesAffected": [
+				"index.html",
+				"src/main.ts",
+				"src/style.css"
+			],
+			"category": "ux",
+			"importance": "major"
+		},
+		{
+			"title": "Start screen footer added with leaderboards link and GitHub link",
+			"trigger": "The leaderboards button was grouped with the primary action buttons, giving it equal visual weight. A GitHub link was also absent from the UI entirely.",
+			"response": "The leaderboards button was moved out of the main button stack into a new `.menu-footer` bar at the bottom of the menu screen, styled as a low-prominence text link. A GitHub link pointing to the repository was added alongside it, separated by a decorative dot. Both elements share a `footer-link` style that suppresses the standard button chrome and highlights on hover.",
+			"decisions": "The leaderboards action was demoted to a footer link rather than kept as a full-width button to reflect its lower priority relative to starting a game. Giving it the same visual treatment as the GitHub link (plain text, hover-only color change) keeps the primary call-to-action hierarchy clear without removing the feature from the screen.",
+			"filesAffected": [
+				"index.html",
+				"src/style.css"
+			],
+			"category": "ux",
+			"importance": "minor"
+		}
+	],
+	"backfilled": true,
+	"backfillMethod": "diff-only",
+	"treeHash": "01112439c533037df1ff0e6525bde38f2a5668ba",
+	"recap": "The start screen received a substantial visual and interaction overhaul. The most prominent addition is a live animated snake running on an isometric 3D grid, displayed as a hero element at the top of the menu. The snake is driven by the same bot logic used in real gameplay, so it moves intelligently, eats food, and restarts after dying — giving new visitors an immediate sense of the game's style before they press a single button. The canvas fades softly into the background using a CSS mask, and the game title and tagline float over it as an overlay.\n\nThe button layout was also redesigned. Bot configuration options — previously shown as always-visible dropdowns — now live inside expandable inline panels that appear only when a player chooses \"Solo Bot\" or \"Bot vs Bot.\" Each panel contains the relevant bot selectors and a launch button, and collapses cleanly with a cancel action. This keeps the default view focused on the two primary actions (New Game and Two Player) while still making advanced options accessible without a separate screen or modal."
+}

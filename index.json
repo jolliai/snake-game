@@ -292,6 +292,22 @@
 				"insertions": 253,
 				"deletions": 209
 			}
+		},
+		{
+			"commitHash": "3e3909722cdf4066f2601d6ea2dce11b60449262",
+			"parentCommitHash": null,
+			"treeHash": "01112439c533037df1ff0e6525bde38f2a5668ba",
+			"commitType": "commit",
+			"commitMessage": "Merge pull request #17 from jeverest/better-start-screen",
+			"commitDate": "2026-05-13T17:10:24-07:00",
+			"branch": "backfilled",
+			"generatedAt": "2026-07-07T15:08:32.426Z",
+			"topicCount": 3,
+			"diffStats": {
+				"filesChanged": 4,
+				"insertions": 744,
+				"deletions": 40
+			}
 		}
 	],
 	"commitAliases": {
