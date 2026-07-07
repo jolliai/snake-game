@@ -207,6 +207,23 @@
 				}
 			],
 			"lastUpdatedAt": "2026-07-07T15:24:20.601Z"
+		},
+		{
+			"stableSlug": "game-initial-commit",
+			"title": "Snake Game Initial Commit",
+			"summary": "Initial browser-based Snake game in TypeScript: single-class architecture, expanding grid on 25% fill, deferred start on first key press.",
+			"relatedBranches": [
+				"backfilled"
+			],
+			"sourceRefs": [
+				{
+					"type": "summary",
+					"id": "c7dc6c92109ce50611dcbc984c02a6ea5cb7fbb9",
+					"timestamp": "2025-10-30T08:38:28-07:00",
+					"branch": "backfilled"
+				}
+			],
+			"lastUpdatedAt": "2026-07-07T15:24:20.601Z"
 		}
 	]
 }
