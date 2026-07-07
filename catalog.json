@@ -1361,6 +1361,22 @@
 					]
 				}
 			]
+		},
+		{
+			"commitHash": "8fc36ca61a091e484fb848f974b3e6602042cc0a",
+			"recap": "Players can now press R at any point during a snake game session to immediately start a fresh game. The reset works in all states — mid-game, paused, or after a game-over — and the on-screen controls hint was updated so the shortcut is visible without any prior knowledge. A secondary fix ensures the pause banner no longer lingers on screen after a reset, so the new game always starts with a clean display.",
+			"topics": [
+				{
+					"title": "Add keyboard shortcut to reset the game at any time",
+					"decisions": "- **Reset fires unconditionally, before pause or direction checks**: Placing the reset handler at the top of the key-handling logic ensures it works in every game state — including while paused — without needing to thread reset awareness through each existing state branch. The alternative of gating reset on game state would have added complexity and created edge cases where the key silently did nothing.\n- **Hiding the pause overlay on reset rather than on pause toggle**: The pause overlay was only ever dismissed by toggling pause off, so a hard reset left it visible. Clearing it explicitly during reset keeps the UI consistent without changing how the pause toggle itself works, avoiding unintended side effects on the normal pause/unpause flow.",
+					"category": "feature",
+					"importance": "major",
+					"filesAffected": [
+						"src/main.ts",
+						"index.html"
+					]
+				}
+			]
 		}
 	]
 }

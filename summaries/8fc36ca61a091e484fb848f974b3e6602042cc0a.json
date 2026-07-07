@@ -1,0 +1,50 @@
+{
+	"version": 5,
+	"commitHash": "8fc36ca61a091e484fb848f974b3e6602042cc0a",
+	"commitMessage": "Merge pull request #1 from jeverest/feature/reset-key",
+	"commitAuthor": "Joe Hart",
+	"commitDate": "2026-02-12T19:31:52-08:00",
+	"branch": "backfilled",
+	"generatedAt": "2026-07-07T15:23:47.079Z",
+	"commitType": "commit",
+	"commitSource": "cli",
+	"transcriptEntries": 0,
+	"conversationTurns": 0,
+	"llm": {
+		"model": "claude-sonnet-4-6",
+		"inputTokens": 5237,
+		"outputTokens": 500,
+		"cachedTokens": 0,
+		"apiLatencyMs": 13432,
+		"stopReason": null,
+		"source": "jolli-proxy"
+	},
+	"stats": {
+		"filesChanged": 2,
+		"insertions": 7,
+		"deletions": 1
+	},
+	"diffStats": {
+		"filesChanged": 2,
+		"insertions": 7,
+		"deletions": 1
+	},
+	"topics": [
+		{
+			"title": "Add keyboard shortcut to reset the game at any time",
+			"trigger": "Players had no way to restart the snake game mid-session without navigating away or waiting for a game-over screen. A reset key was needed so players could start fresh instantly.",
+			"response": "- Added an `R` key handler in `src/main.ts` inside `handleKeyPress` that calls `startNewGame()` immediately, before any other key checks, so reset works regardless of game state (running, paused, or game-over).\n- Fixed a bug in `startNewGame()` in `src/main.ts` where the pause overlay was not hidden when restarting, leaving a stale \"Paused\" banner visible on the new game.\n- Updated the on-screen control hint in `index.html` to include \"Press R to Reset\" so players can discover the shortcut without consulting external documentation.",
+			"decisions": "- **Reset fires unconditionally, before pause or direction checks**: Placing the reset handler at the top of the key-handling logic ensures it works in every game state — including while paused — without needing to thread reset awareness through each existing state branch. The alternative of gating reset on game state would have added complexity and created edge cases where the key silently did nothing.\n- **Hiding the pause overlay on reset rather than on pause toggle**: The pause overlay was only ever dismissed by toggling pause off, so a hard reset left it visible. Clearing it explicitly during reset keeps the UI consistent without changing how the pause toggle itself works, avoiding unintended side effects on the normal pause/unpause flow.",
+			"filesAffected": [
+				"src/main.ts",
+				"index.html"
+			],
+			"category": "feature",
+			"importance": "major"
+		}
+	],
+	"backfilled": true,
+	"backfillMethod": "diff-only",
+	"treeHash": "611d1670b999684ceeed254f74a30064ac0d09d2",
+	"recap": "Players can now press R at any point during a snake game session to immediately start a fresh game. The reset works in all states — mid-game, paused, or after a game-over — and the on-screen controls hint was updated so the shortcut is visible without any prior knowledge. A secondary fix ensures the pause banner no longer lingers on screen after a reset, so the new game always starts with a clean display."
+}
