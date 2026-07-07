@@ -406,6 +406,35 @@
 				}
 			],
 			"lastUpdatedAt": "2026-07-07T15:24:20.601Z"
+		},
+		{
+			"stableSlug": "bot-system-camera",
+			"title": "Bot System with Auto-Rotating Camera",
+			"summary": "Three selectable autoplay bot profiles with auto-rotating isometric camera; unified BFS and O(1) snake-set for performance.",
+			"relatedBranches": [
+				"backfilled"
+			],
+			"sourceRefs": [
+				{
+					"type": "summary",
+					"id": "33d73c531daf7232a4dfcd80eb14a2f75bf90f3b",
+					"timestamp": "2026-03-09T14:49:01-07:00",
+					"branch": "backfilled"
+				},
+				{
+					"type": "summary",
+					"id": "b86322de7e03ae6c81bbc857f2edde1c724d243c",
+					"timestamp": "2026-03-09T14:51:05-07:00",
+					"branch": "backfilled"
+				},
+				{
+					"type": "summary",
+					"id": "b893d96ebf814ebf7f0bbf7d250038ea348c0161",
+					"timestamp": "2026-03-09T15:56:29-07:00",
+					"branch": "backfilled"
+				}
+			],
+			"lastUpdatedAt": "2026-07-07T15:24:20.601Z"
 		}
 	]
 }
