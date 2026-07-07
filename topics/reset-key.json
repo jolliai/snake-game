@@ -1,0 +1,96 @@
+{
+	"schemaVersion": 1,
+	"stableSlug": "reset-key",
+	"title": "Reset Key (Shift+R) to Restart Game",
+	"content": "## Overview\n\nPressing **Shift+R** resets the snake game at any time — whether the game is running, paused, or on the game-over screen. The on-screen controls hint in `index.html` displays \"Press Shift+R to Reset\" so players can discover the shortcut without consulting external documentation.\n\n## Implementation\n\n**Files:** `src/main.ts`, `index.html`\n\n### Key handler (`src/main.ts` — `handleKeyPress`)\n\nA check for `e.key === 'R'` (uppercase, which the browser only produces when Shift is held) is placed at the **very top** of `handleKeyPress`, before the pause check and before any movement/direction logic. When matched, it calls `startNewGame()` immediately and returns early, so no other key logic runs. This guarantees the reset fires unconditionally from any game state.\n\n### New-game routine (`src/main.ts` — `startNewGame`)\n\n`startNewGame()` explicitly adds the `hidden` CSS class to the pause overlay element when a new game begins. This prevents a visual bug where resetting from a paused state would leave the \"Paused\" banner visible over the fresh game canvas. The fix lives in `startNewGame` rather than in the key handler so it applies regardless of how a new game is triggered.\n\n### On-screen hint (`index.html`)\n\nThe controls hint text was updated to include \"Press Shift+R to Reset\".\n\n## Behavior\n\n| Game state at time of reset | Result |\n|---|---|\n| Running | Immediate reset; new game starts cleanly |\n| Paused | Pause overlay is hidden; new game starts cleanly |\n| Game over | New game starts cleanly |\n\n## History note\n\nAn earlier iteration used plain (unmodified) **R** for reset. That was replaced by **Shift+R** after repeated revert/reapply cycles indicated that an unmodified single-key reset caused accidental resets during normal play (the snake is steered with letter keys, making a bare R easy to hit by mistake). The final merged implementation (PR #3) settled on Shift+R as the deliberate, low-accident-risk binding.",
+	"relatedBranches": [
+		"backfilled"
+	],
+	"sourceRefs": [
+		{
+			"type": "summary",
+			"id": "3f1385f0725ec89cdd48335b5b3d7b6fe9c22904",
+			"timestamp": "2026-02-12T19:29:06-08:00",
+			"branch": "backfilled"
+		},
+		{
+			"type": "summary",
+			"id": "8fc36ca61a091e484fb848f974b3e6602042cc0a",
+			"timestamp": "2026-02-12T19:31:52-08:00",
+			"branch": "backfilled"
+		},
+		{
+			"type": "summary",
+			"id": "a6e5d83b2a2bbe422c9b968b3d6d41344b66261a",
+			"timestamp": "2026-02-12T19:49:42-08:00",
+			"branch": "backfilled"
+		},
+		{
+			"type": "summary",
+			"id": "b43163cd730114014cf8ace3639b291170f92bee",
+			"timestamp": "2026-02-12T19:49:49-08:00",
+			"branch": "backfilled"
+		},
+		{
+			"type": "summary",
+			"id": "4010c429cb7bc88839654d402fdef528316a40d8",
+			"timestamp": "2026-02-12T20:00:37-08:00",
+			"branch": "backfilled"
+		},
+		{
+			"type": "summary",
+			"id": "5daac7a44ffa8be20e7a790dded179275ae813ad",
+			"timestamp": "2026-02-12T20:00:43-08:00",
+			"branch": "backfilled"
+		},
+		{
+			"type": "summary",
+			"id": "23b8def245f9a79c5a3fa5535668ad1fd0094257",
+			"timestamp": "2026-02-12T21:12:50-08:00",
+			"branch": "backfilled"
+		},
+		{
+			"type": "summary",
+			"id": "6a246da4709c33699770b508d8bc0d333aa33c98",
+			"timestamp": "2026-02-12T21:12:56-08:00",
+			"branch": "backfilled"
+		},
+		{
+			"type": "summary",
+			"id": "ece3dace0888050c6dbaf9280a9036d2ad503754",
+			"timestamp": "2026-02-12T23:25:58-08:00",
+			"branch": "backfilled"
+		},
+		{
+			"type": "summary",
+			"id": "6035fb2baefd3ff03427b0555dfec5fd3386ade0",
+			"timestamp": "2026-02-12T23:26:04-08:00",
+			"branch": "backfilled"
+		},
+		{
+			"type": "summary",
+			"id": "fdc0482b3763252734dc76ce44c87c24f87e8d5f",
+			"timestamp": "2026-02-12T23:59:29-08:00",
+			"branch": "backfilled"
+		},
+		{
+			"type": "summary",
+			"id": "73e560987466db4a911987519f9f71a45c38af8c",
+			"timestamp": "2026-02-13T00:10:42-08:00",
+			"branch": "backfilled"
+		},
+		{
+			"type": "summary",
+			"id": "1bc698e5847f04005aacece58b5853fe9720235e",
+			"timestamp": "2026-02-13T00:15:46-08:00",
+			"branch": "backfilled"
+		},
+		{
+			"type": "summary",
+			"id": "189aa45fafec4aa32c096f17de769a25cde56ea2",
+			"timestamp": "2026-02-13T00:24:59-08:00",
+			"branch": "backfilled"
+		}
+	],
+	"lastUpdatedAt": "2026-07-07T15:24:20.601Z"
+}
