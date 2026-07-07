@@ -1,0 +1,36 @@
+{
+	"version": 5,
+	"commitHash": "b117b30428fbf788c07a80aa233dd0d02159b1f8",
+	"commitMessage": "Add future plans README",
+	"commitAuthor": "Joe Hart",
+	"commitDate": "2026-02-13T09:27:16-08:00",
+	"branch": "backfilled",
+	"generatedAt": "2026-07-07T15:20:12.784Z",
+	"commitType": "commit",
+	"commitSource": "cli",
+	"transcriptEntries": 0,
+	"conversationTurns": 0,
+	"llm": {
+		"model": "claude-sonnet-4-6",
+		"inputTokens": 4833,
+		"outputTokens": 8,
+		"cachedTokens": 0,
+		"apiLatencyMs": 1792,
+		"stopReason": null,
+		"source": "jolli-proxy"
+	},
+	"stats": {
+		"filesChanged": 1,
+		"insertions": 2,
+		"deletions": 0
+	},
+	"diffStats": {
+		"filesChanged": 1,
+		"insertions": 2,
+		"deletions": 0
+	},
+	"topics": [],
+	"backfilled": true,
+	"backfillMethod": "diff-only",
+	"treeHash": "7dff3a4699cfb4bafcadfb1fdd7ddae48e46ecad"
+}
