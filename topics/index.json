@@ -793,6 +793,29 @@
 				}
 			],
 			"lastUpdatedAt": "2026-07-07T16:18:39.088Z"
+		},
+		{
+			"stableSlug": "iron-snake-exit-door",
+			"title": "Iron Snake Exit Door (JOE-9): Level Progression via Exit",
+			"summary": "Iron Snake levels now require steering into a cyan exit door on the board's edge after the goal is met, replacing instant passive advancement.",
+			"relatedBranches": [
+				"josephhart/joe-9-add-exit"
+			],
+			"sourceRefs": [
+				{
+					"type": "summary",
+					"id": "f01522c4bcf761c6a32036b7e4452c802d1ae07c",
+					"timestamp": "2026-07-07T18:07:42.000Z",
+					"branch": "josephhart/joe-9-add-exit"
+				},
+				{
+					"type": "plan",
+					"id": "rippling-crafting-donut-f01522c4",
+					"timestamp": "2026-07-07T18:08:10.281Z",
+					"branch": "josephhart/joe-9-add-exit"
+				}
+			],
+			"lastUpdatedAt": "2026-07-07T18:08:52.740Z"
 		}
 	]
 }
