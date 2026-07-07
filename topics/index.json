@@ -137,10 +137,11 @@
 		},
 		{
 			"stableSlug": "dev-tooling-config",
-			"title": "Developer Tooling & Config (gitignore, Jolli)",
-			"summary": "Project gitignore excludes the `.jolli` directory, keeping Jolli's local artifacts out of version control.",
+			"title": "Developer Tooling & Config (gitignore, Jolli, Claude)",
+			"summary": ".gitignore excludes .jolli/ (Jolli tool artifacts) and .claude/ (Claude Code local settings) from version control.",
 			"relatedBranches": [
-				"chore/gitignore-jolli"
+				"chore/gitignore-jolli",
+				"backfilled"
 			],
 			"sourceRefs": [
 				{
@@ -148,9 +149,21 @@
 					"id": "31d93c3f670b49f2eb5583d128ce61bdc2a98299",
 					"timestamp": "2026-07-01T18:45:04.000Z",
 					"branch": "chore/gitignore-jolli"
+				},
+				{
+					"type": "summary",
+					"id": "518efbd94bbd030dd10fc2007a2f26a80b2cc5c0",
+					"timestamp": "2026-02-13T00:57:47-08:00",
+					"branch": "backfilled"
+				},
+				{
+					"type": "summary",
+					"id": "a438a7bb2831cd2ae81767014116e26f4528b75e",
+					"timestamp": "2026-03-18T08:06:51-07:00",
+					"branch": "backfilled"
 				}
 			],
-			"lastUpdatedAt": "2026-07-07T02:20:01.705Z"
+			"lastUpdatedAt": "2026-07-07T15:24:20.601Z"
 		}
 	]
 }
