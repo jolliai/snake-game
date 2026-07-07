@@ -702,22 +702,6 @@
 			]
 		},
 		{
-			"commitHash": "0e9e869a0350b28403a23c31c20eccba71133b03",
-			"recap": "A new playable snake bot called Nomad was added to the game. Unlike the existing bots, the Nomad actively steers away from its own body trail, favoring open, unexplored areas of the board. It still picks up food along the way, but exploration takes priority over aggressive food-chasing. The Nomad is now available for selection alongside the seven previously existing bots.",
-			"topics": [
-				{
-					"title": "New Nomad bot added that avoids its own trail to explore open space",
-					"decisions": "- **Trail-avoidance as the defining behavior**: The bot's personality is built around penalizing proximity to its own body segments rather than, say, maximizing territory control or aggressive food pursuit. Closer segments carry a heavier penalty, creating a gradient that nudges the snake outward into unexplored space. This produces emergent wandering behavior without requiring explicit path planning to \"new\" areas.\n- **Food pursuit kept moderate**: Unlike the hunter bot, the nomad scores food paths positively but with lower weight, and applies a smaller distance-to-food penalty. This keeps the bot functional (it won't ignore food) while ensuring the trail-avoidance and open-space rewards dominate its movement decisions in normal play.\n- **Safety floor preserved**: Moves that break the tail-reachability constraint are scored at a large negative value (with a small reachable-area offset), ensuring the nomad still avoids self-trapping even while wandering. This reuses the existing position-analysis helpers rather than implementing a separate safety check.",
-					"category": "feature",
-					"importance": "major",
-					"filesAffected": [
-						"src/bots/nomad-bot.ts",
-						"src/bots/index.ts"
-					]
-				}
-			]
-		},
-		{
 			"commitHash": "03b468b2985ea09b7a6dc6900e8233cba8bb39f9",
 			"recap": "A new bot called Chaser is now available in the snake game. It pursues food along the shortest calculated path and plays aggressively by default, closing the gap to food faster than the existing bots. When the direct path to food would leave the snake with no safe escape route, Chaser automatically shifts into a holding pattern — drifting toward its own tail to keep options open until a safe path to food reopens. Players can now select Chaser alongside the existing roster of bot personalities.",
 			"topics": [
@@ -1406,6 +1390,22 @@
 					"filesAffected": [
 						"src/bots/ambusher-bot.ts",
 						"src/bots/chaser-bot.ts",
+						"src/bots/index.ts"
+					]
+				}
+			]
+		},
+		{
+			"commitHash": "0e9e869a0350b28403a23c31c20eccba71133b03",
+			"recap": "A new playable snake bot called Nomad was added to the game. Unlike the existing bots, the Nomad actively steers away from its own body trail, favoring open, unexplored areas of the board. It still picks up food along the way, but exploration takes priority over aggressive food-chasing. The Nomad is now available for selection alongside the seven previously existing bots.",
+			"topics": [
+				{
+					"title": "New Nomad bot added that avoids its own trail to explore open space",
+					"decisions": "- **Trail-avoidance as the defining behavior**: The bot's personality is built around penalizing proximity to its own body segments rather than, say, maximizing territory control or aggressive food pursuit. Closer segments carry a heavier penalty, creating a gradient that nudges the snake outward into unexplored space. This produces emergent wandering behavior without requiring explicit path planning to \"new\" areas.\n- **Food pursuit kept moderate**: Unlike the hunter bot, the nomad scores food paths positively but with lower weight, and applies a smaller distance-to-food penalty. This keeps the bot functional (it won't ignore food) while ensuring the trail-avoidance and open-space rewards dominate its movement decisions in normal play.\n- **Safety floor preserved**: Moves that break the tail-reachability constraint are scored at a large negative value (with a small reachable-area offset), ensuring the nomad still avoids self-trapping even while wandering. This reuses the existing position-analysis helpers rather than implementing a separate safety check.",
+					"category": "feature",
+					"importance": "major",
+					"filesAffected": [
+						"src/bots/nomad-bot.ts",
 						"src/bots/index.ts"
 					]
 				}

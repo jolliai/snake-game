@@ -46,5 +46,7 @@
 	"backfilled": true,
 	"backfillMethod": "diff-only",
 	"treeHash": "ea2f333315bfa9357a03b3be56541aaa2f6c7b7c",
-	"recap": "A new playable snake bot called Nomad was added to the game. Unlike the existing bots, the Nomad actively steers away from its own body trail, favoring open, unexplored areas of the board. It still picks up food along the way, but exploration takes priority over aggressive food-chasing. The Nomad is now available for selection alongside the seven previously existing bots."
+	"recap": "A new playable snake bot called Nomad was added to the game. Unlike the existing bots, the Nomad actively steers away from its own body trail, favoring open, unexplored areas of the board. It still picks up food along the way, but exploration takes priority over aggressive food-chasing. The Nomad is now available for selection alongside the seven previously existing bots.",
+	"jolliDocUrl": "https://jolli.ai/brckbmk4/articles?doc=2644",
+	"jolliDocId": 2644
 }
