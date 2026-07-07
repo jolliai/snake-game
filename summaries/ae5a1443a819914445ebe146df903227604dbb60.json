@@ -46,5 +46,7 @@
 	"backfilled": true,
 	"backfillMethod": "diff-only",
 	"treeHash": "060555171ce1b17345837cb58bdcf6cd10c10abe",
-	"recap": "A new bot called Chaser was added to the snake game and is now available alongside the existing roster of bot personalities. Where other bots prioritize survival or open-space exploration, Chaser aggressively pursues food along the shortest available path. When the direct route to food would leave the snake with no safe escape, Chaser shifts into a tail-following mode, drifting toward its own tail to keep space open until a safe food path becomes available again. Players can now select Chaser from the bot menu for a noticeably more aggressive playstyle."
+	"recap": "A new bot called Chaser was added to the snake game and is now available alongside the existing roster of bot personalities. Where other bots prioritize survival or open-space exploration, Chaser aggressively pursues food along the shortest available path. When the direct route to food would leave the snake with no safe escape, Chaser shifts into a tail-following mode, drifting toward its own tail to keep space open until a safe food path becomes available again. Players can now select Chaser from the bot menu for a noticeably more aggressive playstyle.",
+	"jolliDocUrl": "https://jolli.ai/brckbmk4/articles?doc=2636",
+	"jolliDocId": 2636
 }
