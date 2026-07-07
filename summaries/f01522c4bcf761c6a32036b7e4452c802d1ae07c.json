@@ -57,7 +57,9 @@
 			"slug": "rippling-crafting-donut-f01522c4",
 			"title": "JOE-9 — Add Exit (Iron Snake)",
 			"addedAt": "2026-07-07T17:52:26.394Z",
-			"updatedAt": "2026-07-07T18:08:10.232Z"
+			"updatedAt": "2026-07-07T18:08:10.232Z",
+			"jolliPlanDocUrl": "https://jolli.ai/brckbmk4/articles?doc=2701",
+			"jolliPlanDocId": 2701
 		}
 	],
 	"references": [
@@ -87,5 +89,7 @@
 	],
 	"transcripts": [
 		"bc6677f8-2cdf-476e-915a-bae2a971d182"
-	]
+	],
+	"jolliDocUrl": "https://jolli.ai/brckbmk4/articles?doc=2703",
+	"jolliDocId": 2703
 }
