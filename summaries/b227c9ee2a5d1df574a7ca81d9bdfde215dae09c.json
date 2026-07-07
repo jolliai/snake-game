@@ -1,0 +1,50 @@
+{
+	"version": 5,
+	"commitHash": "b227c9ee2a5d1df574a7ca81d9bdfde215dae09c",
+	"commitMessage": "Suppress leaderboard name prompt for bot-driven runs",
+	"commitAuthor": "Joe Hart",
+	"commitDate": "2026-05-12T16:56:55-07:00",
+	"branch": "backfilled",
+	"generatedAt": "2026-07-07T15:09:40.581Z",
+	"commitType": "commit",
+	"commitSource": "cli",
+	"transcriptEntries": 0,
+	"conversationTurns": 0,
+	"llm": {
+		"model": "claude-sonnet-4-6",
+		"inputTokens": 5427,
+		"outputTokens": 622,
+		"cachedTokens": 0,
+		"apiLatencyMs": 15408,
+		"stopReason": null,
+		"source": "jolli-proxy"
+	},
+	"stats": {
+		"filesChanged": 2,
+		"insertions": 11,
+		"deletions": 2
+	},
+	"diffStats": {
+		"filesChanged": 2,
+		"insertions": 11,
+		"deletions": 2
+	},
+	"topics": [
+		{
+			"title": "Bot-assisted runs excluded from leaderboard name prompt",
+			"trigger": "If a player enabled the bot at any point during a run and then disabled it before the game ended, the game would still prompt them to enter their name on the leaderboard. Only runs where the bot was active at the exact moment of death were being excluded, leaving a loophole for bot-assisted scores to appear on the human leaderboard.",
+			"response": "- Added a `botEverActive` flag in `src/main.ts` that is set to `true` the moment the bot is switched on during a run and is initialized at run start to reflect whether the bot begins the run enabled. This replaces the previous check against the instantaneous `botEnabled` state at game-over time.\n- Updated the game-over logic in `src/main.ts` to gate the leaderboard name prompt on `botEverActive` rather than `botEnabled`, ensuring any bot involvement during the run disqualifies the score.\n- Added a `.leaderboard-prompt.hidden` CSS rule in `src/style.css` to support hiding the prompt element via a class toggle.",
+			"decisions": "- **Lifetime tracking over point-in-time check**: The previous approach only checked whether the bot was active at the instant the game ended, which allowed players to use the bot mid-run and then switch it off before dying to sneak onto the leaderboard. Tracking whether the bot was ever active during the run closes this gap entirely. The trade-off is a small amount of extra state to carry through the run, but the integrity benefit is clear and the cost is negligible.\n- **Flag initialized from current bot state at run start**: When a new run begins, the \"ever active\" flag is seeded from whether the bot is already on, rather than always starting at false. This means a player who starts a run with the bot already enabled is immediately disqualified, with no window where an early-game bot score could slip through.",
+			"filesAffected": [
+				"src/main.ts",
+				"src/style.css"
+			],
+			"category": "bugfix",
+			"importance": "major"
+		}
+	],
+	"backfilled": true,
+	"backfillMethod": "diff-only",
+	"treeHash": "4814f9104b10769258d4862993532ad9f2454d07",
+	"recap": "Scores achieved with bot assistance are now fully excluded from the human leaderboard, even when the bot was only active for part of a run. Previously, a player could turn the bot on mid-game and then switch it off before dying, and the game would still invite them to submit their score. The game now tracks whether the bot was used at any point during a run, and if it was, the name-entry prompt is suppressed entirely at game over. Runs that begin with the bot already enabled are also disqualified from the first moment, with no gap where an early assisted score could be submitted."
+}

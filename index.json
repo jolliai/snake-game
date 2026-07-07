@@ -340,6 +340,22 @@
 				"insertions": 11,
 				"deletions": 2
 			}
+		},
+		{
+			"commitHash": "b227c9ee2a5d1df574a7ca81d9bdfde215dae09c",
+			"parentCommitHash": null,
+			"treeHash": "4814f9104b10769258d4862993532ad9f2454d07",
+			"commitType": "commit",
+			"commitMessage": "Suppress leaderboard name prompt for bot-driven runs",
+			"commitDate": "2026-05-12T16:56:55-07:00",
+			"branch": "backfilled",
+			"generatedAt": "2026-07-07T15:09:40.581Z",
+			"topicCount": 1,
+			"diffStats": {
+				"filesChanged": 2,
+				"insertions": 11,
+				"deletions": 2
+			}
 		}
 	],
 	"commitAliases": {
