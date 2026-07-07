@@ -46,5 +46,7 @@
 	"backfilled": true,
 	"backfillMethod": "diff-only",
 	"treeHash": "8234988d2b33b1f76e999553638f3c6b1fab04ea",
-	"recap": "A new bot called Coiler was added to the snake game's roster of playable AI personalities. Unlike the existing bots, Coiler actively steers toward moves that keep its head adjacent to its own body, producing a tight, methodical coiling pattern as it moves around the board. It remains safe by strongly prioritizing the ability to reach its own tail at all times, so the coiling tendency never causes it to box itself in. Players can now select Coiler alongside the existing survival, hunter, and explorer bots."
+	"recap": "A new bot called Coiler was added to the snake game's roster of playable AI personalities. Unlike the existing bots, Coiler actively steers toward moves that keep its head adjacent to its own body, producing a tight, methodical coiling pattern as it moves around the board. It remains safe by strongly prioritizing the ability to reach its own tail at all times, so the coiling tendency never causes it to box itself in. Players can now select Coiler alongside the existing survival, hunter, and explorer bots.",
+	"jolliDocUrl": "https://jolli.ai/brckbmk4/articles?doc=2628",
+	"jolliDocId": 2628
 }
