@@ -881,34 +881,6 @@
 			"commitHash": "a438a7bb2831cd2ae81767014116e26f4528b75e"
 		},
 		{
-			"commitHash": "b893d96ebf814ebf7f0bbf7d250038ea348c0161",
-			"recap": "The bot's per-move decision logic previously ran three independent graph searches for every direction it considered — one to measure open space, one to verify tail reachability, and one to find the path to food. These three passes were collapsed into a single traversal that collects all three results simultaneously, cutting the search work to roughly one-third per candidate move. Tail reachability is now detected by checking whether any explored cell sits next to the tail, rather than running a dedicated search, preserving the same scoring behavior with no extra traversal cost.\n\nAlongside the search consolidation, the game now maintains a fast-lookup set of all cells the snake currently occupies. Collision detection and food placement previously scanned the full snake array on every check; both now resolve in constant time regardless of snake length. Food spawning also gained a separate strategy for late-game situations where the snake fills more than half the board: instead of repeatedly guessing random positions and rejecting occupied ones, it scans the grid once and picks from the known empty cells directly.",
-			"topics": [
-				{
-					"title": "Combine three separate pathfinding passes into one unified scan",
-					"decisions": "- **Single-pass over separate passes**: Running one BFS instead of three cuts the per-move computation to roughly one-third. The tail reachability check was redesigned to work within the same traversal: rather than treating the tail as a traversable target cell, the algorithm keeps the tail blocked and flags reachability the moment any visited cell is adjacent to it. This preserves the original blocking semantics while avoiding a dedicated search.\n- **Tail adjacency instead of direct path**: The original `hasPath` call allowed the tail cell to be entered (via `allowTargetOccupied`). The new approach detects reachability by checking whether any explored cell neighbors the tail, which is equivalent for the bot's scoring purposes and avoids the need for special-case target handling inside the traversal loop.",
-					"category": "performance",
-					"importance": "major",
-					"filesAffected": [
-						"src/main.ts",
-						"src/bots/bot-types.ts",
-						"src/bots/explorer-bot.ts",
-						"src/bots/hunter-bot.ts",
-						"src/bots/survival-bot.ts"
-					]
-				},
-				{
-					"title": "Track occupied snake cells in a set for fast collision and food checks",
-					"decisions": "- **Set maintained alongside array**: The snake array is kept for ordered access (head, tail, iteration), while the set handles membership tests. Keeping both in sync adds a small constant overhead per move but eliminates linear scans in the collision and food paths, which are called far more frequently as the snake grows.\n- **Threshold-based food spawn strategy**: At low fill ratios the existing random-sample-and-reject loop is fast on average, so it is preserved. The set-based full-grid scan is only activated above 50% fill, where rejection sampling degrades. This avoids paying the scan cost on every food spawn during normal play.",
-					"category": "performance",
-					"importance": "major",
-					"filesAffected": [
-						"src/main.ts"
-					]
-				}
-			]
-		},
-		{
 			"commitHash": "33d73c531daf7232a4dfcd80eb14a2f75bf90f3b",
 			"recap": "The game gained a full autoplay system with three distinct bot personalities: Survival, Hunter, and Explorer. Each bot evaluates every possible move using a scoring formula tuned to a different risk appetite -- Survival maximizes open space, Hunter chases food aggressively, and Explorer favors wide lanes away from walls. Players can switch profiles at any time from a dropdown on both the menu and the in-game overlay, toggle the bot on and off with a button or keyboard shortcut, and launch straight into a bot demo from the main menu. Manual direction input is disabled while the bot is active to prevent conflicting control.\n\nWhile the bot plays, the camera slowly rotates around the board, giving the demo mode a more dynamic feel. If the player manually adjusts the camera angle, the auto-rotation pauses for a few seconds before resuming, so a manual reposition is respected without requiring any extra action to restore the animation.\n\n---",
 			"topics": [
@@ -1404,6 +1376,34 @@
 					"title": "Camera auto-rotates when bot is active, pauses on manual adjustment",
 					"decisions": "- **Pause-window over full stop on manual input**: When the player manually rotates the camera, the auto-rotate loop is not cancelled — it simply skips updates until a short pause window expires. This avoids the need to restart the loop after each keypress and means rotation resumes smoothly without any extra interaction.",
 					"category": "feature",
+					"importance": "major",
+					"filesAffected": [
+						"src/main.ts"
+					]
+				}
+			]
+		},
+		{
+			"commitHash": "b893d96ebf814ebf7f0bbf7d250038ea348c0161",
+			"recap": "The bot's per-move decision logic previously ran three independent graph searches for every direction it considered — one to measure open space, one to verify tail reachability, and one to find the path to food. These three passes were collapsed into a single traversal that collects all three results simultaneously, cutting the search work to roughly one-third per candidate move. Tail reachability is now detected by checking whether any explored cell sits next to the tail, rather than running a dedicated search, preserving the same scoring behavior with no extra traversal cost.\n\nAlongside the search consolidation, the game now maintains a fast-lookup set of all cells the snake currently occupies. Collision detection and food placement previously scanned the full snake array on every check; both now resolve in constant time regardless of snake length. Food spawning also gained a separate strategy for late-game situations where the snake fills more than half the board: instead of repeatedly guessing random positions and rejecting occupied ones, it scans the grid once and picks from the known empty cells directly.",
+			"topics": [
+				{
+					"title": "Combine three separate pathfinding passes into one unified scan",
+					"decisions": "- **Single-pass over separate passes**: Running one BFS instead of three cuts the per-move computation to roughly one-third. The tail reachability check was redesigned to work within the same traversal: rather than treating the tail as a traversable target cell, the algorithm keeps the tail blocked and flags reachability the moment any visited cell is adjacent to it. This preserves the original blocking semantics while avoiding a dedicated search.\n- **Tail adjacency instead of direct path**: The original `hasPath` call allowed the tail cell to be entered (via `allowTargetOccupied`). The new approach detects reachability by checking whether any explored cell neighbors the tail, which is equivalent for the bot's scoring purposes and avoids the need for special-case target handling inside the traversal loop.",
+					"category": "performance",
+					"importance": "major",
+					"filesAffected": [
+						"src/main.ts",
+						"src/bots/bot-types.ts",
+						"src/bots/explorer-bot.ts",
+						"src/bots/hunter-bot.ts",
+						"src/bots/survival-bot.ts"
+					]
+				},
+				{
+					"title": "Track occupied snake cells in a set for fast collision and food checks",
+					"decisions": "- **Set maintained alongside array**: The snake array is kept for ordered access (head, tail, iteration), while the set handles membership tests. Keeping both in sync adds a small constant overhead per move but eliminates linear scans in the collision and food paths, which are called far more frequently as the snake grows.\n- **Threshold-based food spawn strategy**: At low fill ratios the existing random-sample-and-reject loop is fast on average, so it is preserved. The set-based full-grid scan is only activated above 50% fill, where rejection sampling degrades. This avoids paying the scan cost on every food spawn during normal play.",
+					"category": "performance",
 					"importance": "major",
 					"filesAffected": [
 						"src/main.ts"
