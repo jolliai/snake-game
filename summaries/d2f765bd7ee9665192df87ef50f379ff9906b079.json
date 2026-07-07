@@ -1,0 +1,36 @@
+{
+	"version": 5,
+	"commitHash": "d2f765bd7ee9665192df87ef50f379ff9906b079",
+	"commitMessage": "Merge pull request #18 from jeverest/chore/npmupdates",
+	"commitAuthor": "Joe Hart",
+	"commitDate": "2026-05-15T14:56:37-07:00",
+	"branch": "backfilled",
+	"generatedAt": "2026-07-07T15:07:48.164Z",
+	"commitType": "commit",
+	"commitSource": "cli",
+	"transcriptEntries": 0,
+	"conversationTurns": 0,
+	"llm": {
+		"model": "claude-sonnet-4-6",
+		"inputTokens": 26377,
+		"outputTokens": 8,
+		"cachedTokens": 0,
+		"apiLatencyMs": 1994,
+		"stopReason": null,
+		"source": "jolli-proxy"
+	},
+	"stats": {
+		"filesChanged": 1,
+		"insertions": 253,
+		"deletions": 209
+	},
+	"diffStats": {
+		"filesChanged": 1,
+		"insertions": 253,
+		"deletions": 209
+	},
+	"topics": [],
+	"backfilled": true,
+	"backfillMethod": "diff-only",
+	"treeHash": "1aae2b21c450a1367ae4815ca3e20478d723f9c7"
+}
