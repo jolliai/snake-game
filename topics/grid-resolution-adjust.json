@@ -1,0 +1,30 @@
+{
+	"schemaVersion": 1,
+	"stableSlug": "grid-resolution-adjust",
+	"title": "Grid Resolution Adjustment with +/- Keys",
+	"content": "## Overview\n\nBefore starting a game, players can press `+`/`=` or `-`/`_` to increase or decrease the grid resolution in increments of 5 cells. The adjustment is clamped between a minimum of 5 and a maximum of 50 cells. The game area, snake starting position, food, and UI all refresh immediately so the player can preview the layout before committing.\n\n## Behavior\n\n- **Active only before a game starts.** The `+`/`-` keyboard handler in `src/main.ts` checks that no game is in progress before applying any change.\n- **Step size of 5.** Each keypress shifts the grid count by 5 (e.g., 10 → 15 → 20).\n- **Hard limits: 5–50 cells.** Values outside this range are clamped. Below 5 the grid becomes unplayable; above 50 cells become too small to see on a 300 px canvas.\n- **Live preview.** After each adjustment, `updateCanvasSize`, the snake starting position, food placement, and the display are all recalculated immediately.\n- **`startNewGame()` respects the chosen size.** The function no longer resets to a hardcoded default; it uses whatever grid size the player has selected.\n\n## Architecture\n\n### Fixed canvas, variable cell size (`src/main.ts`)\n\nA `CANVAS_SIZE` constant fixes the canvas at **300×300 pixels** regardless of grid resolution. Cell size is derived at runtime:\n\n```\ncellSize = CANVAS_SIZE / gridCount\n```\n\nThis means finer grids produce smaller cells rather than a larger canvas. `updateCanvasSize` applies this calculation on every grid change.\n\n**Why fixed canvas over fixed cell size:** A fixed cell size would cause the canvas to grow dramatically at large grid counts, potentially overflowing its container and breaking the page layout. Keeping the canvas constant makes the game area's physical footprint on screen predictable at any resolution.\n\n### Snake starting position\n\n`startNewGame()` calculates the snake's starting cell as the **center of the current grid** rather than using a hardcoded coordinate. This ensures the snake is always placed within bounds regardless of which grid size the player chose.\n\n### Keyboard handling (`src/main.ts`)\n\nThe existing keyboard event handler was extended to recognize:\n- `+` and `=` (with or without Shift) → increase grid count by 5\n- `-` and `_` (with or without Shift) → decrease grid count by 5\n\n### Controls hint (`index.html`)\n\nThe on-screen controls hint was updated to advertise the `+`/`-` shortcut so players can discover it without consulting documentation.\n\n## Files Changed\n\n- `src/main.ts` — `CANVAS_SIZE` constant, `updateCanvasSize` calculation, keyboard handler extension, `startNewGame` center-position logic\n- `index.html` — controls hint text updated",
+	"relatedBranches": [
+		"backfilled"
+	],
+	"sourceRefs": [
+		{
+			"type": "summary",
+			"id": "6e5c38e162b7660dbd2a4c157b37f5a62dead6ce",
+			"timestamp": "2026-02-13T00:48:08-08:00",
+			"branch": "backfilled"
+		},
+		{
+			"type": "summary",
+			"id": "f0f3c0dc95822910c271d71807a147c60a115733",
+			"timestamp": "2026-02-13T00:54:53-08:00",
+			"branch": "backfilled"
+		},
+		{
+			"type": "summary",
+			"id": "c149ca2cae9ee5c7283013705dde89027d4fbefd",
+			"timestamp": "2026-02-13T00:55:01-08:00",
+			"branch": "backfilled"
+		}
+	],
+	"lastUpdatedAt": "2026-07-07T15:24:20.601Z"
+}
