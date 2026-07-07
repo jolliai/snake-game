@@ -1,0 +1,42 @@
+{
+	"schemaVersion": 1,
+	"stableSlug": "isometric-perspective-rendering",
+	"title": "Isometric & Perspective 2.5D Rendering",
+	"content": "## Overview\n\nThe snake game's rendering pipeline in `src/main.ts` uses a full isometric 2.5D projection system with perspective foreshortening, replacing the original flat top-down grid. The snake, food, and ground plane are rendered as extruded 3D blocks on a tilted diamond-shaped board. The view is interactively rotatable at runtime.\n\n## Coordinate Transform\n\nA `toIso()` function converts grid positions to canvas screen coordinates using two configurable parameters:\n\n- **Rotation angle** — controls the compass orientation of the diamond.\n- **Perspective ratio** — a vertical squash factor controlling how steeply the board tilts.\n\nBasis vectors derived from these parameters are precomputed and stored. A `isoCache` grid of screen coordinates for every grid intersection is rebuilt whenever the view changes, avoiding redundant math per frame.\n\n`toIso()` also applies **perspective projection**: each point is scaled by a per-point factor based on its depth distance from the viewer, converging toward a vanishing point at the far edge of the grid. The focal length is derived from the grid's actual pixel depth range at the current scale and a tunable `perspectiveStrength` property (clamped to a safe 0–1 range), so the effect scales correctly regardless of grid size or rotation angle.\n\n## Rendering Pipeline\n\nThe scene is composed in layers each frame:\n\n1. **`drawGroundPlane()`** — fills the board with alternating dark diamond tiles.\n2. **`drawGridLines()`** — overlays subtle grid lines (skipped when tiles are too small).\n3. **`drawGroundBorder()`** — draws the outer diamond outline.\n4. **`drawBlockShadow()`** — draws a flat shadow beneath each block in a separate pass before blocks are painted.\n5. **`drawBlock()`** — renders each snake segment and food item as a 3D extruded block with a top face and two visible side faces, each shaded a distinct color to simulate lighting.\n\n### Block Face Rendering\n\n`drawBlock()` dynamically classifies all four side faces as front-facing or back-facing by inspecting projected corner positions at draw time. Back faces are drawn first, then front faces on top. Shading (light vs. dark) is determined by each face's outward normal direction rather than hardcoded left/right assumptions. This makes rendering correct at any rotation angle and is required for perspective projection, where apparent tile geometry varies by position on the board.\n\n### Block Height\n\nBlock extrusion height is computed by `getBlockHeight()`, which applies the same per-tile depth scale used by `toIso()`. This keeps block height stable across all rotation angles (independent of the angle-dependent basis vectors) and causes blocks to shrink naturally toward the horizon under perspective projection.\n\n## Depth Sorting\n\nAll objects (snake segments and food) are sorted before drawing using the **painter's algorithm** (back-to-front). The sort key is a dot product of each object's grid position against the vertical components of the isometric basis vectors (`basisXy` and `basisYy`), i.e. the projected screen-Y value. This generalizes correctly to any camera angle; the earlier naive sum-of-grid-coordinates approach only worked at one specific orientation.\n\n## Canvas Sizing\n\nThe canvas is sized to the **maximum possible grid extent across all rotation angles** rather than the actual extent at the current angle. This prevents the canvas from resizing and the page layout from jumping when the player rotates the board, at the cost of a small amount of unused canvas space at non-45° angles. A `getIsoWidth()` helper clamps canvas width between a minimum and the available window width. A `resize` event listener recomputes canvas dimensions and redraws whenever the browser window changes size. The grid center is anchored to the canvas center so rotation pivots smoothly without the grid drifting.\n\nResponsive CSS constraints in `src/style.css` accommodate the variable canvas dimensions.\n\n## Keyboard Controls\n\n| Key | Action |\n|-----|--------|\n| `Q` | Rotate view −5° |\n| `E` | Rotate view +5° |\n| `[` | Decrease perspective strength |\n| `]` | Increase perspective strength |\n\nRotation triggers a full canvas resize and redraw. Perspective strength changes are applied live.\n\n## Files\n\n- `src/main.ts` — all projection math, rendering methods, depth sorting, canvas sizing, and keyboard wiring.\n- `src/style.css` — responsive CSS constraints for the variable-size canvas.",
+	"relatedBranches": [
+		"backfilled"
+	],
+	"sourceRefs": [
+		{
+			"type": "summary",
+			"id": "bcb7e2afd84e1c5fb5169bcf5ee13a92cd20a240",
+			"timestamp": "2026-02-22T09:27:03-08:00",
+			"branch": "backfilled"
+		},
+		{
+			"type": "summary",
+			"id": "8915b6cd5a7682d1007fb7e760be1f53131947be",
+			"timestamp": "2026-02-22T09:28:07-08:00",
+			"branch": "backfilled"
+		},
+		{
+			"type": "summary",
+			"id": "fedde9cede2be2772b549d2205311312abcb07d1",
+			"timestamp": "2026-02-22T12:36:34-08:00",
+			"branch": "backfilled"
+		},
+		{
+			"type": "summary",
+			"id": "40fd84a19a80ae089d2feb6f4c08f803eb3ca255",
+			"timestamp": "2026-02-22T12:42:43-08:00",
+			"branch": "backfilled"
+		},
+		{
+			"type": "summary",
+			"id": "b055a1b30a3193160789bc854a7e87f51189c85b",
+			"timestamp": "2026-02-22T13:27:59-08:00",
+			"branch": "backfilled"
+		}
+	],
+	"lastUpdatedAt": "2026-07-07T15:24:20.601Z"
+}
