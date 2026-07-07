@@ -1,0 +1,50 @@
+{
+	"version": 5,
+	"commitHash": "bcb7e2afd84e1c5fb5169bcf5ee13a92cd20a240",
+	"commitMessage": "Add isometric 2.5D rendering with rotatable view",
+	"commitAuthor": "Joe Hart",
+	"commitDate": "2026-02-22T09:27:03-08:00",
+	"branch": "backfilled",
+	"generatedAt": "2026-07-07T15:20:02.554Z",
+	"commitType": "commit",
+	"commitSource": "cli",
+	"transcriptEntries": 0,
+	"conversationTurns": 0,
+	"llm": {
+		"model": "claude-sonnet-4-6",
+		"inputTokens": 9508,
+		"outputTokens": 795,
+		"cachedTokens": 0,
+		"apiLatencyMs": 21033,
+		"stopReason": null,
+		"source": "jolli-proxy"
+	},
+	"stats": {
+		"filesChanged": 2,
+		"insertions": 254,
+		"deletions": 45
+	},
+	"diffStats": {
+		"filesChanged": 2,
+		"insertions": 254,
+		"deletions": 45
+	},
+	"topics": [
+		{
+			"title": "Isometric 2.5D rendering with rotatable view for snake game",
+			"trigger": "The developer wanted to replace the flat top-down grid with a visually richer isometric perspective, giving the game a 2.5D appearance where the snake and food appear as raised blocks on a tilted playing field.",
+			"response": "- The flat grid renderer in `src/main.ts` was replaced entirely with an isometric projection system. A coordinate transform converts grid positions to screen positions using configurable rotation angle and perspective ratio parameters. A cache of pre-computed screen coordinates for every grid intersection is rebuilt whenever the view changes, avoiding redundant math during each frame.\n- Four new rendering methods were added: `drawGroundPlane` fills the board with alternating dark diamond tiles, `drawGridLines` overlays subtle grid lines (skipped when tiles are too small), `drawGroundBorder` draws the outer diamond outline, and `drawBlock` renders each snake segment and food item as a three-faced extruded block with distinct top, left-face, and right-face colors. A `drawBlockShadow` method draws a flat shadow beneath each block on the ground plane.\n- Depth ordering was added to the draw loop using a painter's algorithm sort: all objects (snake segments and food) are sorted by their combined grid coordinates before drawing, ensuring blocks closer to the viewer are painted on top of blocks further away. Q and E keyboard keys were wired up to rotate the isometric view by 5° increments in either direction, triggering a full canvas resize and redraw.",
+			"decisions": "- **Painter's algorithm over per-pixel depth testing**: Sorting objects by the sum of their grid coordinates before drawing is a simple and fast approach for this grid-constrained scene. A full depth buffer would add significant complexity with no visible benefit, since objects always occupy discrete grid cells and never partially overlap in ambiguous ways.\n- **Dynamic canvas resizing tied to view angle**: Rather than fixing the canvas to a square and clipping the rotated diamond, the canvas dimensions are recomputed from the actual screen extents of the grid corners each time the angle changes. This keeps the entire board visible at any rotation without wasted blank space, at the cost of the page layout needing to accommodate a variable-size canvas — addressed by adding responsive CSS constraints.\n- **Configurable angle and perspective ratio as first-class parameters**: The rotation angle and vertical squash factor were stored as adjustable instance values rather than hardcoded constants. This makes the view interactively rotatable at runtime and leaves the door open for animating or further tuning the projection without restructuring the rendering code.",
+			"filesAffected": [
+				"src/main.ts",
+				"src/style.css"
+			],
+			"category": "feature",
+			"importance": "major"
+		}
+	],
+	"backfilled": true,
+	"backfillMethod": "diff-only",
+	"treeHash": "4ef728b37be1e16eda7ff7b02fd7d43b70691e3b",
+	"recap": "The snake game's renderer was rebuilt from a flat top-down grid into a fully isometric 2.5D view. The playing field now appears as a tilted diamond board, and every snake segment and food item is rendered as a raised three-sided block with distinct shading on the top and two visible side faces. Shadows are drawn beneath each block on the ground plane, and blocks closer to the viewer are always painted on top of those further away.\n\nPlayers can now rotate the isometric view in real time using the Q and E keys, each press shifting the camera angle by 5 degrees. The canvas resizes automatically to keep the entire board visible at any angle, and the CSS was updated so the layout accommodates the variable canvas dimensions on smaller screens."
+}

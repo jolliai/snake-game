@@ -1065,6 +1065,22 @@
 					]
 				}
 			]
+		},
+		{
+			"commitHash": "bcb7e2afd84e1c5fb5169bcf5ee13a92cd20a240",
+			"recap": "The snake game's renderer was rebuilt from a flat top-down grid into a fully isometric 2.5D view. The playing field now appears as a tilted diamond board, and every snake segment and food item is rendered as a raised three-sided block with distinct shading on the top and two visible side faces. Shadows are drawn beneath each block on the ground plane, and blocks closer to the viewer are always painted on top of those further away.\n\nPlayers can now rotate the isometric view in real time using the Q and E keys, each press shifting the camera angle by 5 degrees. The canvas resizes automatically to keep the entire board visible at any angle, and the CSS was updated so the layout accommodates the variable canvas dimensions on smaller screens.",
+			"topics": [
+				{
+					"title": "Isometric 2.5D rendering with rotatable view for snake game",
+					"decisions": "- **Painter's algorithm over per-pixel depth testing**: Sorting objects by the sum of their grid coordinates before drawing is a simple and fast approach for this grid-constrained scene. A full depth buffer would add significant complexity with no visible benefit, since objects always occupy discrete grid cells and never partially overlap in ambiguous ways.\n- **Dynamic canvas resizing tied to view angle**: Rather than fixing the canvas to a square and clipping the rotated diamond, the canvas dimensions are recomputed from the actual screen extents of the grid corners each time the angle changes. This keeps the entire board visible at any rotation without wasted blank space, at the cost of the page layout needing to accommodate a variable-size canvas — addressed by adding responsive CSS constraints.\n- **Configurable angle and perspective ratio as first-class parameters**: The rotation angle and vertical squash factor were stored as adjustable instance values rather than hardcoded constants. This makes the view interactively rotatable at runtime and leaves the door open for animating or further tuning the projection without restructuring the rendering code.",
+					"category": "feature",
+					"importance": "major",
+					"filesAffected": [
+						"src/main.ts",
+						"src/style.css"
+					]
+				}
+			]
 		}
 	]
 }
