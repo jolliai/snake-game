@@ -1124,6 +1124,22 @@
 				"insertions": 7,
 				"deletions": 1
 			}
+		},
+		{
+			"commitHash": "ece3dace0888050c6dbaf9280a9036d2ad503754",
+			"parentCommitHash": null,
+			"treeHash": "4d88bccdb8065a7588b9b8b3380a80368fb9e42a",
+			"commitType": "commit",
+			"commitMessage": "Revert \"Reapply \"Reapply \"Reapply \"Add R key to reset game from any state\"\"\"\"",
+			"commitDate": "2026-02-12T23:25:58-08:00",
+			"branch": "backfilled",
+			"generatedAt": "2026-07-07T15:22:25.486Z",
+			"topicCount": 1,
+			"diffStats": {
+				"filesChanged": 2,
+				"insertions": 1,
+				"deletions": 7
+			}
 		}
 	],
 	"commitAliases": {

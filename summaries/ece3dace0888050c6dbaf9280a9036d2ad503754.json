@@ -1,0 +1,50 @@
+{
+	"version": 5,
+	"commitHash": "ece3dace0888050c6dbaf9280a9036d2ad503754",
+	"commitMessage": "Revert \"Reapply \"Reapply \"Reapply \"Add R key to reset game from any state\"\"\"\"",
+	"commitAuthor": "Joe Hart",
+	"commitDate": "2026-02-12T23:25:58-08:00",
+	"branch": "backfilled",
+	"generatedAt": "2026-07-07T15:22:25.486Z",
+	"commitType": "commit",
+	"commitSource": "cli",
+	"transcriptEntries": 0,
+	"conversationTurns": 0,
+	"llm": {
+		"model": "claude-sonnet-4-6",
+		"inputTokens": 5248,
+		"outputTokens": 462,
+		"cachedTokens": 0,
+		"apiLatencyMs": 12471,
+		"stopReason": null,
+		"source": "jolli-proxy"
+	},
+	"stats": {
+		"filesChanged": 2,
+		"insertions": 1,
+		"deletions": 7
+	},
+	"diffStats": {
+		"filesChanged": 2,
+		"insertions": 1,
+		"deletions": 7
+	},
+	"topics": [
+		{
+			"title": "Remove reset keyboard shortcut and update player instructions",
+			"trigger": "A previously added feature allowing players to press the R key to reset the game from any state was reverted, removing that capability from the game.",
+			"response": "- The R key handler was removed from `src/main.ts`, eliminating the ability to trigger a new game via keyboard at any point during play.\n- The on-screen control hint in `index.html` was updated to remove the \"Press R to Reset\" instruction, keeping the displayed controls accurate.\n- A call to hide the pause screen overlay when starting a new game was also removed from the `startNewGame` flow in `src/main.ts`.",
+			"decisions": "- **Reverting rather than adjusting the feature**: The entire reset-via-keyboard feature was rolled back rather than patched or refined. This suggests the implementation introduced a problem significant enough to warrant full removal — likely a regression or unintended interaction — rather than a targeted fix, which would have been faster but riskier if the root cause was unclear.\n- **Removing the pause-screen hide call alongside the key handler**: The cleanup of the pause overlay dismissal was bundled into this revert rather than kept as a standalone improvement. Keeping it would have left a partial remnant of the reverted feature's side effects in the codebase, which could cause confusion or subtle bugs later.",
+			"filesAffected": [
+				"src/main.ts",
+				"index.html"
+			],
+			"category": "bugfix",
+			"importance": "major"
+		}
+	],
+	"backfilled": true,
+	"backfillMethod": "diff-only",
+	"treeHash": "4d88bccdb8065a7588b9b8b3380a80368fb9e42a",
+	"recap": "The ability to reset the snake game by pressing the R key was removed. This keyboard shortcut had been added and re-added across several prior commits, but this commit reverts it entirely, leaving players without a mid-game reset option from the keyboard. The on-screen instructions visible to players were updated to match, no longer advertising a reset key that no longer works. A related change to how the pause screen was dismissed when starting a new game was also rolled back as part of the same revert."
+}
