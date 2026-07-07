@@ -46,5 +46,7 @@
 	"backfilled": true,
 	"backfillMethod": "diff-only",
 	"treeHash": "cb6b7e860f8ef7dedc668b0bbda30e056bbb4c04",
-	"recap": "A new Spiral bot was added to the game's roster of playable bots. Unlike the existing bots that react primarily to food or threats, the Spiral bot attempts to sweep the grid in wide clockwise arcs, turning inward whenever it approaches a wall. Players can now select it alongside the existing options and observe a distinctly different movement personality — one that prioritizes grid coverage over direct food pursuit. The bot still avoids collisions and self-trapping, so it plays safely while maintaining its spiral character."
+	"recap": "A new Spiral bot was added to the game's roster of playable bots. Unlike the existing bots that react primarily to food or threats, the Spiral bot attempts to sweep the grid in wide clockwise arcs, turning inward whenever it approaches a wall. Players can now select it alongside the existing options and observe a distinctly different movement personality — one that prioritizes grid coverage over direct food pursuit. The bot still avoids collisions and self-trapping, so it plays safely while maintaining its spiral character.",
+	"jolliDocUrl": "https://jolli.ai/brckbmk4/articles?doc=2664",
+	"jolliDocId": 2664
 }

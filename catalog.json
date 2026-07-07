@@ -513,22 +513,6 @@
 			]
 		},
 		{
-			"commitHash": "572e53700a554fa72b31a06688e05e0f8da928bc",
-			"recap": "A new Spiral bot was added to the game's roster of playable bots. Unlike the existing bots that react primarily to food or threats, the Spiral bot attempts to sweep the grid in wide clockwise arcs, turning inward whenever it approaches a wall. Players can now select it alongside the existing options and observe a distinctly different movement personality — one that prioritizes grid coverage over direct food pursuit. The bot still avoids collisions and self-trapping, so it plays safely while maintaining its spiral character.",
-			"topics": [
-				{
-					"title": "New spiral bot that sweeps the grid in clockwise patterns",
-					"decisions": "- **Scoring bias over hard-coded turn rules**: Rather than forcing a fixed turn sequence, the bot uses a continuous scoring system that nudges movement clockwise while still allowing the safety layer to override when the snake is in danger. This keeps the spiral behavior emergent and graceful under pressure — a rigid turn rule would cause the snake to walk into walls or its own body when the ideal clockwise move is blocked.\n- **Straight preferred over clockwise turn by default**: Straight movement scores slightly higher than a clockwise turn (1200 vs 800) so the snake extends each leg of the spiral as far as possible before turning. Turning too eagerly would produce tight, inefficient loops rather than wide sweeping spirals that cover more of the grid.\n- **Moderate food weighting**: Food pursuit is included but kept at a lower priority than spiral geometry. A bot that aggressively chases food would abandon the spiral pattern constantly, making it indistinguishable from the explorer or hunter bots. The modest food weight means the snake will still eat opportunistically without breaking its sweep pattern.",
-					"category": "feature",
-					"importance": "major",
-					"filesAffected": [
-						"src/bots/spiral-bot.ts",
-						"src/bots/index.ts"
-					]
-				}
-			]
-		},
-		{
 			"commitHash": "03b468b2985ea09b7a6dc6900e8233cba8bb39f9",
 			"recap": "A new bot called Chaser is now available in the snake game. It pursues food along the shortest calculated path and plays aggressively by default, closing the gap to food faster than the existing bots. When the direct path to food would leave the snake with no safe escape route, Chaser automatically shifts into a holding pattern — drifting toward its own tail to keep options open until a safe path to food reopens. Players can now select Chaser alongside the existing roster of bot personalities.",
 			"topics": [
@@ -1406,6 +1390,22 @@
 					"importance": "major",
 					"filesAffected": [
 						"src/bots/sweeper-bot.ts",
+						"src/bots/index.ts"
+					]
+				}
+			]
+		},
+		{
+			"commitHash": "572e53700a554fa72b31a06688e05e0f8da928bc",
+			"recap": "A new Spiral bot was added to the game's roster of playable bots. Unlike the existing bots that react primarily to food or threats, the Spiral bot attempts to sweep the grid in wide clockwise arcs, turning inward whenever it approaches a wall. Players can now select it alongside the existing options and observe a distinctly different movement personality — one that prioritizes grid coverage over direct food pursuit. The bot still avoids collisions and self-trapping, so it plays safely while maintaining its spiral character.",
+			"topics": [
+				{
+					"title": "New spiral bot that sweeps the grid in clockwise patterns",
+					"decisions": "- **Scoring bias over hard-coded turn rules**: Rather than forcing a fixed turn sequence, the bot uses a continuous scoring system that nudges movement clockwise while still allowing the safety layer to override when the snake is in danger. This keeps the spiral behavior emergent and graceful under pressure — a rigid turn rule would cause the snake to walk into walls or its own body when the ideal clockwise move is blocked.\n- **Straight preferred over clockwise turn by default**: Straight movement scores slightly higher than a clockwise turn (1200 vs 800) so the snake extends each leg of the spiral as far as possible before turning. Turning too eagerly would produce tight, inefficient loops rather than wide sweeping spirals that cover more of the grid.\n- **Moderate food weighting**: Food pursuit is included but kept at a lower priority than spiral geometry. A bot that aggressively chases food would abandon the spiral pattern constantly, making it indistinguishable from the explorer or hunter bots. The modest food weight means the snake will still eat opportunistically without breaking its sweep pattern.",
+					"category": "feature",
+					"importance": "major",
+					"filesAffected": [
+						"src/bots/spiral-bot.ts",
 						"src/bots/index.ts"
 					]
 				}
