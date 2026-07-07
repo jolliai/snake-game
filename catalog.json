@@ -1266,6 +1266,22 @@
 					]
 				}
 			]
+		},
+		{
+			"commitHash": "6a246da4709c33699770b508d8bc0d333aa33c98",
+			"recap": "Players can now press R at any point during a Snake game session to immediately restart — mid-game, while paused, or after a game over. The reset shortcut works unconditionally, so there is no need to navigate to a specific screen first. The on-screen controls hint was also updated to surface this shortcut to players who haven't discovered it yet.",
+			"topics": [
+				{
+					"title": "Add keyboard shortcut to reset the game from any state",
+					"decisions": "- **Reset works from any state**: The R key handler was placed before all other input checks, ensuring it fires unconditionally — whether the game is running, paused, or over. The alternative of only allowing reset from specific states would have been more restrictive and less useful, especially for players who want to restart mid-game without waiting for a game over.\n- **Hiding the pause overlay on reset**: When a new game starts via reset, the pause screen is now explicitly dismissed. Without this, resetting while paused would leave the overlay visible over the fresh game, creating a broken visual state. This was handled at the start-game level rather than the key handler level so the fix applies regardless of how a new game is triggered.",
+					"category": "feature",
+					"importance": "major",
+					"filesAffected": [
+						"src/main.ts",
+						"index.html"
+					]
+				}
+			]
 		}
 	]
 }
