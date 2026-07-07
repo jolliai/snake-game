@@ -761,7 +761,7 @@
 		{
 			"stableSlug": "rainbow-snake-surprise",
 			"title": "Rainbow Snake Surprise (JOE-7)",
-			"summary": "1-in-100 easter egg that renders player 1's snake as an animated rainbow shimmer with a Mortal Kombat \"FRIENDSHIP!\"-style banner.",
+			"summary": "JOE-7: ~1-in-100 chance activates animated rainbow snake, celebratory banner, and a secret leaderboard revealed only after a rainbow score is earned.",
 			"relatedBranches": [
 				"josephhart/joe-7-add-rainbow-colored-snake-suprise"
 			],
@@ -777,9 +777,15 @@
 					"id": "optimized-petting-donut-a186ad20",
 					"timestamp": "2026-07-07T16:00:43.262Z",
 					"branch": "josephhart/joe-7-add-rainbow-colored-snake-suprise"
+				},
+				{
+					"type": "summary",
+					"id": "cf7df218edc27d13844e1e9688608ef6c8561d19",
+					"timestamp": "2026-07-07T16:18:17.000Z",
+					"branch": "josephhart/joe-7-add-rainbow-colored-snake-suprise"
 				}
 			],
-			"lastUpdatedAt": "2026-07-07T16:01:09.463Z"
+			"lastUpdatedAt": "2026-07-07T16:18:39.088Z"
 		}
 	]
 }
