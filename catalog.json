@@ -1412,24 +1412,6 @@
 			]
 		},
 		{
-			"commitHash": "a186ad204e48dc5770e2761f453e391ab34d240a",
-			"recap": "The snake game gained a rare easter egg: on roughly one in every hundred games, the player's snake renders as a full animated rainbow that shifts and scrolls along the body throughout the entire session. The effect is exclusive to the player's own snake, so two-player games remain visually distinct with the second player's snake staying its usual blue.\n\nWhen a rainbow game triggers, a Mortal Kombat \"FRIENDSHIP!\" inspired banner appears over the board. A semicircular rainbow arc sits behind chunky all-caps arcade lettering that bounces into view, flashes three times, and then fades away automatically after about three seconds — leaving the board unobstructed for the rest of the game. The banner never reappears mid-game and clears itself immediately if the player exits to the menu or dies quickly.",
-			"ticketId": "JOE-7",
-			"topics": [
-				{
-					"title": "Rainbow Snake surprise with Mortal Kombat friendship banner",
-					"decisions": "- **Animated shimmer over static gradient**: The rainbow hue was made to scroll continuously along the snake body rather than being a fixed head-to-tail gradient. This keeps the effect visually alive throughout the game and matches the project's established preference for visible, gameplay-paced motion. A static gradient would have been simpler but would have felt inert after the first few seconds.\n- **Mortal Kombat \"FRIENDSHIP!\" aesthetic for the banner**: Rather than a plain colored text overlay (the minimal interpretation of the ticket), the banner was styled as the classic MK friendship finisher — a rainbow arc, chunky arcade lettering, a bounce-in animation, and a flash effect. The deliberately wholesome, over-the-top tone amplifies the surprise and makes the rare event feel genuinely special rather than just informational.\n- **URL override seam for testing**: Because a 1-in-100 random event cannot be reliably exercised in automated tests, a `?rainbow=1/0` query parameter was added to force the outcome. This avoids flaky tests and lets manual verification happen instantly without waiting on probability, at the cost of a small amount of URL-parsing code that has no effect in production.",
-					"category": "feature",
-					"importance": "major",
-					"filesAffected": [
-						"src/main.ts",
-						"src/style.css",
-						"index.html"
-					]
-				}
-			]
-		},
-		{
 			"commitHash": "cf7df218edc27d13844e1e9688608ef6c8561d19",
 			"recap": "A hidden \"Rainbow Snake\" leaderboard was added to the game, collecting scores earned during the rare rainbow runs that occur roughly once every hundred games. The tab for this board is invisible on a fresh install and stays hidden until a player actually completes a rainbow run and submits their name — at which point the tab appears with a rainbow-gradient sheen, signalling the discovery. Scores from rainbow games are routed exclusively to this secret board and never appear on the standard Single Player, Two Player, or Bot vs Bot standings. After a rainbow run ends, the \"View Leaderboard\" button takes the player straight to the newly revealed board rather than their usual mode, making the discovery feel intentional. Clearing the rainbow board re-hides the tab entirely, resetting the secret for future sessions.",
 			"ticketId": "JOE-7",
@@ -1444,6 +1426,24 @@
 						"src/main.ts",
 						"index.html",
 						"src/style.css"
+					]
+				}
+			]
+		},
+		{
+			"commitHash": "a186ad204e48dc5770e2761f453e391ab34d240a",
+			"recap": "The snake game gained a rare easter egg: on roughly one in every hundred games, the player's snake renders as a full animated rainbow that shifts and scrolls along the body throughout the entire session. The effect is exclusive to the player's own snake, so two-player games remain visually distinct with the second player's snake staying its usual blue.\n\nWhen a rainbow game triggers, a Mortal Kombat \"FRIENDSHIP!\" inspired banner appears over the board. A semicircular rainbow arc sits behind chunky all-caps arcade lettering that bounces into view, flashes three times, and then fades away automatically after about three seconds — leaving the board unobstructed for the rest of the game. The banner never reappears mid-game and clears itself immediately if the player exits to the menu or dies quickly.",
+			"ticketId": "JOE-7",
+			"topics": [
+				{
+					"title": "Rainbow Snake surprise with Mortal Kombat friendship banner",
+					"decisions": "- **Animated shimmer over static gradient**: The rainbow hue was made to scroll continuously along the snake body rather than being a fixed head-to-tail gradient. This keeps the effect visually alive throughout the game and matches the project's established preference for visible, gameplay-paced motion. A static gradient would have been simpler but would have felt inert after the first few seconds.\n- **Mortal Kombat \"FRIENDSHIP!\" aesthetic for the banner**: Rather than a plain colored text overlay (the minimal interpretation of the ticket), the banner was styled as the classic MK friendship finisher — a rainbow arc, chunky arcade lettering, a bounce-in animation, and a flash effect. The deliberately wholesome, over-the-top tone amplifies the surprise and makes the rare event feel genuinely special rather than just informational.\n- **URL override seam for testing**: Because a 1-in-100 random event cannot be reliably exercised in automated tests, a `?rainbow=1/0` query parameter was added to force the outcome. This avoids flaky tests and lets manual verification happen instantly without waiting on probability, at the cost of a small amount of URL-parsing code that has no effect in production.",
+					"category": "feature",
+					"importance": "major",
+					"filesAffected": [
+						"src/main.ts",
+						"src/style.css",
+						"index.html"
 					]
 				}
 			]
