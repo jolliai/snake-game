@@ -1,0 +1,48 @@
+{
+	"version": 5,
+	"commitHash": "b0dd53cb099bd70f07c1b0dd313ba08a070a9c63",
+	"commitMessage": "Add project README with features, controls, and setup instructions",
+	"commitAuthor": "Joe Hart",
+	"commitDate": "2026-02-13T08:08:51-08:00",
+	"branch": "backfilled",
+	"generatedAt": "2026-07-07T15:20:22.708Z",
+	"commitType": "commit",
+	"commitSource": "cli",
+	"transcriptEntries": 0,
+	"conversationTurns": 0,
+	"llm": {
+		"model": "claude-sonnet-4-6",
+		"inputTokens": 5164,
+		"outputTokens": 208,
+		"cachedTokens": 0,
+		"apiLatencyMs": 6119,
+		"stopReason": null,
+		"source": "jolli-proxy"
+	},
+	"stats": {
+		"filesChanged": 1,
+		"insertions": 44,
+		"deletions": 0
+	},
+	"diffStats": {
+		"filesChanged": 1,
+		"insertions": 44,
+		"deletions": 0
+	},
+	"topics": [
+		{
+			"title": "Add README with game features, controls, and setup instructions",
+			"trigger": "The project needed a README so that new contributors and players could understand what the game does, how to play it, and how to run it locally.",
+			"response": "Created `README.md` covering the game's feature set (expanding grid, adjustable starting grid size, high score persistence, pause/resume, and dark theme), a controls reference table, and quick-start instructions for both development and production builds.",
+			"decisions": "The README documents the expanding grid mechanic and adjustable grid resolution as headline features, reflecting that these are the most distinctive behaviors of this snake implementation compared to a standard clone. Surfacing them prominently helps set expectations for anyone evaluating or contributing to the project.",
+			"filesAffected": [
+				"README.md"
+			],
+			"category": "docs",
+			"importance": "minor"
+		}
+	],
+	"backfilled": true,
+	"backfillMethod": "diff-only",
+	"treeHash": "6441cbb71e3b2774a73fe41c7b8cbbb0e90c0dbd"
+}

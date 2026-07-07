@@ -1107,6 +1107,20 @@
 		},
 		{
 			"commitHash": "e7777fa7355805627306e678e326170b1b4ce41f"
+		},
+		{
+			"commitHash": "b0dd53cb099bd70f07c1b0dd313ba08a070a9c63",
+			"topics": [
+				{
+					"title": "Add README with game features, controls, and setup instructions",
+					"decisions": "The README documents the expanding grid mechanic and adjustable grid resolution as headline features, reflecting that these are the most distinctive behaviors of this snake implementation compared to a standard clone. Surfacing them prominently helps set expectations for anyone evaluating or contributing to the project.",
+					"category": "docs",
+					"importance": "minor",
+					"filesAffected": [
+						"README.md"
+					]
+				}
+			]
 		}
 	]
 }
