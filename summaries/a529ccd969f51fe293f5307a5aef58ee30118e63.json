@@ -46,5 +46,7 @@
 	"backfilled": true,
 	"backfillMethod": "diff-only",
 	"treeHash": "060555171ce1b17345837cb58bdcf6cd10c10abe",
-	"recap": "A new bot called Chaser is now available in the game. It pursues food along the shortest navigable route and scores each possible move using real path analysis rather than simple straight-line estimates, making it noticeably more direct and efficient than the existing bots when the board is open. When the shortest path to food would leave the snake unable to reach its own tail — a reliable sign of an impending dead end — Chaser abandons food pursuit entirely and shifts into a survival posture, drifting toward its own tail to keep its options open until a safe food path becomes available again. Players selecting Chaser will see a snake that closes on food quickly in open conditions and retreats into cautious looping behavior when the board tightens."
+	"recap": "A new bot called Chaser is now available in the game. It pursues food along the shortest navigable route and scores each possible move using real path analysis rather than simple straight-line estimates, making it noticeably more direct and efficient than the existing bots when the board is open. When the shortest path to food would leave the snake unable to reach its own tail — a reliable sign of an impending dead end — Chaser abandons food pursuit entirely and shifts into a survival posture, drifting toward its own tail to keep its options open until a safe food path becomes available again. Players selecting Chaser will see a snake that closes on food quickly in open conditions and retreats into cautious looping behavior when the board tightens.",
+	"jolliDocUrl": "https://jolli.ai/brckbmk4/articles?doc=2632",
+	"jolliDocId": 2632
 }
