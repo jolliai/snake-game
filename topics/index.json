@@ -107,11 +107,12 @@
 		{
 			"stableSlug": "project-docs",
 			"title": "Project Documentation & README",
-			"summary": "README.md is the single source of truth for the project; CLAUDE.md provides session guidance for AI agents working in the repo.",
+			"summary": "README.md is the single authoritative doc; CLAUDE.md provides AI agent guidance. Covers features, controls, setup, bots, and roadmap.",
 			"relatedBranches": [
 				"docs/cleanup",
 				"docs/claude-md-jolli-memory",
-				"josephhart/joe-7-add-rainbow-colored-snake-suprise"
+				"josephhart/joe-7-add-rainbow-colored-snake-suprise",
+				"backfilled"
 			],
 			"sourceRefs": [
 				{
@@ -131,9 +132,51 @@
 					"id": "ea18bf87e66146aebefae37044f63b51e497e07a",
 					"timestamp": "2026-07-07T02:19:54.000Z",
 					"branch": "josephhart/joe-7-add-rainbow-colored-snake-suprise"
+				},
+				{
+					"type": "summary",
+					"id": "b0dd53cb099bd70f07c1b0dd313ba08a070a9c63",
+					"timestamp": "2026-02-13T08:08:51-08:00",
+					"branch": "backfilled"
+				},
+				{
+					"type": "summary",
+					"id": "e7777fa7355805627306e678e326170b1b4ce41f",
+					"timestamp": "2026-02-13T08:25:26-08:00",
+					"branch": "backfilled"
+				},
+				{
+					"type": "summary",
+					"id": "22d688a4e07a99a8367c03b146e1df8768a23ec6",
+					"timestamp": "2026-02-13T09:19:20-08:00",
+					"branch": "backfilled"
+				},
+				{
+					"type": "summary",
+					"id": "b117b30428fbf788c07a80aa233dd0d02159b1f8",
+					"timestamp": "2026-02-13T09:27:16-08:00",
+					"branch": "backfilled"
+				},
+				{
+					"type": "summary",
+					"id": "65d2f9396fca9e7da7f5bef6ba2e78fd7eb2a397",
+					"timestamp": "2026-02-13T10:01:08-08:00",
+					"branch": "backfilled"
+				},
+				{
+					"type": "summary",
+					"id": "1a475b3c48552e11049de3f1aa7f17e007eb314c",
+					"timestamp": "2026-02-13T10:04:11-08:00",
+					"branch": "backfilled"
+				},
+				{
+					"type": "summary",
+					"id": "aa60e54001ccf9ac4c6d03b41422ba10a39c93ac",
+					"timestamp": "2026-03-06T11:54:51-08:00",
+					"branch": "backfilled"
 				}
 			],
-			"lastUpdatedAt": "2026-07-07T02:20:01.705Z"
+			"lastUpdatedAt": "2026-07-07T15:24:20.601Z"
 		},
 		{
 			"stableSlug": "dev-tooling-config",
