@@ -1,0 +1,50 @@
+{
+	"version": 5,
+	"commitHash": "1bc698e5847f04005aacece58b5853fe9720235e",
+	"commitMessage": "Add Shift+R to reset game from any state",
+	"commitAuthor": "Joe Hart",
+	"commitDate": "2026-02-13T00:15:46-08:00",
+	"branch": "backfilled",
+	"generatedAt": "2026-07-07T15:21:39.674Z",
+	"commitType": "commit",
+	"commitSource": "cli",
+	"transcriptEntries": 0,
+	"conversationTurns": 0,
+	"llm": {
+		"model": "claude-sonnet-4-6",
+		"inputTokens": 5226,
+		"outputTokens": 509,
+		"cachedTokens": 0,
+		"apiLatencyMs": 12826,
+		"stopReason": null,
+		"source": "jolli-proxy"
+	},
+	"stats": {
+		"filesChanged": 2,
+		"insertions": 7,
+		"deletions": 1
+	},
+	"diffStats": {
+		"filesChanged": 2,
+		"insertions": 7,
+		"deletions": 1
+	},
+	"topics": [
+		{
+			"title": "Add keyboard shortcut to reset the game at any time",
+			"trigger": "Players had no way to restart the game mid-session without waiting for a game-over screen. A reset shortcut was needed that would work regardless of whether the game was running, paused, or already over.",
+			"response": "- In `src/main.ts`, a check for the `Shift+R` key combination (`e.key === 'R'`) was added at the top of the keyboard handler, calling `startNewGame()` immediately and returning early so no other key logic runs. This ensures reset works from any game state.\n- Also in `startNewGame()`, the pause overlay is now explicitly hidden when a new game begins, fixing a case where resetting from a paused state would leave the pause UI visible over the fresh game.\n- In `index.html`, the on-screen controls hint was updated to include \"Press Shift+R to Reset\" so players can discover the shortcut without guessing.",
+			"decisions": "- **Shift+R over plain R**: Using `Shift+R` (detected as uppercase `'R'`) rather than unmodified `R` avoids accidentally triggering a reset when a player is typing or when the key might conflict with other single-key bindings. The modifier adds a small intentionality barrier that prevents frustrating accidental resets mid-game.\n- **Reset handled before all other key logic**: Placing the reset check at the very top of the keyboard handler, before pause or movement checks, guarantees it fires unconditionally from any game state. An alternative would have been to gate it on specific states, but that would create edge cases where the shortcut silently does nothing.",
+			"filesAffected": [
+				"src/main.ts",
+				"index.html"
+			],
+			"category": "feature",
+			"importance": "major"
+		}
+	],
+	"backfilled": true,
+	"backfillMethod": "diff-only",
+	"treeHash": "3d49d1acbb78ea98aa2a3516de3f9beac06ca443",
+	"recap": "Players can now reset the snake game at any point during a session using Shift+R — whether the game is running, paused, or already over. The reset shortcut is listed directly in the on-screen controls so it is immediately discoverable. Resetting from a paused state now also correctly clears the pause overlay, leaving the screen clean for the new game."
+}

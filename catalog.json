@@ -1188,6 +1188,22 @@
 					]
 				}
 			]
+		},
+		{
+			"commitHash": "1bc698e5847f04005aacece58b5853fe9720235e",
+			"recap": "Players can now reset the snake game at any point during a session using Shift+R — whether the game is running, paused, or already over. The reset shortcut is listed directly in the on-screen controls so it is immediately discoverable. Resetting from a paused state now also correctly clears the pause overlay, leaving the screen clean for the new game.",
+			"topics": [
+				{
+					"title": "Add keyboard shortcut to reset the game at any time",
+					"decisions": "- **Shift+R over plain R**: Using `Shift+R` (detected as uppercase `'R'`) rather than unmodified `R` avoids accidentally triggering a reset when a player is typing or when the key might conflict with other single-key bindings. The modifier adds a small intentionality barrier that prevents frustrating accidental resets mid-game.\n- **Reset handled before all other key logic**: Placing the reset check at the very top of the keyboard handler, before pause or movement checks, guarantees it fires unconditionally from any game state. An alternative would have been to gate it on specific states, but that would create edge cases where the shortcut silently does nothing.",
+					"category": "feature",
+					"importance": "major",
+					"filesAffected": [
+						"src/main.ts",
+						"index.html"
+					]
+				}
+			]
 		}
 	]
 }

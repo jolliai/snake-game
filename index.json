@@ -1060,6 +1060,22 @@
 				"insertions": 7,
 				"deletions": 1
 			}
+		},
+		{
+			"commitHash": "1bc698e5847f04005aacece58b5853fe9720235e",
+			"parentCommitHash": null,
+			"treeHash": "3d49d1acbb78ea98aa2a3516de3f9beac06ca443",
+			"commitType": "commit",
+			"commitMessage": "Add Shift+R to reset game from any state",
+			"commitDate": "2026-02-13T00:15:46-08:00",
+			"branch": "backfilled",
+			"generatedAt": "2026-07-07T15:21:39.674Z",
+			"topicCount": 1,
+			"diffStats": {
+				"filesChanged": 2,
+				"insertions": 7,
+				"deletions": 1
+			}
 		}
 	],
 	"commitAliases": {
