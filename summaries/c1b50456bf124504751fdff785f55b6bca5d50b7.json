@@ -1,0 +1,52 @@
+{
+	"version": 5,
+	"commitHash": "c1b50456bf124504751fdff785f55b6bca5d50b7",
+	"commitMessage": "Merge branch 'main' into add-spiral-bot",
+	"commitAuthor": "Joe Hart",
+	"commitDate": "2026-04-06T18:32:12-07:00",
+	"branch": "backfilled",
+	"generatedAt": "2026-07-07T15:13:22.454Z",
+	"commitType": "commit",
+	"commitSource": "cli",
+	"transcriptEntries": 0,
+	"conversationTurns": 0,
+	"llm": {
+		"model": "claude-sonnet-4-6",
+		"inputTokens": 7935,
+		"outputTokens": 744,
+		"cachedTokens": 0,
+		"apiLatencyMs": 16885,
+		"stopReason": null,
+		"source": "jolli-proxy"
+	},
+	"stats": {
+		"filesChanged": 4,
+		"insertions": 224,
+		"deletions": 1
+	},
+	"diffStats": {
+		"filesChanged": 4,
+		"insertions": 224,
+		"deletions": 1
+	},
+	"topics": [
+		{
+			"title": "Three new snake bot personalities added to the game",
+			"trigger": "The game needed more variety in bot opponents and play styles beyond the existing lineup, prompting the addition of several new bots with distinct behavioral strategies.",
+			"response": "- `src/bots/ambusher-bot.ts` was created to implement a bot that drifts toward the center of the grid and waits, only pursuing food aggressively when it spawns within a configurable strike radius. Outside that radius it moves toward food while preferring central positions as a tiebreaker.\n- `src/bots/chaser-bot.ts` was created to implement a bot that always follows the shortest available path to food, falling back to tail-chasing behavior when the direct food path would leave it unable to reach its own tail. Food pursuit is weighted heavily over open-space preservation.\n- `src/bots/nomad-bot.ts` was created to implement a bot that actively avoids its own body trail by penalizing moves near recently occupied cells, prioritizing open space and fresh territory while still collecting food opportunistically.\n- `src/bots/index.ts` was updated to import and register all three new bots in the `AVAILABLE_BOTS` array alongside the existing roster.",
+			"decisions": "- **Distinct behavioral identities over parameter tuning**: Each bot was given a fundamentally different scoring philosophy rather than being a re-tuned version of an existing bot. The Ambusher anchors to a spatial position, the Chaser maximizes food-path efficiency, and the Nomad penalizes body proximity. This makes each bot feel meaningfully different to play against and avoids a situation where bots are indistinguishable in practice.\n- **Shared survival floor across all bots**: All three bots use the same tail-reachability check as a hard constraint — moves that would leave the snake unable to reach its own tail are scored far below any safe move. This keeps the new bots from dying trivially while still allowing their distinct personalities to express themselves in safe situations.\n- **Body-proximity penalty as the Nomad's core mechanic**: Rather than rewarding exploration abstractly, the Nomad directly counts nearby body segments and applies a steep per-segment penalty. This produces emergent trail-avoidance behavior without requiring explicit path history tracking, keeping the implementation simple while achieving the intended wandering effect.",
+			"filesAffected": [
+				"src/bots/ambusher-bot.ts",
+				"src/bots/chaser-bot.ts",
+				"src/bots/nomad-bot.ts",
+				"src/bots/index.ts"
+			],
+			"category": "feature",
+			"importance": "major"
+		}
+	],
+	"backfilled": true,
+	"backfillMethod": "diff-only",
+	"treeHash": "822c5f83df0de67981d7dd90673fe04507e24732",
+	"recap": "Three new bot opponents were added to the snake game, each with a distinct play style. The Ambusher stakes out the center of the board and only chases food when it spawns nearby, making it a patient, positional opponent. The Chaser relentlessly pursues the shortest route to food and switches to a defensive tail-following mode when the direct path becomes dangerous. The Nomad actively steers away from its own body trail, spreading across fresh territory and picking up food along the way rather than hunting it directly. All three bots are now selectable alongside the existing roster."
+}
