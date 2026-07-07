@@ -844,6 +844,22 @@
 					]
 				}
 			]
+		},
+		{
+			"commitHash": "127c160181386eb69dc714c174265e825cc1843e",
+			"recap": "A fifth bot, Edge Runner, was added to the snake game. It patrols the outer edges of the board by default, sweeping inward only when food appears near the perimeter. When food sits in the middle of the board, Edge Runner abandons its wall-hugging behavior and chases it directly. Players can now select Edge Runner alongside the existing four bots, giving the game a new strategic personality distinct from the others.",
+			"topics": [
+				{
+					"title": "New perimeter-patrolling bot added to snake game bot roster",
+					"decisions": "- **Wall bonus gated on food position**: Rather than always rewarding edge proximity, the wall-hugging score bonus is only activated when food is within two cells of the perimeter. This preserves the bot's distinctive identity while preventing it from ignoring centrally-placed food and dying chasing the walls — a trade-off between personality consistency and survival.\n- **Tail-reachability as a dominant constraint**: The ability to reach the snake's own tail carries an extremely high positive weight, and losing that ability carries a severe penalty. This makes survival the bot's overriding concern, ensuring the perimeter-patrol behavior never leads to self-entrapment — a deliberate choice to prioritize longevity over aggressive food-seeking.",
+					"category": "feature",
+					"importance": "major",
+					"filesAffected": [
+						"src/bots/edge-runner-bot.ts",
+						"src/bots/index.ts"
+					]
+				}
+			]
 		}
 	]
 }
