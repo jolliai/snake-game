@@ -586,6 +586,22 @@
 					]
 				}
 			]
+		},
+		{
+			"commitHash": "a2b18e9c96f0f741483ddb27329c1952b1023f1d",
+			"recap": "A new bot called Sweeper was added to the game's roster of AI opponents. It navigates the grid in a back-and-forth lawnmower pattern, sweeping each row horizontally and stepping down to the next row at the end, aiming for full grid coverage rather than purely chasing food or reacting to other snakes. The bot balances this pattern against survival: it continuously checks whether it can still reach its own tail and how much open space remains, and will abandon the sweep path when following it would put it in danger. Players can now select Sweeper alongside the existing ten bots.",
+			"topics": [
+				{
+					"title": "New sweeper bot added with lawnmower grid coverage pattern",
+					"decisions": "- **Scoring over hard rules**: The bot uses a weighted numeric score for each candidate direction rather than a strict rule chain. This keeps safety constraints (reaching the tail, maintaining open space) dominant while still nudging the bot toward the sweep pattern — the pattern preference adds only a modest bonus, so the bot will deviate from the lawnmower path when doing so would trap it.\n- **Top-to-bottom, not arbitrary sweep axis**: Rows are swept horizontally and the bot advances downward, rather than sweeping columns or alternating axes. This matches the most natural reading order for a grid and keeps the directional logic simple — a single row-parity check determines the preferred horizontal direction, and an \"at row end\" check triggers the downward turn.\n- **Mild penalty for moving upward**: Rather than forbidding upward movement entirely, the bot applies a small score penalty for it. This preserves escape options when the snake is cornered while still discouraging backtracking against the intended sweep direction.",
+					"category": "feature",
+					"importance": "major",
+					"filesAffected": [
+						"src/bots/sweeper-bot.ts",
+						"src/bots/index.ts"
+					]
+				}
+			]
 		}
 	]
 }

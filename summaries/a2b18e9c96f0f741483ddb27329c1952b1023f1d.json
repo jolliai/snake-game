@@ -1,0 +1,50 @@
+{
+	"version": 5,
+	"commitHash": "a2b18e9c96f0f741483ddb27329c1952b1023f1d",
+	"commitMessage": "Merge pull request #13 from jeverest/add-sweeper-bot",
+	"commitAuthor": "Joe Hart",
+	"commitDate": "2026-04-08T09:26:19-07:00",
+	"branch": "backfilled",
+	"generatedAt": "2026-07-07T15:11:59.882Z",
+	"commitType": "commit",
+	"commitSource": "cli",
+	"transcriptEntries": 0,
+	"conversationTurns": 0,
+	"llm": {
+		"model": "claude-sonnet-4-6",
+		"inputTokens": 6062,
+		"outputTokens": 602,
+		"cachedTokens": 0,
+		"apiLatencyMs": 16162,
+		"stopReason": null,
+		"source": "jolli-proxy"
+	},
+	"stats": {
+		"filesChanged": 2,
+		"insertions": 86,
+		"deletions": 1
+	},
+	"diffStats": {
+		"filesChanged": 2,
+		"insertions": 86,
+		"deletions": 1
+	},
+	"topics": [
+		{
+			"title": "New sweeper bot added with lawnmower grid coverage pattern",
+			"trigger": "The project needed a new snake bot that could methodically cover the entire grid rather than reacting opportunistically to food or other snakes.",
+			"response": "- `src/bots/sweeper-bot.ts` was created from scratch, implementing a scoring-based direction chooser. The bot evaluates each candidate move using safety checks (tail reachability, open area), food proximity, and a lawnmower-pattern preference: even rows sweep right, odd rows sweep left, with a bias to turn downward at row ends.\n- `src/bots/index.ts` was updated to import `sweeperBot` and append it to the `AVAILABLE_BOTS` array, making it selectable alongside the existing ten bots.",
+			"decisions": "- **Scoring over hard rules**: The bot uses a weighted numeric score for each candidate direction rather than a strict rule chain. This keeps safety constraints (reaching the tail, maintaining open space) dominant while still nudging the bot toward the sweep pattern — the pattern preference adds only a modest bonus, so the bot will deviate from the lawnmower path when doing so would trap it.\n- **Top-to-bottom, not arbitrary sweep axis**: Rows are swept horizontally and the bot advances downward, rather than sweeping columns or alternating axes. This matches the most natural reading order for a grid and keeps the directional logic simple — a single row-parity check determines the preferred horizontal direction, and an \"at row end\" check triggers the downward turn.\n- **Mild penalty for moving upward**: Rather than forbidding upward movement entirely, the bot applies a small score penalty for it. This preserves escape options when the snake is cornered while still discouraging backtracking against the intended sweep direction.",
+			"filesAffected": [
+				"src/bots/sweeper-bot.ts",
+				"src/bots/index.ts"
+			],
+			"category": "feature",
+			"importance": "major"
+		}
+	],
+	"backfilled": true,
+	"backfillMethod": "diff-only",
+	"treeHash": "243e987e440af0609decc3aa1603079f6ccd1ee5",
+	"recap": "A new bot called Sweeper was added to the game's roster of AI opponents. It navigates the grid in a back-and-forth lawnmower pattern, sweeping each row horizontally and stepping down to the next row at the end, aiming for full grid coverage rather than purely chasing food or reacting to other snakes. The bot balances this pattern against survival: it continuously checks whether it can still reach its own tail and how much open space remains, and will abandon the sweep path when following it would put it in danger. Players can now select Sweeper alongside the existing ten bots."
+}
