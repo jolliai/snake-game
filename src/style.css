@@ -224,6 +224,73 @@ button:active {
   50% { opacity: 0.7; box-shadow: 0 0 36px rgba(239, 68, 68, 0.95); }
 }
 
+/* Rainbow Snake surprise (JOE-7): a Mortal Kombat "FRIENDSHIP!"-style reveal —
+   a rainbow arc behind chunky arcade text that pops in, flashes, then fades.
+   Overlays the board (like the death banner) and auto-dismisses via JS. */
+.rainbow-banner {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.6s ease;
+  /* Pop-in keeps the translateX(-50%) centring in every keyframe (see below). */
+  animation: friendship-pop 0.5s cubic-bezier(0.2, 1.5, 0.4, 1);
+}
+
+/* Fade-out state toggled by JS shortly before the banner is hidden. */
+.rainbow-banner.fading { opacity: 0; }
+
+/* Semicircular rainbow arc: concentric bands from a bottom-anchored radial
+   gradient, clipped to the top half of a fixed-radius circle. Beyond the outer
+   band is transparent so the box reads as an arc, not a square. */
+.rainbow-arc {
+  width: 240px;
+  height: 120px;
+  margin-bottom: -14px;
+  background: radial-gradient(circle 118px at 50% 100%,
+    transparent 0 46%,
+    #e11d48 46% 55%,
+    #f97316 55% 64%,
+    #facc15 64% 73%,
+    #22c55e 73% 82%,
+    #3b82f6 82% 91%,
+    #a855f7 91% 99%,
+    transparent 99% 100%);
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.6));
+}
+
+/* Chunky arcade caption: bright yellow with a layered dark outline + glow. */
+.rainbow-text {
+  font-family: 'Arial Black', 'Impact', system-ui, sans-serif;
+  font-weight: 900;
+  font-size: 2.1em;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  color: #ffe600;
+  text-shadow:
+    -2px -2px 0 #1a1208, 2px -2px 0 #1a1208,
+    -2px 2px 0 #1a1208, 2px 2px 0 #1a1208,
+    0 4px 8px rgba(0, 0, 0, 0.7),
+    0 0 18px rgba(255, 255, 255, 0.5);
+  animation: friendship-flash 0.4s ease-in-out 3;
+}
+
+@keyframes friendship-pop {
+  0% { transform: translateX(-50%) scale(0.4); opacity: 0; }
+  60% { transform: translateX(-50%) scale(1.15); opacity: 1; }
+  100% { transform: translateX(-50%) scale(1); opacity: 1; }
+}
+
+@keyframes friendship-flash {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
 .game-info {
   display: flex;
   gap: 2rem;
@@ -461,6 +528,22 @@ button.footer-link:active {
   border-color: #4ade80;
   color: #4ade80;
   background-color: rgba(74, 222, 128, 0.1);
+}
+
+/* The secret Rainbow Snake tab (JOE-7) surfaces only once its board has a
+   score; give it a rainbow sheen so the reveal reads as a prize. */
+.lb-tab-rainbow {
+  border-image: linear-gradient(90deg, #f87171, #fbbf24, #4ade80, #38bdf8, #a78bfa) 1;
+  background-image: linear-gradient(90deg, #f87171, #fbbf24, #4ade80, #38bdf8, #a78bfa);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.lb-tab-rainbow.active {
+  background-color: transparent;
+  box-shadow: 0 0 0 1px #a78bfa, 0 0 12px rgba(167, 139, 250, 0.35);
 }
 
 #leaderboard-table-wrap {
