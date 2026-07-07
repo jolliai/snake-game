@@ -1124,6 +1124,22 @@
 		},
 		{
 			"commitHash": "518efbd94bbd030dd10fc2007a2f26a80b2cc5c0"
+		},
+		{
+			"commitHash": "c149ca2cae9ee5c7283013705dde89027d4fbefd",
+			"recap": "Players can now choose their preferred grid size directly from the game screen before starting a match. Pressing the plus or minus keys cycles the grid through a range of sizes in meaningful steps, and the playing field updates instantly to preview the new layout. The snake's starting position always lands in the center of whichever grid size is selected, and the chosen size is preserved when resetting after a game over rather than reverting to a default. The canvas itself stays the same physical size on screen at all times; only the number and size of cells changes.",
+			"topics": [
+				{
+					"title": "Adjustable grid size before game starts using keyboard shortcuts",
+					"decisions": "- **Fixed canvas size over variable canvas size**: Keeping the canvas dimensions constant while varying cell size means the game area never changes its footprint on the page. A variable canvas would have required layout recalculations and could have caused the surrounding UI to shift or overflow at extreme grid sizes, making the fixed-size approach simpler and more predictable for players.\n- **Step size of 5 with min/max clamps**: Jumping by 5 squares per keypress gives players a meaningful change in difficulty without requiring many presses to reach a useful setting. Hard limits of 5 and 50 prevent degenerate states where cells are either too large to be interesting or too small to be visible at the fixed canvas resolution.",
+					"category": "feature",
+					"importance": "major",
+					"filesAffected": [
+						"src/main.ts",
+						"index.html"
+					]
+				}
+			]
 		}
 	]
 }
