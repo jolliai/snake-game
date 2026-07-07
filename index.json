@@ -1028,6 +1028,22 @@
 				"insertions": 7,
 				"deletions": 1
 			}
+		},
+		{
+			"commitHash": "6e5c38e162b7660dbd2a4c157b37f5a62dead6ce",
+			"parentCommitHash": null,
+			"treeHash": "581ad49890ac704e65aa6b06cb55f1e553f22455",
+			"commitType": "commit",
+			"commitMessage": "Add +/- keys to adjust grid resolution before game starts",
+			"commitDate": "2026-02-13T00:48:08-08:00",
+			"branch": "backfilled",
+			"generatedAt": "2026-07-07T15:21:12.002Z",
+			"topicCount": 1,
+			"diffStats": {
+				"filesChanged": 2,
+				"insertions": 29,
+				"deletions": 7
+			}
 		}
 	],
 	"commitAliases": {

@@ -1,0 +1,50 @@
+{
+	"version": 5,
+	"commitHash": "6e5c38e162b7660dbd2a4c157b37f5a62dead6ce",
+	"commitMessage": "Add +/- keys to adjust grid resolution before game starts",
+	"commitAuthor": "Joe Hart",
+	"commitDate": "2026-02-13T00:48:08-08:00",
+	"branch": "backfilled",
+	"generatedAt": "2026-07-07T15:21:12.002Z",
+	"commitType": "commit",
+	"commitSource": "cli",
+	"transcriptEntries": 0,
+	"conversationTurns": 0,
+	"llm": {
+		"model": "claude-sonnet-4-6",
+		"inputTokens": 5839,
+		"outputTokens": 693,
+		"cachedTokens": 0,
+		"apiLatencyMs": 17314,
+		"stopReason": null,
+		"source": "jolli-proxy"
+	},
+	"stats": {
+		"filesChanged": 2,
+		"insertions": 29,
+		"deletions": 7
+	},
+	"diffStats": {
+		"filesChanged": 2,
+		"insertions": 29,
+		"deletions": 7
+	},
+	"topics": [
+		{
+			"title": "Allow players to adjust grid size before starting a game",
+			"trigger": "Players had no way to change the size of the game grid before starting — it was fixed at a single default size with no option to make it larger or smaller.",
+			"response": "- Added keyboard handling in `src/main.ts` for the plus and minus keys (including their shifted variants) that fires only when the game has not yet started. Each press adjusts the grid size in increments of 5, clamped between 5 and 50 cells. The snake position, food, and display all update immediately so the player can preview the new layout before committing.\n- Introduced a `CANVAS_SIZE` constant in `src/main.ts` to fix the canvas at 300×300 pixels regardless of grid resolution. Cell size is now derived by dividing the canvas size by the grid count, so finer grids produce smaller cells rather than a larger canvas. The `updateCanvasSize` method was updated to apply this calculation on every grid change.\n- Updated the controls hint text in `index.html` to advertise the new +/- shortcut, and `startNewGame` was changed to respect the player's chosen grid size rather than always resetting to the default.",
+			"decisions": "- **Fixed canvas size instead of fixed cell size**: Keeping the canvas at a constant pixel size means the game area stays the same physical size on screen no matter what grid resolution the player picks. The alternative — keeping cell size fixed and growing the canvas — would have caused the game board to expand dramatically at large grid sizes, potentially overflowing its container and breaking the layout.\n- **Increments of 5 with hard limits**: Adjusting by 5 cells at a time keeps the interaction snappy and avoids the player needing many keypresses to reach a meaningfully different grid. The floor of 5 prevents a grid so small it becomes unplayable, and the ceiling of 50 prevents cells so tiny they are hard to see on a fixed 300-pixel canvas.\n- **Centering the snake on grid change**: Rather than leaving the snake at a hardcoded coordinate that might fall outside a smaller grid, the starting position is recalculated as the center of whatever grid size is active. This also made `startNewGame` more robust by removing the hardcoded starting cell entirely.",
+			"filesAffected": [
+				"src/main.ts",
+				"index.html"
+			],
+			"category": "feature",
+			"importance": "major"
+		}
+	],
+	"backfilled": true,
+	"backfillMethod": "diff-only",
+	"treeHash": "581ad49890ac704e65aa6b06cb55f1e553f22455",
+	"recap": "Players can now press the plus and minus keys on the pre-game screen to choose how large the game grid will be before their first move. The board previews the new layout immediately — snake position, food placement, and cell size all update in real time as the player adjusts. The game area stays the same physical size on screen at every resolution: finer grids produce smaller cells rather than a larger board, keeping the layout stable. The grid size chosen before starting is also preserved when a new game begins, so players do not have to re-select their preferred difficulty after each round."
+}
