@@ -860,6 +860,22 @@
 					]
 				}
 			]
+		},
+		{
+			"commitHash": "be331716af40275ebae0cbc79c3e7eea33ebc5ed",
+			"recap": "A new bot called Coiler was added to the snake game's roster of playable AI personalities. Unlike the existing bots, Coiler actively steers toward moves that keep its head adjacent to its own body, producing a tight, methodical coiling pattern as it moves around the board. It remains safe by strongly prioritizing the ability to reach its own tail at all times, so the coiling tendency never causes it to box itself in. Players can now select Coiler alongside the existing survival, hunter, and explorer bots.",
+			"topics": [
+				{
+					"title": "New snake bot that coils tightly around its own body to stay compact",
+					"decisions": "- **Coiling via self-adjacency reward**: Rather than guiding the snake purely toward food or open space, the bot rewards moves where the head ends up next to its own body. This keeps the snake's footprint compact and methodical, producing a visually distinct coiling behavior. The trade-off is that the snake may take longer paths to food, but the high weight on tail reachability (80,000 points) prevents it from trapping itself.\n- **Scoring weight balance**: The body-adjacency bonus (3,000 per neighbor) was set high enough to meaningfully influence direction choices but well below the tail-reachability penalty (−100,000 for losing tail access), ensuring the coiling preference never overrides survival. Food proximity and path-to-food scores sit in between, so the bot still collects food efficiently while favoring compact movement.",
+					"category": "feature",
+					"importance": "major",
+					"filesAffected": [
+						"src/bots/coiler-bot.ts",
+						"src/bots/index.ts"
+					]
+				}
+			]
 		}
 	]
 }

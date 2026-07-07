@@ -1,0 +1,50 @@
+{
+	"version": 5,
+	"commitHash": "be331716af40275ebae0cbc79c3e7eea33ebc5ed",
+	"commitMessage": "Add Coiler bot that hugs its own body to stay compact",
+	"commitAuthor": "Joe Hart",
+	"commitDate": "2026-04-06T16:59:09-07:00",
+	"branch": "backfilled",
+	"generatedAt": "2026-07-07T15:16:36.753Z",
+	"commitType": "commit",
+	"commitSource": "cli",
+	"transcriptEntries": 0,
+	"conversationTurns": 0,
+	"llm": {
+		"model": "claude-sonnet-4-6",
+		"inputTokens": 5867,
+		"outputTokens": 598,
+		"cachedTokens": 0,
+		"apiLatencyMs": 15033,
+		"stopReason": null,
+		"source": "jolli-proxy"
+	},
+	"stats": {
+		"filesChanged": 2,
+		"insertions": 62,
+		"deletions": 1
+	},
+	"diffStats": {
+		"filesChanged": 2,
+		"insertions": 62,
+		"deletions": 1
+	},
+	"topics": [
+		{
+			"title": "New snake bot that coils tightly around its own body to stay compact",
+			"trigger": "The project needed a new bot personality with a distinct movement style — one that prioritizes staying compact and organized rather than aggressively chasing food or maximizing open space.",
+			"response": "- `src/bots/coiler-bot.ts` was created with a `scoreDirection` function that evaluates each candidate move using a weighted scoring system. In addition to standard safety checks (reachable area, tail reachability, path to food), it counts how many of the four neighboring cells around the next head position are occupied by the snake's own body, rewarding moves that keep the snake tightly coiled. The body-adjacency bonus is weighted at 3,000 points per adjacent body segment.\n- `src/bots/index.ts` was updated to import `coilerBot` and add it to the `AVAILABLE_BOTS` array, making it selectable alongside the existing survival, hunter, and explorer bots.",
+			"decisions": "- **Coiling via self-adjacency reward**: Rather than guiding the snake purely toward food or open space, the bot rewards moves where the head ends up next to its own body. This keeps the snake's footprint compact and methodical, producing a visually distinct coiling behavior. The trade-off is that the snake may take longer paths to food, but the high weight on tail reachability (80,000 points) prevents it from trapping itself.\n- **Scoring weight balance**: The body-adjacency bonus (3,000 per neighbor) was set high enough to meaningfully influence direction choices but well below the tail-reachability penalty (−100,000 for losing tail access), ensuring the coiling preference never overrides survival. Food proximity and path-to-food scores sit in between, so the bot still collects food efficiently while favoring compact movement.",
+			"filesAffected": [
+				"src/bots/coiler-bot.ts",
+				"src/bots/index.ts"
+			],
+			"category": "feature",
+			"importance": "major"
+		}
+	],
+	"backfilled": true,
+	"backfillMethod": "diff-only",
+	"treeHash": "8234988d2b33b1f76e999553638f3c6b1fab04ea",
+	"recap": "A new bot called Coiler was added to the snake game's roster of playable AI personalities. Unlike the existing bots, Coiler actively steers toward moves that keep its head adjacent to its own body, producing a tight, methodical coiling pattern as it moves around the board. It remains safe by strongly prioritizing the ability to reach its own tail at all times, so the coiling tendency never causes it to box itself in. Players can now select Coiler alongside the existing survival, hunter, and explorer bots."
+}
