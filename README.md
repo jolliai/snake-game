@@ -84,3 +84,10 @@ npm run preview
 - TypeScript
 - Vite
 - HTML5 Canvas
+
+## Project memory
+
+This repo's development history is documented with **Jolli Memory** — each commit
+is distilled into a structured summary you can browse as a knowledge wiki and an
+interactive graph. See the [Jolli Memory viewing guide](docs/jolli-memory/README-JOLLI-MEMORY.md)
+to set it up and explore it.
