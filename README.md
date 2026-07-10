@@ -2,6 +2,10 @@
 
 A classic snake game reimagined with an isometric, rotating 3D board — built with TypeScript and HTML5 Canvas, bundled with Vite.
 
+<p align="center">
+  <img src="docs/screenshot.png" alt="Isometric 3D snake game — a green snake winding across a rotating checkerboard board with a red apple, score and level readout above" width="720">
+</p>
+
 ## Features
 
 - **Isometric 3D board** - the grid renders as a rotating isometric scene with shaded blocks, depth ordering, and adjustable perspective (no WebGL — just canvas 2D)
