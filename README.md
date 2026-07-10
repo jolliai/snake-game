@@ -2,12 +2,17 @@
 
 A classic snake game reimagined with an isometric, rotating 3D board — built with TypeScript and HTML5 Canvas, bundled with Vite.
 
+<p align="center">
+  <img src="docs/screenshot.png" alt="Iron Snake Mode — a green snake on an irregular, non-rectangular isometric board with an interior hole and a red apple, level and to-goal readout above" width="720">
+</p>
+
 ## Features
 
 - **Isometric 3D board** - the grid renders as a rotating isometric scene with shaded blocks, depth ordering, and adjustable perspective (no WebGL — just canvas 2D)
 - **Overhead view** - toggle to a flat, top-down grid at any time with `O`
 - **Board rotation** - spin the board manually with `Q`/`E`, tweak perspective with `[`/`]`, or let it auto-rotate during bot playback
 - **Expanding grid** - the grid doubles in size when the snake fills 25% of the board, advancing the level and increasing speed
+- **Iron Snake Mode** - an opt-in mode (toggle it on the start menu) that swaps the square grid for irregular, randomly-carved board shapes with interior holes to navigate around; each level sets a cumulative score goal, and clearing it morphs the board into a fresh shape while your snake stays in place
 - **Adjustable starting grid** - use `+`/`-` keys to change grid resolution (5x5 to 50x50) before the game starts
 - **Three game modes** - single player, two-player (PvP), and bot-vs-bot
 - **11 autoplay bots** - each with a distinct strategy; pick one for solo bot demos or pit two against each other
@@ -18,10 +23,12 @@ A classic snake game reimagined with an isometric, rotating 3D board — built w
 
 ## Game modes
 
-- **New Game (single player)** - control one snake; toggle bot AI on/off mid-game with `B`
+- **New Game (single player)** - control one snake and chase the high score
 - **Two Player (PvP)** - Player 1 (green, WASD) vs Player 2 (blue, arrow keys); last snake alive wins
 - **Solo Bot** - watch a single bot of your choice play
 - **Bot vs Bot** - pick two bots and watch them compete
+
+Toggle **Iron Snake Mode** on the start menu to layer irregular, hole-filled boards and per-level score goals on top of your chosen mode.
 
 ## Bots
 
@@ -48,7 +55,6 @@ A classic snake game reimagined with an isometric, rotating 3D board — built w
 | R | Reset current run |
 | Enter | Start a new game (menu / game over) |
 | Esc | Return to the main menu |
-| B | Toggle bot autoplay (single player) |
 | O | Toggle overhead (top-down) view |
 | Q / E | Rotate the board clockwise / counter-clockwise |
 | T | Pause / resume auto-rotation (during bot playback) |
@@ -79,11 +85,22 @@ npm run build
 npm run preview
 ```
 
+## Testing
+
+End-to-end tests run with [Playwright](https://playwright.dev/):
+
+```bash
+npm test            # run the E2E suite headless
+npm run test:ui     # open the interactive Playwright runner
+npm run test:report # open the last HTML report
+```
+
 ## Tech Stack
 
 - TypeScript
 - Vite
 - HTML5 Canvas
+- Playwright (end-to-end tests)
 
 ## Project memory
 
