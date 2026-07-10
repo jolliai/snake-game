@@ -3,7 +3,7 @@
 A classic snake game reimagined with an isometric, rotating 3D board — built with TypeScript and HTML5 Canvas, bundled with Vite.
 
 <p align="center">
-  <img src="docs/screenshot.png" alt="Isometric 3D snake game — a green snake winding across a rotating checkerboard board with a red apple, score and level readout above" width="720">
+  <img src="docs/screenshot.png" alt="Iron Snake Mode — a green snake on an irregular, non-rectangular isometric board with an interior hole and a red apple, level and to-goal readout above" width="720">
 </p>
 
 ## Features
