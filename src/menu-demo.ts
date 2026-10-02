@@ -2,6 +2,7 @@ import { AVAILABLE_BOTS } from './bots'
 import type { BotHelpers, BotState, SnakeBot } from './bots/bot-types'
 import { applyLoopGuard, createLoopMemory, resetLoopMemory, type LoopMemory } from './bots/loop-guard'
 import { generateIronSnakeBoard } from './iron-snake'
+import { getPalette } from './palette'
 import {
   DIRECTIONS,
   DIRECTION_VECTORS,
@@ -21,10 +22,9 @@ const DEMO_IRON_CHANCE = 0.5 // odds a page load runs Iron Snake boards (vs. pla
 const DEMO_HEAD_HEIGHT_SCALE = 1.6 // head stands taller than the body, like the real game
 const DEMO_TAIL_HEIGHT_SCALE = 0.7 // tail is a bit shorter so it reads as tapering off
 
-// Snake/food colours mirror the real game's P1 palette: [top, right, left].
-const DEMO_HEAD_COLORS: [string, string, string] = ['#4ade80', '#22c55e', '#16a34a']
-const DEMO_BODY_COLORS: [string, string, string] = ['#22c55e', '#16a34a', '#15803d']
-const DEMO_FOOD_COLORS: [string, string, string] = ['#ef4444', '#dc2626', '#b91c1c']
+// Snake/food colours come from the shared palette, so the menu demo matches the
+// real game's P1 look automatically — including when Colour Blind Mode is
+// toggled on the menu this demo is the backdrop for.
 
 export class MenuDemo {
   private canvas: HTMLCanvasElement
@@ -390,13 +390,14 @@ export class MenuDemo {
       (a.x * this.basisXy + a.y * this.basisYy) - (b.x * this.basisXy + b.y * this.basisYy)
     )
 
+    const pal = getPalette()
     for (const obj of objects) this.drawBlockShadow(obj.x, obj.y)
     for (const obj of objects) {
       switch (obj.type) {
-        case 'head': this.drawSnakeHead(obj.x, obj.y, DEMO_HEAD_COLORS, this.direction); break
-        case 'body': this.drawBlock(obj.x, obj.y, DEMO_BODY_COLORS[0], DEMO_BODY_COLORS[1], DEMO_BODY_COLORS[2]); break
-        case 'tail': this.drawSnakeTail(obj.x, obj.y, DEMO_BODY_COLORS, this.tailDirection(this.snake)); break
-        case 'food': this.drawBlock(obj.x, obj.y, DEMO_FOOD_COLORS[0], DEMO_FOOD_COLORS[1], DEMO_FOOD_COLORS[2]); break
+        case 'head': this.drawSnakeHead(obj.x, obj.y, pal.p1Head, this.direction); break
+        case 'body': this.drawBlock(obj.x, obj.y, pal.p1Body[0], pal.p1Body[1], pal.p1Body[2]); break
+        case 'tail': this.drawSnakeTail(obj.x, obj.y, pal.p1Body, this.tailDirection(this.snake)); break
+        case 'food': this.drawBlock(obj.x, obj.y, pal.food[0], pal.food[1], pal.food[2]); break
       }
     }
   }
