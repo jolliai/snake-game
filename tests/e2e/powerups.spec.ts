@@ -98,13 +98,18 @@ test.describe('Power-ups', () => {
   })
 
   test('?powerup=off never spawns a power-up', async ({ page }) => {
+    // A bare "nothing appears" assertion passes on a build that has no power-ups
+    // at all, so first prove the feature exists: the forced spawn must work.
+    await startAndStep(page, 'double')
+    await expect(page.locator('#powerup-toast')).toBeVisible({ timeout: 5000 })
+
+    // Now the same flow with spawns disabled — neither the toast nor the HUD
+    // badge should ever appear.
     await page.goto('/?powerup=off')
     await expect(page.locator(SCREENS.menu)).toBeVisible()
     await page.locator('#new-game').click()
     await expect(page.locator(SCREENS.game)).toBeVisible()
 
-    // Drive several moves; with spawns disabled, neither the toast nor the HUD
-    // badge should ever appear.
     await page.keyboard.press('ArrowRight')
     await page.waitForTimeout(1200)
     await expect(page.locator('#powerup-toast')).toBeHidden()
