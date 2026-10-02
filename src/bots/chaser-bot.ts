@@ -1,5 +1,14 @@
 import type { Direction } from '../game-types'
 import type { BotHelpers, BotState, SnakeBot } from './bot-types'
+import { scorePowerUp, type PowerUpAppetite } from './power-up'
+
+// Chaser is a shortest-path aggressor, so a power-up is just another target to
+// race toward — the helper naturally favours whichever (food or power-up) the
+// move heads toward more cheaply. Leans on Double Points / Slow-Mo.
+const POWERUP_APPETITE: PowerUpAppetite = {
+  weight: 1.3,
+  typeBias: { double: 1.2, slow: 1.2 },
+}
 
 function scoreDirection(state: BotState, helpers: BotHelpers, direction: Direction): number {
   const simulatedSnake = helpers.simulateMove(state.snake, direction, state.food)
@@ -11,7 +20,7 @@ function scoreDirection(state: BotState, helpers: BotHelpers, direction: Directi
   const ateFood = nextHead.x === state.food.x && nextHead.y === state.food.y
   const tail = simulatedSnake[simulatedSnake.length - 1]
 
-  const analysis = helpers.analyzePosition(nextHead, simulatedSnake, { tail, food: state.food })
+  const analysis = helpers.analyzePosition(nextHead, simulatedSnake, { tail, food: state.food, powerUp: state.powerUp ?? undefined })
   const distanceToFood = Math.abs(nextHead.x - state.food.x) + Math.abs(nextHead.y - state.food.y)
   const distanceToTail = Math.abs(nextHead.x - tail.x) + Math.abs(nextHead.y - tail.y)
 
@@ -45,6 +54,9 @@ function scoreDirection(state: BotState, helpers: BotHelpers, direction: Directi
   if (direction === state.direction) {
     score += 3
   }
+
+  // Chase a reachable power-up as hard as food.
+  score += scorePowerUp(state, analysis, direction, POWERUP_APPETITE)
 
   return score
 }

@@ -1,5 +1,14 @@
 import type { Direction } from '../game-types'
 import type { BotHelpers, BotState, SnakeBot } from './bot-types'
+import { minDistToBody, scorePowerUp, type PowerUpAppetite } from './power-up'
+
+// Nomad craves fresh territory, so it detours for a power-up sitting out in the
+// open but declines one hugging its own trail (consistent with its bodyProximity
+// aversion).
+const POWERUP_APPETITE: PowerUpAppetite = {
+  weight: 0.9,
+  gate: ({ state, pu }) => minDistToBody(pu, state.snake) > 1,
+}
 
 function scoreDirection(state: BotState, helpers: BotHelpers, direction: Direction): number {
   const simulatedSnake = helpers.simulateMove(state.snake, direction, state.food)
@@ -11,7 +20,7 @@ function scoreDirection(state: BotState, helpers: BotHelpers, direction: Directi
   const ateFood = nextHead.x === state.food.x && nextHead.y === state.food.y
   const tail = simulatedSnake[simulatedSnake.length - 1]
 
-  const analysis = helpers.analyzePosition(nextHead, simulatedSnake, { tail, food: state.food })
+  const analysis = helpers.analyzePosition(nextHead, simulatedSnake, { tail, food: state.food, powerUp: state.powerUp ?? undefined })
   const distanceToFood = Math.abs(nextHead.x - state.food.x) + Math.abs(nextHead.y - state.food.y)
 
   if (!analysis.canReachTail) {
@@ -47,6 +56,8 @@ function scoreDirection(state: BotState, helpers: BotHelpers, direction: Directi
   if (direction === state.direction) {
     score += 8
   }
+
+  score += scorePowerUp(state, analysis, direction, POWERUP_APPETITE)
 
   return score
 }

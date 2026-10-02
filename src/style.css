@@ -224,6 +224,58 @@ button:active {
   50% { opacity: 0.7; box-shadow: 0 0 36px rgba(239, 68, 68, 0.95); }
 }
 
+/* Power-up HUD badge (single-player): shows the active timed effect and the
+   ticks remaining. Sits in the .game-info row; its accent colour is keyed off
+   the effect type via the data-type attribute so it matches the collectible. */
+.powerup-status {
+  padding: 0.1rem 0.7rem;
+  border-radius: 999px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  border: 2px solid var(--powerup-accent, #facc15);
+  color: var(--powerup-accent, #facc15);
+  background-color: rgba(0, 0, 0, 0.25);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--powerup-accent, #facc15) 55%, transparent);
+  animation: powerup-glow 1s ease-in-out infinite;
+}
+
+/* Pickup toast: a brief centred flash naming the power-up just collected.
+   Overlays the board like the death banner and auto-hides via JS. */
+.powerup-toast {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.6rem 1.3rem;
+  border-radius: 999px;
+  font-size: 1.35em;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  pointer-events: none;
+  border: 2px solid var(--powerup-accent, #facc15);
+  color: var(--powerup-accent, #facc15);
+  background-color: rgba(10, 12, 20, 0.92);
+  box-shadow: 0 0 24px color-mix(in srgb, var(--powerup-accent, #facc15) 65%, transparent);
+  animation: powerup-pop 0.4s cubic-bezier(0.2, 1.5, 0.4, 1);
+}
+
+/* Per-type accent colours, matched to the collectible's block palette. */
+.powerup-status[data-type="double"], .powerup-toast[data-type="double"] { --powerup-accent: #facc15; } /* gold */
+.powerup-status[data-type="slow"],   .powerup-toast[data-type="slow"]   { --powerup-accent: #22d3ee; } /* cyan */
+.powerup-status[data-type="shrink"], .powerup-toast[data-type="shrink"] { --powerup-accent: #a855f7; } /* violet */
+
+@keyframes powerup-glow {
+  0%, 100% { box-shadow: 0 0 10px color-mix(in srgb, var(--powerup-accent, #facc15) 45%, transparent); }
+  50% { box-shadow: 0 0 20px color-mix(in srgb, var(--powerup-accent, #facc15) 90%, transparent); }
+}
+
+@keyframes powerup-pop {
+  0% { transform: translateX(-50%) scale(0.7); opacity: 0; }
+  100% { transform: translateX(-50%) scale(1); opacity: 1; }
+}
+
 /* Rainbow Snake surprise (JOE-7): a Mortal Kombat "FRIENDSHIP!"-style reveal —
    a rainbow arc behind chunky arcade text that pops in, flashes, then fades.
    Overlays the board (like the death banner) and auto-dismisses via JS. */

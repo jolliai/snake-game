@@ -1,5 +1,15 @@
 import type { Direction } from '../game-types'
 import type { BotHelpers, BotState, SnakeBot } from './bot-types'
+import { scorePowerUp, type PowerUpAppetite } from './power-up'
+
+// Survival is cautious: it prizes the power-ups that aid survival — Shrink (more
+// open space) and Slow-Mo — and only diverts when the move still keeps its tail
+// reachable (its whole ethos). Double Points is a minor bonus at best.
+const POWERUP_APPETITE: PowerUpAppetite = {
+  weight: 0.7,
+  typeBias: { shrink: 1.8, slow: 1.6, double: 0.6 },
+  gate: ({ analysis }) => analysis.canReachTail,
+}
 
 function scoreDirection(state: BotState, helpers: BotHelpers, direction: Direction): number {
   const simulatedSnake = helpers.simulateMove(state.snake, direction, state.food)
@@ -11,7 +21,7 @@ function scoreDirection(state: BotState, helpers: BotHelpers, direction: Directi
   const ateFood = nextHead.x === state.food.x && nextHead.y === state.food.y
   const tail = simulatedSnake[simulatedSnake.length - 1]
 
-  const analysis = helpers.analyzePosition(nextHead, simulatedSnake, { tail, food: state.food })
+  const analysis = helpers.analyzePosition(nextHead, simulatedSnake, { tail, food: state.food, powerUp: state.powerUp ?? undefined })
   const distanceToFood = Math.abs(nextHead.x - state.food.x) + Math.abs(nextHead.y - state.food.y)
 
   let score = 0
@@ -23,6 +33,7 @@ function scoreDirection(state: BotState, helpers: BotHelpers, direction: Directi
   if (direction === state.direction) {
     score += 10
   }
+  score += scorePowerUp(state, analysis, direction, POWERUP_APPETITE)
   return score
 }
 

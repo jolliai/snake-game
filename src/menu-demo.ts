@@ -223,7 +223,7 @@ export class MenuDemo {
   private analyzePosition(
     start: Position,
     snake: Position[],
-    targets: { tail: Position; food: Position }
+    targets: { tail: Position; food: Position; powerUp?: Position }
   ) {
     const startKey = `${start.x},${start.y}`
     const tailKey = `${targets.tail.x},${targets.tail.y}`
@@ -265,7 +265,9 @@ export class MenuDemo {
       }
     }
 
-    return { reachableArea: visited.size, canReachTail, pathToFood }
+    // The menu demo never spawns power-ups; satisfy the shared AnalysisResult
+    // shape with a null path so the same bots run unchanged here.
+    return { reachableArea: visited.size, canReachTail, pathToFood, pathToPowerUp: null }
   }
 
   // Single source of truth for playable cells: inside the box AND (on an Iron

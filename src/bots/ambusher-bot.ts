@@ -1,5 +1,19 @@
 import type { Direction } from '../game-types'
 import type { BotHelpers, BotState, SnakeBot } from './bot-types'
+import { scorePowerUp, type PowerUpAppetite } from './power-up'
+
+// Ambusher lurks near center and minimizes movement, so it only "strikes" for a
+// power-up that's within its strike range or sits near its central lurk zone;
+// otherwise it stays put rather than commit to a long chase.
+const POWERUP_APPETITE: PowerUpAppetite = {
+  weight: 1,
+  gate: ({ state, pu, path }) => {
+    const strike = Math.max(3, Math.floor(state.gridSize * 0.3))
+    const center = (state.gridSize - 1) / 2
+    const puToCenter = Math.abs(pu.x - center) + Math.abs(pu.y - center)
+    return path <= strike || puToCenter <= strike
+  },
+}
 
 function scoreDirection(state: BotState, helpers: BotHelpers, direction: Direction): number {
   const simulatedSnake = helpers.simulateMove(state.snake, direction, state.food)
@@ -11,7 +25,7 @@ function scoreDirection(state: BotState, helpers: BotHelpers, direction: Directi
   const ateFood = nextHead.x === state.food.x && nextHead.y === state.food.y
   const tail = simulatedSnake[simulatedSnake.length - 1]
 
-  const analysis = helpers.analyzePosition(nextHead, simulatedSnake, { tail, food: state.food })
+  const analysis = helpers.analyzePosition(nextHead, simulatedSnake, { tail, food: state.food, powerUp: state.powerUp ?? undefined })
   const distanceToFood = Math.abs(nextHead.x - state.food.x) + Math.abs(nextHead.y - state.food.y)
 
   // Center of the grid is our ambush point
@@ -48,6 +62,8 @@ function scoreDirection(state: BotState, helpers: BotHelpers, direction: Directi
   if (direction === state.direction) {
     score += 10
   }
+
+  score += scorePowerUp(state, analysis, direction, POWERUP_APPETITE)
 
   return score
 }

@@ -1,4 +1,14 @@
-import type { Direction, Position } from '../game-types'
+import type { Direction, Position, PowerUpType } from '../game-types'
+
+// A power-up collectible visible to the bots, plus how many ticks it will remain
+// on the board before it despawns (used to discount pursuit of one that will
+// vanish before the snake can reach it).
+export type BotPowerUp = {
+  x: number
+  y: number
+  type: PowerUpType
+  ticksLeft: number
+}
 
 export type BotState = {
   snake: Position[]
@@ -6,12 +16,17 @@ export type BotState = {
   gridSize: number
   direction: Direction
   opponentSnake?: Position[]
+  // The on-board power-up, if any (single-player only). Absent/null means none.
+  powerUp?: BotPowerUp | null
 }
 
 export type AnalysisResult = {
   reachableArea: number
   canReachTail: boolean
   pathToFood: number | null
+  // BFS steps from `start` to the power-up, or null if none / unreachable. Only
+  // populated when a `powerUp` target is passed to analyzePosition.
+  pathToPowerUp: number | null
 }
 
 export type BotHelpers = {
@@ -19,7 +34,7 @@ export type BotHelpers = {
   analyzePosition: (
     start: Position,
     snake: Position[],
-    targets: { tail: Position; food: Position }
+    targets: { tail: Position; food: Position; powerUp?: Position }
   ) => AnalysisResult
   getCandidateDirections: (currentDirection: Direction) => Direction[]
 }

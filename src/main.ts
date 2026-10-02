@@ -2,7 +2,7 @@ import './style.css'
 import { AVAILABLE_BOTS, DEFAULT_BOT_ID, getBotById } from './bots'
 import type { BotHelpers, BotState, SnakeBot } from './bots/bot-types'
 import { applyLoopGuard, createLoopMemory, resetLoopMemory, type LoopMemory } from './bots/loop-guard'
-import { DIRECTIONS, DIRECTION_VECTORS, OPPOSITE_DIRECTIONS, type Direction, type Position } from './game-types'
+import { DIRECTIONS, DIRECTION_VECTORS, OPPOSITE_DIRECTIONS, type Direction, type Position, type PowerUpType } from './game-types'
 import {
   addEntry,
   getLeaderboard,
@@ -75,6 +75,43 @@ function parseRainbowOverride(): boolean | null {
   const p = new URLSearchParams(window.location.search).get('rainbow')
   if (p === '1' || p === 'true') return true
   if (p === '0' || p === 'false') return false
+  return null
+}
+
+// Power-ups (single-player + bot-vs-bot). A special collectible occasionally
+// spawns in addition to normal food; collecting it grants a temporary,
+// tick-paced effect surfaced in the HUD. Enabled in single-player and bot-vs-bot
+// (where effects are per-snake); human two-player is deliberately excluded to
+// avoid shared-food ambiguity. Slow-Mo slows the shared clock while any snake
+// holds it. PowerUpType is shared via game-types so the bot layer sees them too.
+// Timed effects (everything except the instant Shrink) run for this many ticks.
+type TimedEffect = 'double' | 'slow'
+
+const POWERUP_TYPES: PowerUpType[] = ['double', 'slow', 'shrink']
+const POWERUP_SPAWN_CHANCE = 0.2 // chance to spawn one after eating food
+const POWERUP_LIFETIME_TICKS = 26 // ticks a spawned power-up lingers before it despawns
+const POWERUP_BLINK_TICKS = 8 // remaining on-board life at which it starts blinking (expiry cue)
+const POWERUP_EFFECT_TICKS = 40 // duration of a timed effect (Double Points / Slow-Mo)
+const POWERUP_SLOW_FACTOR = 1.8 // tick-interval multiplier while Slow-Mo is active
+const POWERUP_SHRINK_AMOUNT = 4 // tail segments removed by a Shrink pickup (never below length 1)
+const POWERUP_DOUBLE_MULTIPLIER = 2 // points per food while Double Points is active
+const POWERUP_TOAST_MS = 1400 // pickup toast hold before it auto-hides
+
+// Per-type presentation: HUD/toast label + icon, and the three isometric block
+// faces (top / right / left) used to render the collectible.
+const POWERUP_META: Record<PowerUpType, { label: string; icon: string; faces: [string, string, string] }> = {
+  double: { label: 'Double Points', icon: '★', faces: ['#fde047', '#facc15', '#ca8a04'] }, // gold
+  slow: { label: 'Slow-Mo', icon: '⏱', faces: ['#67e8f9', '#22d3ee', '#0e7490'] }, // cyan
+  shrink: { label: 'Shrink', icon: '✂', faces: ['#d8b4fe', '#a855f7', '#7e22ce'] }, // violet
+}
+
+// ?powerup=double|slow|shrink forces that type to spawn (deterministic testing /
+// manual verification); ?powerup=off disables spawns; anything else leaves it to
+// the random roll.
+function parsePowerUpOverride(): PowerUpType | 'off' | null {
+  const p = new URLSearchParams(window.location.search).get('powerup')
+  if (p === 'off' || p === '0') return 'off'
+  if (p === 'double' || p === 'slow' || p === 'shrink') return p
   return null
 }
 
@@ -238,6 +275,25 @@ class SnakeGame {
   private rainbowSnake: boolean = false
   private rainbowOverride: boolean | null = parseRainbowOverride()
   private rainbowBannerTimer: number | null = null
+
+  // Power-ups (single-player). `powerUp` is the collectible currently on the
+  // board (null when none); `powerUpTicksLeft` counts down its on-board lifetime
+  // and drives the expiry blink. `activeEffect` is the running timed effect with
+  // `effectTicksLeft` ticks remaining (Shrink is instant, so it never sets these).
+  // `powerUpTick` advances every update() so the blink is tick-paced. The
+  // override (from ?powerup=…) forces spawns for deterministic testing.
+  private powerUp: { x: number; y: number; type: PowerUpType } | null = null
+  private powerUpTicksLeft: number = 0
+  private activeEffect: TimedEffect | null = null
+  private effectTicksLeft: number = 0
+  // P2's timed effect, used only in bot-vs-bot (the sole two-snake mode where
+  // power-ups spawn). Double Points and Shrink are per-snake; Slow-Mo slows the
+  // shared game clock whenever either snake holds it (see currentIntervalMs).
+  private activeEffect2: TimedEffect | null = null
+  private effectTicksLeft2: number = 0
+  private powerUpTick: number = 0
+  private powerUpOverride: PowerUpType | 'off' | null = parsePowerUpOverride()
+  private powerUpToastTimer: number | null = null
 
   constructor() {
     this.canvas = document.getElementById('canvas') as HTMLCanvasElement
@@ -742,10 +798,11 @@ class SnakeGame {
     this.drawGroundBorder()
 
     // Collect all objects to render
-    type DrawType = 'head' | 'body' | 'tail' | 'food' | 'head2' | 'body2' | 'tail2' | 'death'
+    type DrawType = 'head' | 'body' | 'tail' | 'food' | 'head2' | 'body2' | 'tail2' | 'death' | 'powerup'
     // seg/segLen carry the P1 segment's position along its body so the Rainbow
     // Snake surprise can colour each segment by a hue derived from its index.
-    const objects: { x: number; y: number; type: DrawType; seg?: number; segLen?: number }[] = []
+    // pu carries the collectible's type so the power-up case can pick its palette.
+    const objects: { x: number; y: number; type: DrawType; seg?: number; segLen?: number; pu?: PowerUpType }[] = []
 
     const segType = (index: number, len: number): DrawType =>
       index === 0 ? 'head' : index === len - 1 ? 'tail' : 'body'
@@ -762,6 +819,12 @@ class SnakeGame {
     }
 
     objects.push({ x: this.food.x, y: this.food.y, type: 'food' })
+
+    // The power-up collectible (single-player). Hidden during the death freeze so
+    // it doesn't compete with the fatal-cell highlight.
+    if (this.powerUp !== null && !this.awaitingDeathAck) {
+      objects.push({ x: this.powerUp.x, y: this.powerUp.y, type: 'powerup', pu: this.powerUp.type })
+    }
 
     // Death freeze: the fatal cell(s) are drawn in the amber "impact" palette,
     // added to the object list so they respect painter's depth order (a segment
@@ -843,6 +906,19 @@ class SnakeGame {
         case 'food':
           this.drawBlock(obj.x, obj.y, foodColors[0], foodColors[1], foodColors[2])
           break
+        case 'powerup': {
+          const f = POWERUP_META[obj.pu!].faces
+          // Tick-paced expiry blink: dim toward the board colour on alternate
+          // ticks once its lifetime is nearly up, so a fading power-up reads as
+          // "about to vanish" rather than disappearing without warning.
+          const blinking = this.powerUpTicksLeft <= POWERUP_BLINK_TICKS && this.powerUpTick % 2 === 0
+          if (blinking) {
+            this.drawBlock(obj.x, obj.y, this.lerpHex(f[0], '#0f172a', 0.55), this.lerpHex(f[1], '#0f172a', 0.55), this.lerpHex(f[2], '#0f172a', 0.55))
+          } else {
+            this.drawBlock(obj.x, obj.y, f[0], f[1], f[2])
+          }
+          break
+        }
         case 'death':
           this.drawBlock(obj.x, obj.y, '#facc15', '#eab308', '#a16207')
           break
@@ -1174,7 +1250,7 @@ class SnakeGame {
           if (!this.gameStarted) {
             this.gameStarted = true
             this.gameStartTime = performance.now()
-            this.gameLoop = window.setInterval(() => this.update(), this.gameSpeed)
+            this.gameLoop = window.setInterval(() => this.update(), this.currentIntervalMs())
           }
         }
       }
@@ -1264,7 +1340,23 @@ class SnakeGame {
     if (this.gameLoop !== null) return
     this.gameStarted = true
     if (this.gameStartTime === 0) this.gameStartTime = performance.now()
-    this.gameLoop = window.setInterval(() => this.update(), this.gameSpeed)
+    this.gameLoop = window.setInterval(() => this.update(), this.currentIntervalMs())
+  }
+
+  // Effective tick interval: the level-derived gameSpeed, stretched while the
+  // Slow-Mo power-up is active. Every gameplay loop is (re)armed through this so
+  // Slow-Mo survives level/grid changes that recreate the interval.
+  private currentIntervalMs(): number {
+    const slowed = this.activeEffect === 'slow' || this.activeEffect2 === 'slow'
+    return slowed ? Math.round(this.gameSpeed * POWERUP_SLOW_FACTOR) : this.gameSpeed
+  }
+
+  // Re-arm the running loop at the current effective interval (used when Slow-Mo
+  // toggles on or off mid-game). No-op if the loop isn't running.
+  private restartGameLoop() {
+    if (this.gameLoop === null) return
+    clearInterval(this.gameLoop)
+    this.gameLoop = window.setInterval(() => this.update(), this.currentIntervalMs())
   }
 
   startNewGame(mode?: GameMode) {
@@ -1352,7 +1444,11 @@ class SnakeGame {
     this.pendingFinalize = null
     resetLoopMemory(this.botLoopMemory)
     resetLoopMemory(this.botLoopMemory2)
+    this.resetPowerUps()
     this.spawnFood()
+    // Under a ?powerup=<type> override, seat the collectible right in front of
+    // the head so the first move collects it (deterministic manual/e2e testing).
+    this.spawnForcedPowerUpAhead()
     this.updateUI()
     this.showScreen('game')
     document.getElementById('pause')!.classList.add('hidden')
@@ -1392,6 +1488,8 @@ class SnakeGame {
   }
 
   private updateSinglePlayer() {
+    this.tickPowerUps()
+
     if (this.botEnabled) {
       const botDirection = this.chooseBotDirection()
       if (botDirection) {
@@ -1427,15 +1525,25 @@ class SnakeGame {
     this.snakeSet.add(`${head.x},${head.y}`)
 
     if (head.x === this.food.x && head.y === this.food.y) {
-      this.score++
+      this.score += this.activeEffect === 'double' ? POWERUP_DOUBLE_MULTIPLIER : 1
       this.movesSinceFood1 = 0
       resetLoopMemory(this.botLoopMemory)
       this.spawnFood()
+      this.maybeSpawnPowerUp()
       this.checkGridExpansion()
     } else {
       this.movesSinceFood1++
       const tail = this.snake.pop()!
       this.snakeSet.delete(`${tail.x},${tail.y}`)
+    }
+
+    // Collect a power-up the head landed on. Independent of growth (only food
+    // grows the snake), so no tail bookkeeping here. Shrink may pop the tail
+    // it just added; that's fine — the head stays put.
+    if (this.isPowerUpCell(head.x, head.y)) {
+      const type = this.powerUp!.type
+      this.powerUp = null
+      this.applyPowerUp(type)
     }
 
     if (this.snake.length > this.maxLength1) this.maxLength1 = this.snake.length
@@ -1455,6 +1563,8 @@ class SnakeGame {
   }
 
   private updateTwoPlayer() {
+    this.tickPowerUps()
+
     // Get bot directions for BvB mode
     if (this.gameMode === 'bvb') {
       const dir1 = this.chooseBotDirectionForPlayer(1)
@@ -1529,14 +1639,15 @@ class SnakeGame {
     const p1AteFood = head1.x === this.food.x && head1.y === this.food.y
     const p2AteFood = head2.x === this.food.x && head2.y === this.food.y
 
-    if (p1AteFood) this.score++
-    if (p2AteFood) this.score2++
+    if (p1AteFood) this.score += this.activeEffect === 'double' ? POWERUP_DOUBLE_MULTIPLIER : 1
+    if (p2AteFood) this.score2 += this.activeEffect2 === 'double' ? POWERUP_DOUBLE_MULTIPLIER : 1
     this.movesSinceFood1 = p1AteFood ? 0 : this.movesSinceFood1 + 1
     this.movesSinceFood2 = p2AteFood ? 0 : this.movesSinceFood2 + 1
     if (p1AteFood || p2AteFood) {
       resetLoopMemory(this.botLoopMemory)
       resetLoopMemory(this.botLoopMemory2)
       this.spawnFood()
+      this.maybeSpawnPowerUp()
       this.checkGridExpansion()
     }
 
@@ -1548,6 +1659,18 @@ class SnakeGame {
     if (!p2AteFood) {
       const tail = this.snake2.pop()!
       this.snakeSet2.delete(`${tail.x},${tail.y}`)
+    }
+
+    // Collect a power-up whichever head landed on it (heads can't share a cell
+    // here — that's a head-on death, handled above). Effects are per-snake.
+    if (this.isPowerUpCell(head1.x, head1.y)) {
+      const type = this.powerUp!.type
+      this.powerUp = null
+      this.applyPowerUp(type, 1)
+    } else if (this.isPowerUpCell(head2.x, head2.y)) {
+      const type = this.powerUp!.type
+      this.powerUp = null
+      this.applyPowerUp(type, 2)
     }
 
     if (this.snake.length > this.maxLength1) this.maxLength1 = this.snake.length
@@ -1575,12 +1698,22 @@ class SnakeGame {
 
   // === Bot AI ===
 
+  // The power-up as the bots see it: position, type, and remaining on-board
+  // ticks (so a bot can decline a pickup that will despawn before it arrives).
+  // null when there's none — always so in human two-player, but bot-vs-bot spawns
+  // them, and both bots see (and compete for) the same one.
+  private botPowerUp(): { x: number; y: number; type: PowerUpType; ticksLeft: number } | null {
+    if (this.powerUp === null) return null
+    return { x: this.powerUp.x, y: this.powerUp.y, type: this.powerUp.type, ticksLeft: this.powerUpTicksLeft }
+  }
+
   private chooseBotDirection(): Direction | null {
     const botState: BotState = {
       snake: this.snake,
       food: this.food,
       gridSize: this.gridSize,
-      direction: this.direction
+      direction: this.direction,
+      powerUp: this.botPowerUp()
     }
 
     const botHelpers: BotHelpers = {
@@ -1610,7 +1743,8 @@ class SnakeGame {
       food: this.food,
       gridSize: this.gridSize,
       direction: currentDirection,
-      opponentSnake
+      opponentSnake,
+      powerUp: this.botPowerUp()
     }
 
     // Create helpers that include opponent snake as blocked
@@ -1779,12 +1913,13 @@ class SnakeGame {
   private analyzePosition(
     start: Position,
     snake: Position[],
-    targets: { tail: Position; food: Position },
+    targets: { tail: Position; food: Position; powerUp?: Position },
     additionalBlocked?: Set<string>
-  ): { reachableArea: number; canReachTail: boolean; pathToFood: number | null } {
+  ): { reachableArea: number; canReachTail: boolean; pathToFood: number | null; pathToPowerUp: number | null } {
     const startKey = this.positionToKey(start)
     const tailKey = this.positionToKey(targets.tail)
     const foodKey = this.positionToKey(targets.food)
+    const powerUpKey = targets.powerUp ? this.positionToKey(targets.powerUp) : null
 
     // Blocked set matches original countReachableArea: snake minus start.
     // Tail IS blocked (like the original). We detect tail reachability by
@@ -1806,12 +1941,14 @@ class SnakeGame {
     let head = 0
     let canReachTail = false
     let pathToFood: number | null = null
+    let pathToPowerUp: number | null = null
 
     while (head < queue.length) {
       const current = queue[head++]
       const currentKey = this.positionToKey(current.position)
 
       if (currentKey === foodKey) pathToFood = current.distance
+      if (powerUpKey !== null && currentKey === powerUpKey) pathToPowerUp = current.distance
 
       // Check if current cell is adjacent to tail (tail is blocked, so check neighbors)
       if (!canReachTail) {
@@ -1835,7 +1972,7 @@ class SnakeGame {
       }
     }
 
-    return { reachableArea: visited.size, canReachTail, pathToFood }
+    return { reachableArea: visited.size, canReachTail, pathToFood, pathToPowerUp }
   }
 
   private checkCollision(head: Position): boolean {
@@ -1909,7 +2046,7 @@ class SnakeGame {
     this.updateCanvasSize()
 
     if (this.gameLoop) clearInterval(this.gameLoop)
-    this.gameLoop = window.setInterval(() => this.update(), this.gameSpeed)
+    this.gameLoop = window.setInterval(() => this.update(), this.currentIntervalMs())
 
     this.spawnFood()
   }
@@ -2183,7 +2320,7 @@ class SnakeGame {
     this.draw()
 
     if (this.gameLoop) clearInterval(this.gameLoop)
-    this.gameLoop = window.setInterval(() => this.update(), this.gameSpeed)
+    this.gameLoop = window.setInterval(() => this.update(), this.currentIntervalMs())
   }
 
   // Abandon an in-flight morph without restoring the old board (used when the game
@@ -2217,7 +2354,7 @@ class SnakeGame {
         for (let x = 0; x < this.gridSize; x++) {
           if (!this.onBoard(x, y)) continue
           const key = `${x},${y}`
-          if (!this.snakeSet.has(key) && (!this.isTwoSnakeMode() || !this.snakeSet2.has(key))) {
+          if (!this.snakeSet.has(key) && (!this.isTwoSnakeMode() || !this.snakeSet2.has(key)) && !this.isPowerUpCell(x, y)) {
             emptyCells.push({ x, y })
           }
         }
@@ -2237,9 +2374,179 @@ class SnakeGame {
       }
     } while (
       this.snakeSet.has(`${newFood.x},${newFood.y}`) ||
-      (this.isTwoSnakeMode() && this.snakeSet2.has(`${newFood.x},${newFood.y}`))
+      (this.isTwoSnakeMode() && this.snakeSet2.has(`${newFood.x},${newFood.y}`)) ||
+      this.isPowerUpCell(newFood.x, newFood.y)
     )
     this.food = newFood
+  }
+
+  // === Power-ups (single-player + bot-vs-bot) ===
+
+  private isPowerUpCell(x: number, y: number): boolean {
+    return this.powerUp !== null && this.powerUp.x === x && this.powerUp.y === y
+  }
+
+  // True where power-ups are in play: single-player and bot-vs-bot. Human
+  // two-player (pvp) is deliberately excluded.
+  private powerUpsEnabled(): boolean {
+    return this.gameMode === 'single' || this.gameMode === 'bvb'
+  }
+
+  // Advance the per-tick power-up clocks and resolve expiries. Called once per
+  // update() before movement so timers stay in lockstep with gameplay ticks.
+  private tickPowerUps() {
+    this.powerUpTick++
+
+    // Timed effect countdown per snake (Double Points / Slow-Mo). If a Slow-Mo
+    // expires, re-arm the shared loop back toward normal speed.
+    const ended1 = this.tickEffect(1)
+    const ended2 = this.isTwoSnakeMode() ? this.tickEffect(2) : null
+    if (ended1 === 'slow' || ended2 === 'slow') this.restartGameLoop()
+
+    // On-board collectible lifetime: despawn once it runs out (uncollected).
+    if (this.powerUp !== null) {
+      this.powerUpTicksLeft--
+      if (this.powerUpTicksLeft <= 0) this.powerUp = null
+    }
+  }
+
+  // Decrement one snake's timed effect; returns the effect that just ended (so
+  // the caller can react, e.g. restore speed after Slow-Mo), else null.
+  private tickEffect(who: 1 | 2): TimedEffect | null {
+    const eff = who === 1 ? this.activeEffect : this.activeEffect2
+    if (eff === null) return null
+    if (who === 1) {
+      if (--this.effectTicksLeft <= 0) { this.activeEffect = null; this.effectTicksLeft = 0; return eff }
+    } else {
+      if (--this.effectTicksLeft2 <= 0) { this.activeEffect2 = null; this.effectTicksLeft2 = 0; return eff }
+    }
+    return null
+  }
+
+  // Roll for a new collectible after food is eaten. At most one on the board, and
+  // not while any snake already has a timed effect running (a clean beat between
+  // effects). Bot-vs-bot spawns them too; human two-player does not.
+  private maybeSpawnPowerUp() {
+    if (!this.powerUpsEnabled() || this.powerUpOverride === 'off') return
+    if (this.powerUp !== null || this.activeEffect !== null || this.activeEffect2 !== null) return
+
+    if (this.powerUpOverride !== null) {
+      this.spawnPowerUp(this.powerUpOverride)
+      return
+    }
+    if (Math.random() < POWERUP_SPAWN_CHANCE) {
+      this.spawnPowerUp(POWERUP_TYPES[Math.floor(Math.random() * POWERUP_TYPES.length)])
+    }
+  }
+
+  // Place a collectible of `type` on a random empty cell (excluding the snake(s)
+  // and the food). No-op if the board is full.
+  private spawnPowerUp(type: PowerUpType) {
+    const emptyCells: Position[] = []
+    for (let y = 0; y < this.gridSize; y++) {
+      for (let x = 0; x < this.gridSize; x++) {
+        if (!this.onBoard(x, y)) continue
+        const key = `${x},${y}`
+        if (this.snakeSet.has(key)) continue
+        if (this.isTwoSnakeMode() && this.snakeSet2.has(key)) continue
+        if (this.food.x === x && this.food.y === y) continue
+        emptyCells.push({ x, y })
+      }
+    }
+    if (emptyCells.length === 0) return
+    const cell = emptyCells[Math.floor(Math.random() * emptyCells.length)]
+    this.powerUp = { x: cell.x, y: cell.y, type }
+    this.powerUpTicksLeft = POWERUP_LIFETIME_TICKS
+  }
+
+  // Under a ?powerup=<type> override, seat the collectible one cell ahead of the
+  // (P1) head so the first move collects it — deterministic for tests/verification.
+  // Falls back to a random empty cell if that cell isn't usable.
+  private spawnForcedPowerUpAhead() {
+    if (this.powerUpOverride === null || this.powerUpOverride === 'off') return
+    if (!this.powerUpsEnabled()) return
+    const head = this.snake[0]
+    const vec = DIRECTION_VECTORS[this.direction]
+    const ahead = { x: head.x + vec.x, y: head.y + vec.y }
+    // If the cell ahead isn't usable (off-board or on the snake) fall back to a
+    // random empty cell — determinism isn't guaranteed there, but the classic
+    // center start always has open room ahead.
+    if (!this.onBoard(ahead.x, ahead.y) || this.snakeSet.has(`${ahead.x},${ahead.y}`)) {
+      this.spawnPowerUp(this.powerUpOverride)
+      return
+    }
+    this.powerUp = { x: ahead.x, y: ahead.y, type: this.powerUpOverride }
+    this.powerUpTicksLeft = POWERUP_LIFETIME_TICKS
+    // Keep the collectible directly ahead: if the food happens to occupy that
+    // cell, move the food (spawnFood now excludes the power-up cell).
+    if (this.food.x === ahead.x && this.food.y === ahead.y) this.spawnFood()
+  }
+
+  // Apply a collected power-up to snake `who` (1 or 2; 2 only in bot-vs-bot): arm
+  // a per-snake timed effect (Double Points / Slow-Mo) or resolve the instant
+  // Shrink, and flash the pickup toast. Slow-Mo re-arms the shared loop, which
+  // slows the whole board while any snake holds it (see currentIntervalMs).
+  private applyPowerUp(type: PowerUpType, who: 1 | 2 = 1) {
+    switch (type) {
+      case 'double':
+        if (who === 1) { this.activeEffect = 'double'; this.effectTicksLeft = POWERUP_EFFECT_TICKS }
+        else { this.activeEffect2 = 'double'; this.effectTicksLeft2 = POWERUP_EFFECT_TICKS }
+        break
+      case 'slow':
+        if (who === 1) { this.activeEffect = 'slow'; this.effectTicksLeft = POWERUP_EFFECT_TICKS }
+        else { this.activeEffect2 = 'slow'; this.effectTicksLeft2 = POWERUP_EFFECT_TICKS }
+        this.restartGameLoop()
+        break
+      case 'shrink': {
+        // Trim up to POWERUP_SHRINK_AMOUNT tail segments off that snake, never
+        // below length 1.
+        const snake = who === 1 ? this.snake : this.snake2
+        const set = who === 1 ? this.snakeSet : this.snakeSet2
+        const removable = Math.min(POWERUP_SHRINK_AMOUNT, snake.length - 1)
+        for (let i = 0; i < removable; i++) {
+          const tail = snake.pop()!
+          set.delete(`${tail.x},${tail.y}`)
+        }
+        break
+      }
+    }
+    this.showPowerUpToast(type, who)
+  }
+
+  private showPowerUpToast(type: PowerUpType, who: 1 | 2 = 1) {
+    const el = document.getElementById('powerup-toast')
+    if (!el) return
+    const meta = POWERUP_META[type]
+    const prefix = this.isTwoSnakeMode() ? `P${who} ` : ''
+    el.textContent = `${prefix}${meta.icon} ${meta.label}!`
+    el.dataset.type = type
+    el.classList.remove('hidden')
+    if (this.powerUpToastTimer !== null) clearTimeout(this.powerUpToastTimer)
+    this.powerUpToastTimer = window.setTimeout(() => {
+      el.classList.add('hidden')
+      this.powerUpToastTimer = null
+    }, POWERUP_TOAST_MS)
+  }
+
+  private hidePowerUpToast() {
+    if (this.powerUpToastTimer !== null) {
+      clearTimeout(this.powerUpToastTimer)
+      this.powerUpToastTimer = null
+    }
+    const el = document.getElementById('powerup-toast')
+    if (el) el.classList.add('hidden')
+  }
+
+  // Reset all power-up state for a fresh run.
+  private resetPowerUps() {
+    this.powerUp = null
+    this.powerUpTicksLeft = 0
+    this.activeEffect = null
+    this.effectTicksLeft = 0
+    this.activeEffect2 = null
+    this.effectTicksLeft2 = 0
+    this.powerUpTick = 0
+    this.hidePowerUpToast()
   }
 
   // === UI ===
@@ -2266,6 +2573,39 @@ class SnakeGame {
     }
 
     this.updateStarvationWarning()
+    this.updatePowerUpUI()
+  }
+
+  // HUD badge for the active timed power-up(s): icon, label, and ticks remaining
+  // (counting down each move). In bot-vs-bot both snakes' effects show, each
+  // prefixed P1/P2. Hidden when nothing's running; the instant Shrink has no HUD
+  // presence beyond its pickup toast.
+  private updatePowerUpUI() {
+    const el = document.getElementById('powerup-status')
+    if (!el) return
+
+    const twoSnake = this.isTwoSnakeMode()
+    const parts: string[] = []
+    let soleType: TimedEffect | null = null
+    const consider = (who: 1 | 2, eff: TimedEffect | null, ticks: number) => {
+      if (eff === null || ticks <= 0) return
+      const meta = POWERUP_META[eff]
+      parts.push(`${twoSnake ? `P${who} ` : ''}${meta.icon} ${meta.label} ${ticks}`)
+      soleType = eff
+    }
+    consider(1, this.activeEffect, this.effectTicksLeft)
+    if (twoSnake) consider(2, this.activeEffect2, this.effectTicksLeft2)
+
+    if (parts.length === 0) {
+      el.classList.add('hidden')
+      return
+    }
+    el.textContent = parts.join(' · ')
+    // A single active effect keeps its type accent; with two, drop it so the
+    // badge doesn't mislead on colour (falls back to the default accent).
+    if (parts.length === 1 && soleType !== null) el.dataset.type = soleType
+    else delete el.dataset.type
+    el.classList.remove('hidden')
   }
 
   // Show a pulsing alert the moment a snake enters the hunger (tinted) zone, so

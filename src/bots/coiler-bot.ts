@@ -1,5 +1,15 @@
 import type { Direction } from '../game-types'
 import type { BotHelpers, BotState, SnakeBot } from './bot-types'
+import { scorePowerUp, type PowerUpAppetite } from './power-up'
+
+// Coiling packs the body tight, which is exactly what makes a growing snake
+// self-trap — so Shrink is gold to the Coiler (and the helper scales it further
+// with length). Double Points / Slow-Mo don't help its compactness, so they're
+// heavily discounted.
+const POWERUP_APPETITE: PowerUpAppetite = {
+  weight: 0.8,
+  typeBias: { shrink: 2.2, double: 0.3, slow: 0.3 },
+}
 
 function scoreDirection(state: BotState, helpers: BotHelpers, direction: Direction): number {
   const simulatedSnake = helpers.simulateMove(state.snake, direction, state.food)
@@ -11,7 +21,7 @@ function scoreDirection(state: BotState, helpers: BotHelpers, direction: Directi
   const ateFood = nextHead.x === state.food.x && nextHead.y === state.food.y
   const tail = simulatedSnake[simulatedSnake.length - 1]
 
-  const analysis = helpers.analyzePosition(nextHead, simulatedSnake, { tail, food: state.food })
+  const analysis = helpers.analyzePosition(nextHead, simulatedSnake, { tail, food: state.food, powerUp: state.powerUp ?? undefined })
   const distanceToFood = Math.abs(nextHead.x - state.food.x) + Math.abs(nextHead.y - state.food.y)
 
   // Count how many of the 4 neighbors are occupied by the snake's own body.
@@ -35,6 +45,7 @@ function scoreDirection(state: BotState, helpers: BotHelpers, direction: Directi
   score += analysis.pathToFood !== null ? 4000 - analysis.pathToFood * 15 : -3000
   score -= distanceToFood * 8
   score += bodyAdjacency * 3000
+  score += scorePowerUp(state, analysis, direction, POWERUP_APPETITE)
   return score
 }
 

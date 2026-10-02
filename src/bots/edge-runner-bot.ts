@@ -1,5 +1,17 @@
 import type { Direction } from '../game-types'
 import type { BotHelpers, BotState, SnakeBot } from './bot-types'
+import { scorePowerUp, type PowerUpAppetite } from './power-up'
+
+// Edge Runner patrols the perimeter, so it grabs a power-up eagerly when it sits
+// near a wall (on its route) and stays disciplined when one spawns deep in the
+// interior — the same logic it applies to food via `foodNearWall`.
+const POWERUP_APPETITE: PowerUpAppetite = {
+  weight: 1,
+  gate: ({ state, pu }) => {
+    const edge = Math.min(pu.x, pu.y, state.gridSize - 1 - pu.x, state.gridSize - 1 - pu.y)
+    return edge <= Math.floor(state.gridSize * 0.2)
+  },
+}
 
 function scoreDirection(state: BotState, helpers: BotHelpers, direction: Direction): number {
   const simulatedSnake = helpers.simulateMove(state.snake, direction, state.food)
@@ -11,7 +23,7 @@ function scoreDirection(state: BotState, helpers: BotHelpers, direction: Directi
   const ateFood = nextHead.x === state.food.x && nextHead.y === state.food.y
   const tail = simulatedSnake[simulatedSnake.length - 1]
 
-  const analysis = helpers.analyzePosition(nextHead, simulatedSnake, { tail, food: state.food })
+  const analysis = helpers.analyzePosition(nextHead, simulatedSnake, { tail, food: state.food, powerUp: state.powerUp ?? undefined })
   const distanceToFood = Math.abs(nextHead.x - state.food.x) + Math.abs(nextHead.y - state.food.y)
 
   // Reward proximity to walls — minimum distance to any edge.
@@ -46,6 +58,7 @@ function scoreDirection(state: BotState, helpers: BotHelpers, direction: Directi
       score += 500
     }
   }
+  score += scorePowerUp(state, analysis, direction, POWERUP_APPETITE)
   return score
 }
 

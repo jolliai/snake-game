@@ -1,6 +1,10 @@
 export type Position = { x: number; y: number }
 export type Direction = 'UP' | 'DOWN' | 'LEFT' | 'RIGHT'
 
+// Power-up kinds (single-player). Defined here so both the game and the bot
+// layer can refer to them without a circular import through main.ts.
+export type PowerUpType = 'double' | 'slow' | 'shrink'
+
 export const DIRECTIONS: Direction[] = ['UP', 'DOWN', 'LEFT', 'RIGHT']
 
 export const DIRECTION_VECTORS: Record<Direction, Position> = {

@@ -87,17 +87,19 @@
           <div id="grid-display">Grid: <span id="grid-size">10x10</span></div>
           <div id="iron-snake-goal-display" class="hidden">To goal: <span id="iron-snake-goal">0</span></div>
           <div id="bot-status-display">Bot: <span id="bot-status">OFF</span></div>
+          <div id="powerup-status" class="powerup-status hidden" role="status"></div>
         </div>
         <div class="canvas-wrap">
           <canvas id="canvas"></canvas>
           <div id="starvation-warning" class="starvation-warning hidden" role="alert"></div>
           <div id="death-banner" class="death-banner hidden" role="alert"></div>
+          <div id="powerup-toast" class="powerup-toast hidden" role="status"></div>
           <div id="rainbow-banner" class="rainbow-banner hidden" role="status">
             <div class="rainbow-arc" aria-hidden="true"></div>
             <div class="rainbow-text">Rainbow Snake</div>
           </div>
         </div>
-        <div class="controls" id="controls-text">Use Arrow Keys or WASD to move | Press P to Pause | Press R to Reset | +/- to change grid size | Press any direction to start</div>
+        <div class="controls" id="controls-text">Use Arrow Keys or WASD to move | Press P to Pause | Press R to Reset | +/- to change grid size | Grab power-ups: ★ Double Points · ⏱ Slow-Mo · ✂ Shrink</div>
       </div>
       <div id="game-over" class="screen hidden">
         <h1 id="game-over-title">Game Over!</h1>

@@ -1,5 +1,6 @@
 import type { Direction } from '../game-types'
 import type { BotHelpers, BotState, SnakeBot } from './bot-types'
+import { scorePowerUp, type PowerUpAppetite } from './power-up'
 
 /**
  * Determines the ideal sweep direction for a given row.
@@ -7,6 +8,15 @@ import type { BotHelpers, BotState, SnakeBot } from './bot-types'
  */
 function sweepDirection(row: number): Direction {
   return row % 2 === 0 ? 'RIGHT' : 'LEFT'
+}
+
+// Sweeper's lawnmower already covers every cell, so it'll pass over power-ups on
+// its own — it just gets a light nudge onto one on the current or adjacent row,
+// never breaking coverage to chase a distant one. Values Shrink most.
+const POWERUP_APPETITE: PowerUpAppetite = {
+  weight: 0.6,
+  typeBias: { shrink: 1.5 },
+  gate: ({ state, pu }) => Math.abs(pu.y - state.snake[0].y) <= 1,
 }
 
 function scoreDirection(state: BotState, helpers: BotHelpers, direction: Direction): number {
@@ -19,7 +29,7 @@ function scoreDirection(state: BotState, helpers: BotHelpers, direction: Directi
   const ateFood = nextHead.x === state.food.x && nextHead.y === state.food.y
   const tail = simulatedSnake[simulatedSnake.length - 1]
 
-  const analysis = helpers.analyzePosition(nextHead, simulatedSnake, { tail, food: state.food })
+  const analysis = helpers.analyzePosition(nextHead, simulatedSnake, { tail, food: state.food, powerUp: state.powerUp ?? undefined })
 
   // Safety first — must be able to reach tail
   if (!analysis.canReachTail) {
@@ -58,6 +68,8 @@ function scoreDirection(state: BotState, helpers: BotHelpers, direction: Directi
   if (direction === 'UP') {
     score -= 150
   }
+
+  score += scorePowerUp(state, analysis, direction, POWERUP_APPETITE)
 
   return score
 }

@@ -35,5 +35,15 @@ test.describe('Single-player gameplay', () => {
     await expect(page.locator(SCREENS.game)).toBeVisible()
     await expect(page.locator('#score')).toHaveText('0')
     await expect(page.locator('#level')).toHaveText('1')
+
+    // The readouts above are 0/1 on a fresh game too, so on their own they pass
+    // whether or not the key did anything. The discriminating assertion is that
+    // the loop actually stopped: the snake spawned mid-board facing RIGHT and was
+    // already moving, so without a working reset it reaches the wall and dies
+    // within about a second. A real reset leaves it unstarted and it never moves.
+    await page.waitForTimeout(3000)
+    await expect(page.locator('#death-banner')).toBeHidden()
+    await expect(page.locator(SCREENS.gameOver)).toBeHidden()
+    await expect(page.locator('#score')).toHaveText('0')
   })
 })

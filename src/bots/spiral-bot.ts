@@ -1,5 +1,6 @@
 import type { Direction } from '../game-types'
 import type { BotHelpers, BotState, SnakeBot } from './bot-types'
+import { scorePowerUp, type PowerUpAppetite } from './power-up'
 
 // Clockwise turn order: UP -> RIGHT -> DOWN -> LEFT -> UP
 const CLOCKWISE: Record<Direction, Direction> = {
@@ -7,6 +8,15 @@ const CLOCKWISE: Record<Direction, Direction> = {
   RIGHT: 'DOWN',
   DOWN: 'LEFT',
   LEFT: 'UP'
+}
+
+// Spiral won't break its arc for a power-up: it only grabs one when landing on
+// it, or when the clockwise/straight move it would make anyway also heads toward
+// it. Low weight keeps the sweep intact.
+const POWERUP_APPETITE: PowerUpAppetite = {
+  weight: 0.5,
+  gate: ({ state, direction, path }) =>
+    path === 0 || direction === state.direction || direction === CLOCKWISE[state.direction],
 }
 
 function scoreDirection(state: BotState, helpers: BotHelpers, direction: Direction): number {
@@ -19,7 +29,7 @@ function scoreDirection(state: BotState, helpers: BotHelpers, direction: Directi
   const ateFood = nextHead.x === state.food.x && nextHead.y === state.food.y
   const tail = simulatedSnake[simulatedSnake.length - 1]
 
-  const analysis = helpers.analyzePosition(nextHead, simulatedSnake, { tail, food: state.food })
+  const analysis = helpers.analyzePosition(nextHead, simulatedSnake, { tail, food: state.food, powerUp: state.powerUp ?? undefined })
   const distanceToFood = Math.abs(nextHead.x - state.food.x) + Math.abs(nextHead.y - state.food.y)
 
   if (!analysis.canReachTail) {
@@ -57,6 +67,8 @@ function scoreDirection(state: BotState, helpers: BotHelpers, direction: Directi
 
   // Keep enough space
   score += analysis.reachableArea * 8
+
+  score += scorePowerUp(state, analysis, direction, POWERUP_APPETITE)
 
   return score
 }

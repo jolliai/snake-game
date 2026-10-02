@@ -23,6 +23,13 @@ test.describe('Rainbow Snake surprise', () => {
   })
 
   test('?rainbow=0 never shows the banner', async ({ page }) => {
+    // "The banner never appears" is trivially true on a build with no rainbow
+    // feature, so prove the forced-on path works first.
+    await page.goto('/?rainbow=1')
+    await expect(page.locator(SCREENS.menu)).toBeVisible()
+    await page.locator('#new-game').click()
+    await expect(page.locator('#rainbow-banner')).toBeVisible()
+
     await page.goto('/?rainbow=0')
     await expect(page.locator(SCREENS.menu)).toBeVisible()
 
@@ -68,13 +75,21 @@ async function saveLeaderboardEntry(page: Page, name: string): Promise<void> {
 
 test.describe('Rainbow Snake hidden leaderboard', () => {
   test('the Rainbow board tab stays hidden until a rainbow score exists', async ({ page }) => {
+    // The hidden-tab assertion is trivially true on a build with leaderboards
+    // but no rainbow feature, so prove the feature exists first. Abandoning the
+    // run without entering a name saves no score, so the board stays empty.
+    await page.goto('/?rainbow=1')
+    await expect(page.locator(SCREENS.menu)).toBeVisible()
+    await page.locator('#new-game').click()
+    await expect(page.locator('#rainbow-banner')).toBeVisible()
+
     await page.goto('/')
     await expect(page.locator(SCREENS.menu)).toBeVisible()
 
     await page.locator('#open-leaderboards').click()
     await expect(page.locator(SCREENS.leaderboards)).toBeVisible()
 
-    // Fresh context: no rainbow score yet, so the secret tab is not present.
+    // No rainbow score yet, so the secret tab is not present.
     await expect(page.locator(RAINBOW_TAB)).toBeHidden()
     await expect(page.locator(SINGLE_TAB)).toBeVisible()
   })
