@@ -14,6 +14,7 @@ import {
 import type { LeaderboardEntry, LeaderboardMode, GameResult } from './leaderboard'
 import { MenuDemo } from './menu-demo'
 import { generateIronSnakeBoard, growIronSnakeBoard, ironSnakeGridSizeForArea } from './iron-snake'
+import { FOOD_GLYPH, getPalette, isColorBlindMode, setColorBlindMode, type Faces } from './palette'
 
 type GameMode = 'single' | 'pvp' | 'bvb'
 
@@ -47,20 +48,11 @@ const LEVEL_MORPH_MIN_STEP_MS = 130 // step-hold floor so fast late levels still
 const STARVATION_FLOOR = 100 // never starve in fewer than this many moves
 const STARVATION_AREA_FACTOR = 2 // moves-without-food budget per playable cell
 const STARVATION_WARN_FRACTION = 0.6 // hunger tint begins at this fraction of the limit
-// Warning palette the snake blends toward as it starves (top / right / left faces).
-const HUNGER_HEAD_COLORS: [string, string, string] = ['#f59e0b', '#d97706', '#b45309']
-const HUNGER_BODY_COLORS: [string, string, string] = ['#ef4444', '#dc2626', '#b91c1c']
+// The snake blends toward `hungerHead` / `hungerBody` from the active palette
+// as it starves (see src/palette.ts for the per-palette warning colours).
 // Cumulative point goal to clear a level: 5, 15, 30, 50, 75, ... Each level
 // requires more points than the last (deltas 5, 10, 15, 20, ...).
 const ironSnakeGoalForLevel = (level: number): number => (5 * level * (level + 1)) / 2
-// Iron Snake "final stretch" fruit colours. The fruit is recoloured for the
-// last three fruits of a level (remaining 3 -> 2 -> 1), flashing near-white on
-// the final fruit so the level ending is unmistakable.
-const IRON_SNAKE_FINAL_FRUIT_COLORS: Record<number, [string, string, string]> = {
-  3: ['#8b5cf6', '#7c3aed', '#6d28d9'], // violet
-  2: ['#ec4899', '#db2777', '#be185d'], // magenta
-  1: ['#f8fafc', '#e2e8f0', '#cbd5e1'], // white flash (final fruit)
-}
 
 // Rainbow Snake surprise (JOE-7): on a rare game the P1 snake renders as an
 // animated rainbow and a Mortal Kombat "FRIENDSHIP!"-style banner flashes.
@@ -97,12 +89,14 @@ const POWERUP_SHRINK_AMOUNT = 4 // tail segments removed by a Shrink pickup (nev
 const POWERUP_DOUBLE_MULTIPLIER = 2 // points per food while Double Points is active
 const POWERUP_TOAST_MS = 1400 // pickup toast hold before it auto-hides
 
-// Per-type presentation: HUD/toast label + icon, and the three isometric block
-// faces (top / right / left) used to render the collectible.
-const POWERUP_META: Record<PowerUpType, { label: string; icon: string; faces: [string, string, string] }> = {
-  double: { label: 'Double Points', icon: '★', faces: ['#fde047', '#facc15', '#ca8a04'] }, // gold
-  slow: { label: 'Slow-Mo', icon: '⏱', faces: ['#67e8f9', '#22d3ee', '#0e7490'] }, // cyan
-  shrink: { label: 'Shrink', icon: '✂', faces: ['#d8b4fe', '#a855f7', '#7e22ce'] }, // violet
+// Per-type presentation: the HUD/toast label and icon. The collectible's block
+// colours live in the active palette (src/palette.ts) so they can be swapped
+// for colour-blind mode; the icon is reused there as the shape cue stamped on
+// the collectible itself, so the same symbol means the same thing everywhere.
+const POWERUP_META: Record<PowerUpType, { label: string; icon: string }> = {
+  double: { label: 'Double Points', icon: '★' },
+  slow: { label: 'Slow-Mo', icon: '⏱' },
+  shrink: { label: 'Shrink', icon: '✂' },
 }
 
 // ?powerup=double|slow|shrink forces that type to spawn (deterministic testing /
@@ -164,6 +158,12 @@ class SnakeGame {
   // null means the classic full rectangle. `boardArea` is the playable-cell
   // count (capacity metric); `levelGoal` is the cumulative score to advance.
   private ironSnakeMode: boolean = false
+  // Colour Blind Mode: swaps in a colour-blind-safe palette and stamps shape
+  // cues on collectibles. Purely presentational — it changes no game rules — so
+  // unlike ironSnakeMode it can be toggled mid-game and is read at draw time
+  // rather than latched at game start. The authoritative state lives in
+  // src/palette.ts (both canvases read it); this field mirrors the checkbox.
+  private colorBlindMode: boolean = false
   private boardMask: Uint8Array | null = null
   private boardArea: number = 100
   private levelGoal: number = 0
@@ -579,6 +579,52 @@ class SnakeGame {
     this.drawPrism(c, bh, topColor, rightColor, leftColor)
   }
 
+  // Stamp a glyph flat on the top face of a block, used in colour-blind mode to
+  // give collectibles a shape cue (food and all three power-up types otherwise
+  // render as the same cube at the same height, distinguished only by colour).
+  // No-op in the default palette so the normal look is untouched.
+  //
+  // The glyph is drawn upright rather than projected into the isometric plane:
+  // the board rotates continuously, and a skewed glyph spinning with it is far
+  // harder to read than a stationary one sitting on the tile.
+  private drawTopGlyph(gx: number, gy: number, glyph: string) {
+    if (!isColorBlindMode()) return
+
+    const inset = 0.05
+    const bh = this.getBlockHeight(gx, gy)
+    const c = [
+      this.toIso(gx + inset, gy + inset),
+      this.toIso(gx + 1 - inset, gy + inset),
+      this.toIso(gx + 1 - inset, gy + 1 - inset),
+      this.toIso(gx + inset, gy + 1 - inset)
+    ]
+
+    // Centre of the raised top face.
+    const cx = (c[0].x + c[1].x + c[2].x + c[3].x) / 4
+    const cy = (c[0].y + c[1].y + c[2].y + c[3].y) / 4 - bh
+
+    // Size off the tile's on-screen diagonal so the glyph tracks zoom, grid
+    // size, and perspective. Skip it on tiny tiles, where it would be illegible
+    // mush that only obscures the block.
+    const diag = Math.hypot(c[2].x - c[0].x, c[2].y - c[0].y)
+    const size = diag * 0.45
+    if (size < 7) return
+
+    const ctx = this.ctx
+    ctx.save()
+    ctx.font = `${size}px system-ui, sans-serif`
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    // Dark glyph with a light halo: the palette's top faces are all light, but
+    // the halo keeps the symbol legible if a glyph ever lands on a dark one.
+    ctx.lineWidth = Math.max(2, size * 0.18)
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)'
+    ctx.strokeText(glyph, cx, cy)
+    ctx.fillStyle = '#0f172a'
+    ctx.fillText(glyph, cx, cy)
+    ctx.restore()
+  }
+
   // Draw an extruded prism from 4 clockwise ground corners (already projected to
   // iso screen space) raised by `bh`: back side faces first, then front side
   // faces (so they paint over), then the top. Shared by drawBlock and the
@@ -860,39 +906,43 @@ class SnakeGame {
     // nears starvation, so the impending death is legible rather than abrupt.
     const f1 = this.hungerFactor(this.movesSinceFood1)
     const f2 = this.isTwoSnakeMode() ? this.hungerFactor(this.movesSinceFood2) : 0
-    const tint = (base: [string, string, string], warn: [string, string, string], f: number): [string, string, string] =>
+    const pal = getPalette()
+    const tint = (base: Faces, warn: Faces, f: number): Faces =>
       f <= 0 ? base : [this.lerpHex(base[0], warn[0], f), this.lerpHex(base[1], warn[1], f), this.lerpHex(base[2], warn[2], f)]
 
-    const head1 = tint(['#4ade80', '#22c55e', '#16a34a'], HUNGER_HEAD_COLORS, f1)
-    const body1 = tint(['#22c55e', '#16a34a', '#15803d'], HUNGER_BODY_COLORS, f1)
+    const head1 = tint(pal.p1Head, pal.hungerHead, f1)
+    const body1 = tint(pal.p1Body, pal.hungerBody, f1)
 
     // Rainbow Snake surprise: colour each P1 segment by a hue that runs along the
     // body and scrolls over time (animated by the existing per-frame redraw).
     // Supersedes the P1 hunger tint; the starvation text banner still warns.
-    const rainbowPhase = this.rainbowSnake ? (performance.now() / 1000) * RAINBOW_HUE_SWEEP_DEG_PER_SEC : 0
-    const p1Faces = (obj: { seg?: number; segLen?: number }): [string, string, string] =>
+    // Suppressed in colour-blind mode: a hue sweep carries no information
+    // without full colour vision, and it would erase the P1/P2 distinction the
+    // mode exists to guarantee.
+    const rainbow = this.rainbowSnake && !isColorBlindMode()
+    const rainbowPhase = rainbow ? (performance.now() / 1000) * RAINBOW_HUE_SWEEP_DEG_PER_SEC : 0
+    const p1Faces = (obj: { seg?: number; segLen?: number }): Faces =>
       this.rainbowFaces(obj.seg ?? 0, obj.segLen ?? 1, rainbowPhase)
-    const head2 = tint(['#60a5fa', '#3b82f6', '#2563eb'], HUNGER_HEAD_COLORS, f2)
-    const body2 = tint(['#3b82f6', '#2563eb', '#1d4ed8'], HUNGER_BODY_COLORS, f2)
+    const head2 = tint(pal.p2Head, pal.hungerHead, f2)
+    const body2 = tint(pal.p2Body, pal.hungerBody, f2)
 
     // Iron Snake final-stretch cue: recolour the fruit for the last three fruits.
     const remainingFruit = this.ironSnakeRemaining()
-    const foodColors: [string, string, string] =
-      IRON_SNAKE_FINAL_FRUIT_COLORS[remainingFruit] ?? ['#ef4444', '#dc2626', '#b91c1c']
+    const foodColors: Faces = pal.finalFruit[remainingFruit] ?? pal.food
 
     // Draw blocks
     for (const obj of objects) {
       switch (obj.type) {
         case 'head':
-          this.drawSnakeHead(obj.x, obj.y, this.rainbowSnake ? p1Faces(obj) : head1, this.direction)
+          this.drawSnakeHead(obj.x, obj.y, rainbow ? p1Faces(obj) : head1, this.direction)
           break
         case 'body': {
-          const c = this.rainbowSnake ? p1Faces(obj) : body1
+          const c = rainbow ? p1Faces(obj) : body1
           this.drawBlock(obj.x, obj.y, c[0], c[1], c[2])
           break
         }
         case 'tail':
-          this.drawSnakeTail(obj.x, obj.y, this.rainbowSnake ? p1Faces(obj) : body1, this.tailDirection(this.snake))
+          this.drawSnakeTail(obj.x, obj.y, rainbow ? p1Faces(obj) : body1, this.tailDirection(this.snake))
           break
         case 'head2':
           this.drawSnakeHead(obj.x, obj.y, head2, this.direction2)
@@ -905,9 +955,14 @@ class SnakeGame {
           break
         case 'food':
           this.drawBlock(obj.x, obj.y, foodColors[0], foodColors[1], foodColors[2])
+          // Shape cue: food and a power-up are the same cube at the same
+          // height, so without colour vision they are indistinguishable. Stamp
+          // a glyph on the top face so each collectible is identifiable by
+          // shape alone.
+          this.drawTopGlyph(obj.x, obj.y, FOOD_GLYPH)
           break
         case 'powerup': {
-          const f = POWERUP_META[obj.pu!].faces
+          const f = pal.powerUp[obj.pu!]
           // Tick-paced expiry blink: dim toward the board colour on alternate
           // ticks once its lifetime is nearly up, so a fading power-up reads as
           // "about to vanish" rather than disappearing without warning.
@@ -917,10 +972,12 @@ class SnakeGame {
           } else {
             this.drawBlock(obj.x, obj.y, f[0], f[1], f[2])
           }
+          // Same icon the HUD, toast, and controls legend use for this type.
+          if (!blinking) this.drawTopGlyph(obj.x, obj.y, POWERUP_META[obj.pu!].icon)
           break
         }
         case 'death':
-          this.drawBlock(obj.x, obj.y, '#facc15', '#eab308', '#a16207')
+          this.drawBlock(obj.x, obj.y, pal.death[0], pal.death[1], pal.death[2])
           break
       }
     }
@@ -931,7 +988,7 @@ class SnakeGame {
     if (this.awaitingDeathAck) {
       for (const dc of this.deathCells) {
         const offGrid = dc.x < 0 || dc.x >= this.gridSize || dc.y < 0 || dc.y >= this.gridSize
-        if (offGrid) this.drawBlock(dc.x, dc.y, '#facc15', '#eab308', '#a16207')
+        if (offGrid) this.drawBlock(dc.x, dc.y, pal.death[0], pal.death[1], pal.death[2])
       }
     }
   }
@@ -945,6 +1002,12 @@ class SnakeGame {
     if (ironSnakeToggle) {
       ironSnakeToggle.addEventListener('change', () => {
         this.ironSnakeMode = ironSnakeToggle.checked
+      })
+    }
+    const colorBlindToggle = document.getElementById('color-blind-toggle') as HTMLInputElement | null
+    if (colorBlindToggle) {
+      colorBlindToggle.addEventListener('change', () => {
+        this.setColorBlind(colorBlindToggle.checked)
       })
     }
     document.getElementById('new-game')!.addEventListener('click', () => this.startNewGame('single'))
@@ -1373,7 +1436,13 @@ class SnakeGame {
 
     // Roll the rare Rainbow Snake surprise (JOE-7) once per game; it holds for
     // the whole run. rainbowOverride (from ?rainbow=…) wins so tests are stable.
-    this.rainbowSnake = this.rainbowOverride ?? (Math.random() < RAINBOW_CHANCE)
+    // Colour Blind Mode suppresses the roll outright rather than just skipping
+    // the rainbow rendering: the flag also drives the "Rainbow Snake" banner and
+    // routes the score to the hidden rainbow leaderboard, so merely hiding the
+    // colours would announce a surprise the player can never see.
+    this.rainbowSnake = this.colorBlindMode
+      ? false
+      : this.rainbowOverride ?? (Math.random() < RAINBOW_CHANCE)
 
     // Iron Snake Mode uses a larger bounding box (so shapes have room) and carves
     // an irregular mask; classic mode keeps the full rectangle (mask = null).
@@ -2574,6 +2643,17 @@ class SnakeGame {
 
     this.updateStarvationWarning()
     this.updatePowerUpUI()
+  }
+
+  // Enable/disable Colour Blind Mode. Pushes the palette switch into
+  // src/palette.ts (which both canvases read every frame, and which also sets
+  // the `color-blind` body class so the DOM restyles to match), then shows the
+  // shape-cue legend so the glyphs now stamped on collectibles are explained
+  // rather than left as mystery symbols.
+  private setColorBlind(enabled: boolean) {
+    this.colorBlindMode = enabled
+    setColorBlindMode(enabled)
+    document.getElementById('color-blind-legend')!.classList.toggle('hidden', !enabled)
   }
 
   // HUD badge for the active timed power-up(s): icon, label, and ticks remaining

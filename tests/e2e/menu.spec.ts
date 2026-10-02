@@ -9,6 +9,7 @@ test.describe('Main menu', () => {
     // localStorage is empty in a fresh browser context, so the high score is 0.
     await expect(page.locator('#high-score')).toHaveText('0')
     await expect(page.locator('#iron-snake-toggle')).not.toBeChecked()
+    await expect(page.locator('#color-blind-toggle')).not.toBeChecked()
   })
 
   // Asserting the buttons are merely *visible* is not evidence they work: the

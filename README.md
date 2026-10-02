@@ -13,6 +13,7 @@ A classic snake game reimagined with an isometric, rotating 3D board — built w
 - **Board rotation** - spin the board manually with `Q`/`E`, tweak perspective with `[`/`]`, or let it auto-rotate during bot playback
 - **Expanding grid** - the grid doubles in size when the snake fills 25% of the board, advancing the level and increasing speed
 - **Iron Snake Mode** - an opt-in mode (toggle it on the start menu) that swaps the square grid for irregular, randomly-carved board shapes with interior holes to navigate around; each level sets a cumulative score goal, and clearing it morphs the board into a fresh shape while your snake stays in place
+- **Color blind mode** - an opt-in mode (toggle it on the start menu) that replaces the default green-snake/red-apple palette — the pair lost under red-green color blindness — with a blue/orange one separated by brightness as well as hue, and stamps shape glyphs (`◆` food, `★`/`⏱`/`✂` power-ups) on collectibles so they can be told apart with no color vision at all
 - **Adjustable starting grid** - use `+`/`-` keys to change grid resolution (5x5 to 50x50) before the game starts
 - **Three game modes** - single player, two-player (PvP), and bot-vs-bot
 - **11 autoplay bots** - each with a distinct strategy; pick one for solo bot demos or pit two against each other
@@ -28,7 +29,7 @@ A classic snake game reimagined with an isometric, rotating 3D board — built w
 - **Solo Bot** - watch a single bot of your choice play
 - **Bot vs Bot** - pick two bots and watch them compete
 
-Toggle **Iron Snake Mode** on the start menu to layer irregular, hole-filled boards and per-level score goals on top of your chosen mode.
+Toggle **Iron Snake Mode** on the start menu to layer irregular, hole-filled boards and per-level score goals on top of your chosen mode. **Color Blind Mode** toggles alongside it and applies to every mode.
 
 ## Bots
 
@@ -64,7 +65,6 @@ Toggle **Iron Snake Mode** on the start menu to layer irregular, hole-filled boa
 In single player, the game begins when you press a direction key after starting a new game.
 
 ## Coming soon
-- Color blind mode
 - Global/online leaderboards to view other players' high scores
 - First-person view from the snake
 - Possible rename to "snek"

@@ -402,7 +402,7 @@ button:active {
   font-size: 1.05em;
 }
 
-.iron-snake-toggle {
+.menu-toggle {
   display: flex;
   align-items: center;
   gap: 0.5em;
@@ -413,8 +413,55 @@ button:active {
   user-select: none;
 }
 
-.iron-snake-toggle input {
+.menu-toggle input {
   cursor: pointer;
+}
+
+/* Colour Blind Mode.
+
+   The canvas palette lives in src/palette.ts (canvas 2D can't read CSS custom
+   properties), so these rules cover only the DOM half: the handful of colours
+   that encode gameplay meaning rather than decoration. Everything else in this
+   stylesheet is chrome whose hue carries no information, so it is left alone
+   deliberately — this is not a full theme, it's the accessible re-encoding of
+   the signals a player actually has to tell apart.
+
+   Values track src/palette.ts; keep the two in sync. */
+body.color-blind .p1-color {
+  color: #56b4e9; /* P1 blue */
+}
+
+body.color-blind .p2-color {
+  color: #e2e8f0; /* P2 near-white */
+}
+
+body.color-blind .powerup-status[data-type="double"],
+body.color-blind .powerup-toast[data-type="double"] { --powerup-accent: #f0e442; } /* yellow */
+body.color-blind .powerup-status[data-type="slow"],
+body.color-blind .powerup-toast[data-type="slow"] { --powerup-accent: #cc79a7; } /* reddish purple */
+body.color-blind .powerup-status[data-type="shrink"],
+body.color-blind .powerup-toast[data-type="shrink"] { --powerup-accent: #45c49c; } /* bluish green */
+
+/* Explains the glyphs stamped on collectibles while Colour Blind Mode is on,
+   so the symbols aren't left for the player to decode. Shown only in that
+   mode; the controls line already names the power-ups the rest of the time. */
+.color-blind-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.25rem 1rem;
+  margin-top: 0.6rem;
+  font-size: 0.9em;
+  color: #cbd5e1;
+}
+
+.color-blind-legend span {
+  white-space: nowrap;
+}
+
+/* `.hidden` must still win over the legend's flex display. */
+.color-blind-legend.hidden {
+  display: none;
 }
 
 .menu-buttons button#new-game {
